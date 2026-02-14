@@ -1,10 +1,18 @@
 import { MapPin, Mail, Phone, Linkedin, Globe } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../../store/useCVStore';
 import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function AcademicCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+
+  const getHref = (icon: LucideIcon, value: string): string | null => {
+    if (icon === Mail) return `mailto:${value}`;
+    if (icon === Phone) return `tel:${value}`;
+    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    return null;
+  };
 
   const contactItems = [
     { icon: Mail, value: personalInfo.email },
@@ -21,6 +29,8 @@ export function AcademicCoverLetter() {
         fontFamily,
         zoom,
         lineHeight,
+        minHeight: `${effectiveA4Height}px`,
+        ['--a4-break-height' as string]: `${effectiveA4Height}px`,
         paddingLeft: margin,
         paddingRight: margin,
         paddingTop: '40px',
@@ -30,7 +40,7 @@ export function AcademicCoverLetter() {
       {/* Header */}
       <div className="text-center mb-4">
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
         <h1 className="text-[22px] font-bold" style={{ color: primaryColor }}>
           {personalInfo.fullName}
@@ -39,12 +49,20 @@ export function AcademicCoverLetter() {
           <p className="text-[11px] text-gray-500 mt-0.5 italic">{personalInfo.jobTitle}</p>
         )}
         <div className="flex items-center justify-center gap-3 mt-2 flex-wrap">
-          {contactItems.map((item, i) => (
-            <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
-              <item.icon size={9} />
-              {item.value}
-            </span>
-          ))}
+          {contactItems.map((item, i) => {
+            const href = getHref(item.icon, item.value!);
+            return href ? (
+              <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-500 hover:underline">
+                <item.icon size={9} />
+                {item.value}
+              </a>
+            ) : (
+              <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
+                <item.icon size={9} />
+                {item.value}
+              </span>
+            );
+          })}
         </div>
       </div>
 

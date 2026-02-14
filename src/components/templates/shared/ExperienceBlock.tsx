@@ -20,7 +20,7 @@ export function ExperienceBlock({ entries }: ExperienceBlockProps) {
           {entry.bullets.length > 0 && (
             <ul className="mt-1 space-y-0.5">
               {entry.bullets.filter(b => b).map((bullet, i) => (
-                <li key={i} className="text-[10.5px] text-gray-700 flex">
+                <li key={`${bullet}-${i}`} className="text-[10.5px] text-gray-700 flex">
                   <span className="mr-1.5 shrink-0">•</span>
                   <span>{bullet}</span>
                 </li>

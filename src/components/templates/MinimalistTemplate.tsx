@@ -10,7 +10,7 @@ const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
 };
 
 export function MinimalistTemplate() {
-  const { fontFamily, zoom, lineHeight, margin, sectionGap, titleTransform, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, titleTransform, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
   const {
     personalInfo,
     summary,
@@ -94,7 +94,7 @@ export function MinimalistTemplate() {
                     {p.name}
                   </h3>
                   <div className="text-[9.5px] text-gray-400">
-                    {p.link && <span>{p.link}</span>}
+                    {p.link && <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{p.link}</a>}
                     {p.date && <span> · {p.date}</span>}
                   </div>
                   <BulletList bullets={p.bullets} />
@@ -235,6 +235,8 @@ export function MinimalistTemplate() {
         fontFamily,
         zoom,
         lineHeight,
+        minHeight: `${effectiveA4Height}px`,
+        ['--a4-break-height' as string]: `${effectiveA4Height}px`,
         paddingLeft: margin,
         paddingRight: margin,
         paddingTop: '50px',
@@ -244,7 +246,7 @@ export function MinimalistTemplate() {
       {/* Header */}
       <div className="text-center mb-6">
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
         <h1 className="text-[24px] font-normal tracking-[0.15em] text-gray-800 uppercase">
           {personalInfo.fullName}
@@ -254,10 +256,10 @@ export function MinimalistTemplate() {
         )}
         <div className="flex items-center justify-center gap-3 mt-2 text-[9.5px] text-gray-400">
           {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.email && <><span>·</span><span>{personalInfo.email}</span></>}
-          {personalInfo.phone && <><span>·</span><span>{personalInfo.phone}</span></>}
-          {personalInfo.linkedin && <><span>·</span><span>{personalInfo.linkedin}</span></>}
-          {personalInfo.website && <><span>·</span><span>{personalInfo.website}</span></>}
+          {personalInfo.email && <><span>·</span><a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.email}</a></>}
+          {personalInfo.phone && <><span>·</span><a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.phone}</a></>}
+          {personalInfo.linkedin && <><span>·</span><a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.linkedin}</a></>}
+          {personalInfo.website && <><span>·</span><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.website}</a></>}
           {personalInfo.nationality && <><span>·</span><span>{personalInfo.nationality}</span></>}
           {personalInfo.drivingLicense && <><span>·</span><span>License: {personalInfo.drivingLicense}</span></>}
         </div>

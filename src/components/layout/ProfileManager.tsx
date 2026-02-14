@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Copy, Trash2, Pencil } from 'lucide-react';
 import { Dialog } from '../ui/Dialog';
 import { Button } from '../ui/Button';
@@ -12,13 +13,14 @@ interface ProfileManagerProps {
 }
 
 export function ProfileManager({ open, onClose }: ProfileManagerProps) {
+  const { t } = useTranslation();
   const { profiles, activeProfileId, createProfile, deleteProfile, renameProfile, switchProfile, duplicateProfile } = useProfileStore();
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 
   const handleCreate = () => {
-    const name = newName.trim() || `Profile ${profiles.length + 1}`;
+    const name = newName.trim() || t('profileManager.defaultName', { n: profiles.length + 1 });
     createProfile(name);
     setNewName('');
     // Sync facade stores
@@ -40,7 +42,7 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
 
   const handleDelete = (id: string) => {
     if (profiles.length <= 1) return;
-    if (!confirm('Delete this profile?')) return;
+    if (!confirm(t('profileManager.deleteConfirm'))) return;
     deleteProfile(id);
     useCVStore.getState()._syncFromProfile();
     useAppStore.getState()._syncFromProfile();
@@ -54,7 +56,7 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} title="Manage Profiles">
+    <Dialog open={open} onClose={onClose} title={t('profileManager.title')}>
       <div className="space-y-3">
         {/* Create new */}
         <div className="flex gap-2">
@@ -62,13 +64,13 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="New profile name..."
+            placeholder={t('profileManager.newProfilePlaceholder')}
             className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
           <Button variant="primary" size="sm" onClick={handleCreate}>
             <Plus size={14} />
-            Create
+            {t('profileManager.create')}
           </Button>
         </div>
 
@@ -101,7 +103,7 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
                   <>
                     <p className="text-sm font-medium text-gray-900 truncate">{p.name}</p>
                     <p className="text-[10px] text-gray-400">
-                      Updated {new Date(p.updatedAt).toLocaleDateString()}
+                      {t('profileManager.updated', { date: new Date(p.updatedAt).toLocaleDateString() })}
                     </p>
                   </>
                 )}
@@ -110,14 +112,14 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
                 <button
                   onClick={() => { setEditingId(p.id); setEditName(p.name); }}
                   className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
-                  title="Rename"
+                  title={t('profileManager.rename')}
                 >
                   <Pencil size={13} />
                 </button>
                 <button
                   onClick={() => handleDuplicate(p.id)}
                   className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
-                  title="Duplicate"
+                  title={t('profileManager.duplicate')}
                 >
                   <Copy size={13} />
                 </button>
@@ -125,7 +127,7 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
                   <button
                     onClick={() => handleDelete(p.id)}
                     className="p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50"
-                    title="Delete"
+                    title={t('profileManager.delete')}
                   >
                     <Trash2 size={13} />
                   </button>

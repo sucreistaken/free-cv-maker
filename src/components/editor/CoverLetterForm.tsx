@@ -1,71 +1,73 @@
+import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { FormField } from './shared/FormField';
 
 export function CoverLetterForm() {
+  const { t } = useTranslation();
   const { coverLetterData, updateCoverLetter } = useCVStore();
 
   return (
     <div className="p-4 space-y-3">
-      <h2 className="text-sm font-semibold text-gray-800 mb-2">Cover Letter</h2>
+      <h2 className="text-sm font-semibold text-gray-800 mb-2">{t('coverLetterForm.title')}</h2>
 
       <FormField
-        label="Recipient Name"
+        label={t('coverLetterForm.recipientName')}
         value={coverLetterData.recipientName}
         onChange={(v) => updateCoverLetter('recipientName', v)}
-        placeholder="e.g. John Smith"
+        placeholder={t('coverLetterForm.recipientNamePlaceholder')}
       />
       <FormField
-        label="Recipient Title"
+        label={t('coverLetterForm.recipientTitle')}
         value={coverLetterData.recipientTitle}
         onChange={(v) => updateCoverLetter('recipientTitle', v)}
-        placeholder="e.g. Hiring Manager"
+        placeholder={t('coverLetterForm.recipientTitlePlaceholder')}
       />
       <FormField
-        label="Company"
+        label={t('coverLetterForm.company')}
         value={coverLetterData.company}
         onChange={(v) => updateCoverLetter('company', v)}
-        placeholder="e.g. Acme Inc."
+        placeholder={t('coverLetterForm.companyPlaceholder')}
       />
       <FormField
-        label="Address"
+        label={t('coverLetterForm.address')}
         value={coverLetterData.address}
         onChange={(v) => updateCoverLetter('address', v)}
-        placeholder="e.g. 123 Main St, City"
+        placeholder={t('coverLetterForm.addressPlaceholder')}
       />
       <FormField
-        label="Date"
+        label={t('coverLetterForm.date')}
         value={coverLetterData.date}
         onChange={(v) => updateCoverLetter('date', v)}
       />
       <FormField
-        label="Greeting"
+        label={t('coverLetterForm.greeting')}
         value={coverLetterData.greeting}
         onChange={(v) => updateCoverLetter('greeting', v)}
-        placeholder="Dear Hiring Manager,"
+        placeholder={t('coverLetterForm.greetingPlaceholder')}
       />
 
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Body</label>
+        <label className="block text-xs font-medium text-gray-600 mb-1">{t('coverLetterForm.body')}</label>
         <textarea
           value={coverLetterData.body}
           onChange={(e) => updateCoverLetter('body', e.target.value)}
-          placeholder="Write your cover letter content here..."
+          placeholder={t('coverLetterForm.bodyPlaceholder')}
           rows={10}
           className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-y"
         />
       </div>
 
       <FormField
-        label="Closing"
+        label={t('coverLetterForm.closing')}
         value={coverLetterData.closing}
         onChange={(v) => updateCoverLetter('closing', v)}
-        placeholder="Sincerely,"
+        placeholder={t('coverLetterForm.closingPlaceholder')}
       />
       <FormField
-        label="Signature (Name)"
+        label={t('coverLetterForm.signature')}
         value={coverLetterData.signature}
         onChange={(v) => updateCoverLetter('signature', v)}
-        placeholder="Your full name"
+        placeholder={t('coverLetterForm.signaturePlaceholder')}
       />
     </div>
   );

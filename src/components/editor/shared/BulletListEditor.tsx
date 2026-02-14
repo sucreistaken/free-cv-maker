@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Plus, X } from 'lucide-react';
 
 interface BulletListEditorProps {
@@ -6,6 +7,8 @@ interface BulletListEditorProps {
 }
 
 export function BulletListEditor({ bullets, onChange }: BulletListEditorProps) {
+  const { t } = useTranslation();
+
   const updateBullet = (index: number, value: string) => {
     const updated = [...bullets];
     updated[index] = value;
@@ -21,7 +24,7 @@ export function BulletListEditor({ bullets, onChange }: BulletListEditorProps) {
 
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-gray-600">Bullet Points</label>
+      <label className="block text-xs font-medium text-gray-600">{t('experienceForm.bullets')}</label>
       {bullets.map((bullet, index) => (
         <div key={index} className="flex gap-1.5">
           <span className="text-gray-400 mt-2 text-sm">•</span>
@@ -47,7 +50,7 @@ export function BulletListEditor({ bullets, onChange }: BulletListEditorProps) {
         className="flex items-center gap-1 text-xs text-primary hover:text-primary-dark font-medium mt-1"
       >
         <Plus size={14} />
-        Add bullet
+        {t('experienceForm.addBullet')}
       </button>
     </div>
   );

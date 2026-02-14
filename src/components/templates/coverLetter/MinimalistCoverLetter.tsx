@@ -3,7 +3,7 @@ import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function MinimalistCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   return (
     <div
@@ -12,6 +12,8 @@ export function MinimalistCoverLetter() {
         fontFamily,
         zoom,
         lineHeight,
+        minHeight: `${effectiveA4Height}px`,
+        ['--a4-break-height' as string]: `${effectiveA4Height}px`,
         paddingLeft: margin,
         paddingRight: margin,
         paddingTop: '50px',
@@ -21,7 +23,7 @@ export function MinimalistCoverLetter() {
       {/* Header */}
       <div className="text-center mb-6">
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
         <h1 className="text-[24px] font-normal tracking-[0.15em] text-gray-800 uppercase">
           {personalInfo.fullName}
@@ -30,8 +32,8 @@ export function MinimalistCoverLetter() {
           <p className="text-[11px] text-gray-500 tracking-wide mt-1">{personalInfo.jobTitle}</p>
         )}
         <div className="flex items-center justify-center gap-3 mt-2 text-[9.5px] text-gray-400">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <><span>·</span><span>{personalInfo.phone}</span></>}
+          {personalInfo.email && <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.email}</a>}
+          {personalInfo.phone && <><span>·</span><a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.phone}</a></>}
           {personalInfo.location && <><span>·</span><span>{personalInfo.location}</span></>}
         </div>
       </div>

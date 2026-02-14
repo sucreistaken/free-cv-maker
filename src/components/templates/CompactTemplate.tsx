@@ -70,7 +70,7 @@ export function CompactTemplate() {
                 <div key={p.id}>
                   <div className="flex items-baseline gap-1">
                     <span className="text-[9.5px] font-bold text-gray-800">{p.name}</span>
-                    {p.link && <span className="text-[8px] text-gray-400">({p.link})</span>}
+                    {p.link && <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`} target="_blank" rel="noopener noreferrer" className="text-[8px] text-gray-400 hover:underline">({p.link})</a>}
                     {p.date && <span className="text-[8px] text-gray-400 ml-auto shrink-0">{p.date}</span>}
                   </div>
                   <ul className="mt-0.5">
@@ -197,15 +197,15 @@ export function CompactTemplate() {
     }
   };
 
-  const contactParts = [
-    personalInfo.location,
-    personalInfo.email,
-    personalInfo.phone,
-    personalInfo.linkedin,
-    personalInfo.website,
-    personalInfo.nationality,
-    personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '',
-  ].filter(Boolean);
+  const contactParts: { value: string; href: string | null }[] = [
+    { value: personalInfo.location || '', href: null },
+    { value: personalInfo.email || '', href: personalInfo.email ? `mailto:${personalInfo.email}` : null },
+    { value: personalInfo.phone || '', href: personalInfo.phone ? `tel:${personalInfo.phone}` : null },
+    { value: personalInfo.linkedin || '', href: personalInfo.linkedin ? (personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`) : null },
+    { value: personalInfo.website || '', href: personalInfo.website ? (personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`) : null },
+    { value: personalInfo.nationality || '', href: null },
+    { value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '', href: null },
+  ].filter((p) => p.value);
 
   return (
     <div
@@ -227,7 +227,16 @@ export function CompactTemplate() {
           <p className="text-[9.5px] text-gray-600">{personalInfo.jobTitle}</p>
         )}
         <p className="text-[8.5px] text-gray-400 mt-0.5">
-          {contactParts.join(' | ')}
+          {contactParts.map((part, i) => (
+            <span key={i}>
+              {i > 0 && ' | '}
+              {part.href ? (
+                <a href={part.href} target="_blank" rel="noopener noreferrer" className="hover:underline">{part.value}</a>
+              ) : (
+                part.value
+              )}
+            </span>
+          ))}
         </p>
       </div>
 

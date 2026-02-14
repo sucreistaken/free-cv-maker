@@ -1,4 +1,5 @@
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
@@ -15,12 +16,19 @@ export function AcademicTemplate() {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'education', 'languages']);
   const mainSections = visibleSections.filter((s) => !sidebarTypes.has(s.type) && s.type !== 'personalInfo');
   const sidebarSections = visibleSections.filter((s) => sidebarTypes.has(s.type) && s.type !== 'personalInfo');
+
+  const getHref = (icon: LucideIcon, value: string): string | null => {
+    if (icon === Mail) return `mailto:${value}`;
+    if (icon === Phone) return `tel:${value}`;
+    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    return null;
+  };
 
   const contactItems = [
     { icon: MapPin, value: personalInfo.location },
@@ -133,7 +141,7 @@ export function AcademicTemplate() {
                 <div key={p.id}>
                   <h3 className="text-[11px] font-bold text-gray-800">{p.name}</h3>
                   <div className="text-[9px] text-gray-400">
-                    {p.link && <span>{p.link}</span>}
+                    {p.link && <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{p.link}</a>}
                     {p.date && <span> · {p.date}</span>}
                   </div>
                   <BulletList bullets={p.bullets} />
@@ -221,11 +229,11 @@ export function AcademicTemplate() {
   };
 
   return (
-    <div className="a4-page" style={{ fontFamily, zoom, lineHeight, paddingLeft: margin, paddingRight: margin, paddingTop: '40px', paddingBottom: '40px' }}>
+    <div className="a4-page" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px`, paddingLeft: margin, paddingRight: margin, paddingTop: '40px', paddingBottom: '40px' }}>
       {/* Header */}
       <div className="text-center mb-4">
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
         <h1 className="text-[22px] font-bold" style={{ color: primaryColor }}>
           {personalInfo.fullName}
@@ -234,12 +242,20 @@ export function AcademicTemplate() {
           <p className="text-[11px] text-gray-500 mt-0.5 italic">{personalInfo.jobTitle}</p>
         )}
         <div className="flex items-center justify-center gap-3 mt-2 flex-wrap">
-          {contactItems.map((item, i) => (
-            <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
-              <item.icon size={9} />
-              {item.value}
-            </span>
-          ))}
+          {contactItems.map((item, i) => {
+            const href = getHref(item.icon, item.value!);
+            return href ? (
+              <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-500 hover:underline">
+                <item.icon size={9} />
+                {item.value}
+              </a>
+            ) : (
+              <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
+                <item.icon size={9} />
+                {item.value}
+              </span>
+            );
+          })}
         </div>
       </div>
 

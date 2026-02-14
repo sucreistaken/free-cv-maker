@@ -12,7 +12,7 @@ export function ClassicCoverLetter() {
       {/* Header - same style as ClassicTemplate */}
       <div className="text-center mb-4">
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
         <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">
           {personalInfo.fullName}

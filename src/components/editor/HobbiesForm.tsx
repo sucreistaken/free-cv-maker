@@ -1,16 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { Textarea } from '../ui/Textarea';
 
 export function HobbiesForm() {
+  const { t } = useTranslation();
   const { hobbies, updateHobbies } = useCVStore();
 
   return (
     <Textarea
-      label="Hobbies & Interests"
+      label={t('hobbiesForm.label')}
       value={hobbies}
       onChange={(e) => updateHobbies(e.target.value)}
       rows={4}
-      placeholder="e.g. Photography, Hiking, Open-source contribution..."
+      placeholder={t('hobbiesForm.placeholder')}
     />
   );
 }

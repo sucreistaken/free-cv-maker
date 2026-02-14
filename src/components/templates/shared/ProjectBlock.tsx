@@ -13,13 +13,13 @@ export function ProjectBlock({ entries }: ProjectBlockProps) {
             <h3 className="text-[11.5px] font-bold text-gray-800">{entry.name}</h3>
           </div>
           <div className="flex items-center gap-2 text-[10px] text-gray-500">
-            {entry.link && <span className="text-blue-600">{entry.link}</span>}
+            {entry.link && <a href={entry.link.startsWith('http') ? entry.link : `https://${entry.link}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{entry.link}</a>}
             {entry.date && <span>• {entry.date}</span>}
           </div>
           {entry.bullets.length > 0 && (
             <ul className="mt-1 space-y-0.5">
               {entry.bullets.filter(b => b).map((bullet, i) => (
-                <li key={i} className="text-[10.5px] text-gray-700 flex">
+                <li key={`${bullet}-${i}`} className="text-[10.5px] text-gray-700 flex">
                   <span className="mr-1.5 shrink-0">•</span>
                   <span>{bullet}</span>
                 </li>

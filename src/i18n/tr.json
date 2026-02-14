@@ -1,0 +1,254 @@
+{
+  "header": {
+    "brand": "NextCV",
+    "byAuthor": "Kadir Ay",
+    "cv": "CV",
+    "coverLetter": "Ön Yazı",
+    "manageProfiles": "Profilleri Yönet",
+    "exportJson": "JSON Dışa Aktar",
+    "importJson": "JSON İçe Aktar",
+    "importPdf": "PDF İçe Aktar",
+    "reset": "Varsayılana Sıfırla",
+    "printPdf": "Yazdır / PDF"
+  },
+  "footer": {
+    "copyright": "© {{year}} NextCV",
+    "madeBy": "Made by Kadir Ay",
+    "privacy": "Gizlilik",
+    "terms": "Koşullar",
+    "kvkk": "KVKK"
+  },
+  "sections": {
+    "personalInfo": "Kişisel Bilgiler",
+    "summary": "Özet",
+    "experience": "Deneyim",
+    "projects": "Projeler",
+    "education": "Eğitim",
+    "involvement": "Katılımlar",
+    "skills": "Beceriler",
+    "certifications": "Sertifikalar",
+    "languages": "Diller",
+    "awards": "Ödüller",
+    "hobbies": "Hobiler",
+    "references": "Referanslar"
+  },
+  "personalInfoForm": {
+    "profilePhoto": "Profil Fotoğrafı",
+    "remove": "Kaldır",
+    "uploadPhoto": "Fotoğraf Yükle",
+    "fullName": "Ad Soyad",
+    "jobTitle": "İş Unvanı",
+    "jobTitlePlaceholder": "ör. Yazılım Mühendisi",
+    "location": "Konum",
+    "locationPlaceholder": "ör. İstanbul, Türkiye",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "linkedin": "LinkedIn",
+    "linkedinPlaceholder": "ör. in/kullaniciadi",
+    "github": "GitHub",
+    "githubPlaceholder": "ör. github.com/kullaniciadi",
+    "website": "Web Sitesi",
+    "nationality": "Uyruk",
+    "nationalityPlaceholder": "ör. Türk",
+    "drivingLicense": "Ehliyet",
+    "drivingLicensePlaceholder": "ör. B"
+  },
+  "summaryForm": {
+    "label": "Profesyonel Özet",
+    "placeholder": "Kısa bir profesyonel özet yazın..."
+  },
+  "experienceForm": {
+    "add": "Deneyim Ekle",
+    "jobTitle": "İş Unvanı",
+    "company": "Şirket",
+    "location": "Konum",
+    "startDate": "Başlangıç Tarihi",
+    "startDatePlaceholder": "ör. Ocak 2024",
+    "endDate": "Bitiş Tarihi",
+    "endDatePlaceholder": "ör. Devam Ediyor",
+    "bullets": "Madde İşaretleri",
+    "addBullet": "Madde ekle"
+  },
+  "educationForm": {
+    "add": "Eğitim Ekle",
+    "degree": "Derece / Alan",
+    "institution": "Kurum",
+    "year": "Yıl",
+    "yearPlaceholder": "ör. 2021"
+  },
+  "projectsForm": {
+    "add": "Proje Ekle",
+    "projectName": "Proje Adı",
+    "link": "Bağlantı",
+    "linkPlaceholder": "ör. github.com/kullanici/repo",
+    "date": "Tarih",
+    "datePlaceholder": "ör. Eki 2024 - Devam Ediyor"
+  },
+  "involvementForm": {
+    "add": "Katılım Ekle",
+    "role": "Rol",
+    "organization": "Organizasyon",
+    "institution": "Kurum"
+  },
+  "skillsForm": {
+    "add": "Beceri Kategorisi Ekle",
+    "untitledCategory": "İsimsiz Kategori",
+    "category": "Kategori",
+    "categoryPlaceholder": "ör. Teknik",
+    "skills": "Beceriler (virgülle ayırın)",
+    "skillsPlaceholder": "ör. JavaScript, React, Node.js"
+  },
+  "certificationsForm": {
+    "add": "Sertifika Ekle",
+    "name": "Sertifika Adı",
+    "issuer": "Veren Kurum",
+    "issuerPlaceholder": "ör. harvard.edu",
+    "year": "Yıl",
+    "description": "Açıklama"
+  },
+  "languagesForm": {
+    "add": "Dil Ekle",
+    "language": "Dil",
+    "languagePlaceholder": "ör. İngilizce",
+    "proficiency": "Seviye",
+    "native": "Ana Dil",
+    "fluent": "Akıcı",
+    "intermediate": "Orta",
+    "beginner": "Başlangıç"
+  },
+  "awardsForm": {
+    "add": "Ödül Ekle",
+    "title": "Ödül Adı",
+    "issuer": "Veren",
+    "issuerPlaceholder": "ör. Google",
+    "year": "Yıl",
+    "description": "Açıklama"
+  },
+  "hobbiesForm": {
+    "label": "Hobiler ve İlgi Alanları",
+    "placeholder": "ör. Fotoğrafçılık, Doğa Yürüyüşü, Açık kaynak katkısı..."
+  },
+  "referencesForm": {
+    "add": "Referans Ekle",
+    "name": "Ad Soyad",
+    "title": "Unvan",
+    "titlePlaceholder": "ör. Kıdemli Geliştirici",
+    "company": "Şirket",
+    "email": "E-posta",
+    "phone": "Telefon"
+  },
+  "coverLetterForm": {
+    "title": "Ön Yazı",
+    "recipientName": "Alıcı Adı",
+    "recipientNamePlaceholder": "ör. Ahmet Yılmaz",
+    "recipientTitle": "Alıcı Unvanı",
+    "recipientTitlePlaceholder": "ör. İK Müdürü",
+    "company": "Şirket",
+    "companyPlaceholder": "ör. ABC Şirketi",
+    "address": "Adres",
+    "addressPlaceholder": "ör. İstanbul, Türkiye",
+    "date": "Tarih",
+    "greeting": "Selamlama",
+    "greetingPlaceholder": "Sayın İK Müdürü,",
+    "body": "İçerik",
+    "bodyPlaceholder": "Ön yazınızın içeriğini buraya yazın...",
+    "closing": "Kapanış",
+    "closingPlaceholder": "Saygılarımla,",
+    "signature": "İmza (Ad Soyad)",
+    "signaturePlaceholder": "Tam adınız"
+  },
+  "theme": {
+    "title": "Tema ve Ayarlar",
+    "primaryColor": "Ana Renk",
+    "accentColor": "Vurgu Rengi",
+    "fontFamily": "Yazı Tipi",
+    "fontSize": "Yazı Boyutu",
+    "small": "Küçük",
+    "medium": "Orta",
+    "large": "Büyük",
+    "lineSpacing": "Satır Aralığı",
+    "compact": "Sıkışık",
+    "normal": "Normal",
+    "relaxed": "Geniş",
+    "pageMargins": "Sayfa Kenar Boşlukları",
+    "narrow": "Dar",
+    "wide": "Geniş",
+    "sectionTitleStyle": "Bölüm Başlık Stili",
+    "upper": "BÜYÜK HARF",
+    "capitalize": "İlk Harf Büyük",
+    "sectionSpacing": "Bölüm Aralığı",
+    "tight": "Sıkı",
+    "loose": "Gevşek",
+    "photoDisplay": "Fotoğraf Görünümü",
+    "showPhoto": "Fotoğrafı göster",
+    "size": "Boyut",
+    "shape": "Şekil",
+    "circle": "Daire",
+    "rounded": "Yuvarlak",
+    "square": "Kare"
+  },
+  "preview": {
+    "fit": "Sığdır",
+    "togglePageBreaks": "Sayfa kırılımlarını göster/gizle",
+    "pageCount": "{{count}} sayfa",
+    "calibration": "Sayfa kırılım kalibrasyonu",
+    "reset": "Sıfırla",
+    "page": "Sayfa {{n1}} | Sayfa {{n2}}"
+  },
+  "profileManager": {
+    "title": "Profilleri Yönet",
+    "newProfilePlaceholder": "Yeni profil adı...",
+    "create": "Oluştur",
+    "defaultName": "Profil {{n}}",
+    "updated": "Güncelleme: {{date}}",
+    "rename": "Yeniden Adlandır",
+    "duplicate": "Çoğalt",
+    "delete": "Sil",
+    "deleteConfirm": "Bu profili silmek istediğinize emin misiniz?"
+  },
+  "templateSelector": {
+    "title": "Şablon Seçin"
+  },
+  "templates": {
+    "classic": "Klasik",
+    "classicDesc": "Kalın başlıklar ve yatay çizgilerle temiz tek sütun düzeni",
+    "modern": "Modern",
+    "modernDesc": "İletişim ve beceriler için koyu panelli kenar çubuğu düzeni",
+    "minimalist": "Minimalist",
+    "minimalistDesc": "Serif yazı tipleri, geniş boşluklar, minimal süsleme",
+    "creative": "Yaratıcı",
+    "creativeDesc": "Renkli banner başlık, vurgu çubukları ve zaman çizelgesi düzeni",
+    "academic": "Akademik",
+    "academicDesc": "Serif yazı tipleri ve akademik stil ile iki sütunlu kenar çubuğu düzeni",
+    "compact": "Kompakt",
+    "compactDesc": "Tek sayfaya maksimum içerik sığdırmak için yoğun tek sütun düzeni",
+    "twoColumn": "İki Sütun",
+    "twoColumnDesc": "Beceriler ve eğitim için renkli kenar çubuğuyla ana içerik alanı"
+  },
+  "sectionAccordion": {
+    "hideSection": "Bölümü gizle",
+    "showSection": "Bölümü göster"
+  },
+  "toast": {
+    "importFailed": "İçe aktarma başarısız: {{error}}",
+    "pdfImportFailed": "PDF içe aktarma başarısız: {{error}}",
+    "imageError": "Görsel işlenemedi.",
+    "backupReminder": "Değişikliklerinizi yedeklemeyi unutmayın!",
+    "backupNow": "Şimdi Yedekle"
+  },
+  "errorBoundary": {
+    "title": "Bir şeyler ters gitti",
+    "description": "Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin veya aşağıdaki butona tıklayın.",
+    "retry": "Tekrar Dene",
+    "reload": "Sayfayı Yenile"
+  },
+  "mobile": {
+    "editor": "Düzenleyici",
+    "preview": "Önizleme"
+  },
+  "legal": {
+    "privacyTitle": "Gizlilik Politikası",
+    "termsTitle": "Kullanım Koşulları",
+    "kvkkTitle": "KVKK Aydınlatma Metni"
+  }
+}

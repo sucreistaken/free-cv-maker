@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Input } from '../../ui/Input';
 
 interface DateRangeFieldProps {
@@ -8,19 +9,21 @@ interface DateRangeFieldProps {
 }
 
 export function DateRangeField({ startDate, endDate, onStartChange, onEndChange }: DateRangeFieldProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <Input
-        label="Start Date"
+        label={t('experienceForm.startDate')}
         value={startDate}
         onChange={(e) => onStartChange(e.target.value)}
-        placeholder="e.g. Jan 2024"
+        placeholder={t('experienceForm.startDatePlaceholder')}
       />
       <Input
-        label="End Date"
+        label={t('experienceForm.endDate')}
         value={endDate}
         onChange={(e) => onEndChange(e.target.value)}
-        placeholder="e.g. Present"
+        placeholder={t('experienceForm.endDatePlaceholder')}
       />
     </div>
   );

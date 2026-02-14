@@ -2,16 +2,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { TemplateType, ThemeConfig, DocumentType } from '../types/cv';
 import { useProfileStore } from './useProfileStore';
+import i18n from '../i18n';
 
 interface AppStore {
   template: TemplateType;
   theme: ThemeConfig;
   activeTab: 'editor' | 'preview';
   activeDocument: DocumentType;
+  language: 'tr' | 'en';
+  pageBreakHeights: { small: number; medium: number; large: number };
   setTemplate: (template: TemplateType) => void;
   setTheme: (theme: Partial<ThemeConfig>) => void;
   setActiveTab: (tab: 'editor' | 'preview') => void;
   setActiveDocument: (doc: DocumentType) => void;
+  setLanguage: (lang: 'tr' | 'en') => void;
+  setPageBreakHeight: (size: 'small' | 'medium' | 'large', h: number) => void;
   loadFromImport: (settings: { template: TemplateType; theme: ThemeConfig }) => void;
   _syncFromProfile: () => void;
 }
@@ -35,6 +40,8 @@ export const useAppStore = create<AppStore>()(
       },
       activeTab: 'editor',
       activeDocument: 'cv',
+      language: 'tr',
+      pageBreakHeights: { small: 1110, medium: 1121, large: 1210 },
       setTemplate: (template) => {
         set({ template });
         useProfileStore.getState().updateActiveAppSettings({ template });
@@ -48,6 +55,14 @@ export const useAppStore = create<AppStore>()(
       },
       setActiveTab: (activeTab) => set({ activeTab }),
       setActiveDocument: (activeDocument) => set({ activeDocument }),
+      setLanguage: (language) => {
+        set({ language });
+        i18n.changeLanguage(language);
+        document.documentElement.lang = language;
+      },
+      setPageBreakHeight: (size, h) => set((state) => ({
+        pageBreakHeights: { ...state.pageBreakHeights, [size]: h },
+      })),
       loadFromImport: (settings) => {
         set({ template: settings.template, theme: settings.theme });
         useProfileStore.getState().updateActiveAppSettings(settings);

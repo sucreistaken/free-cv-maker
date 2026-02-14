@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { FormField } from './shared/FormField';
 import type { LanguageEntry } from '../../types/cv';
@@ -8,21 +9,22 @@ interface Props {
 
 const proficiencyLevels: LanguageEntry['proficiency'][] = ['native', 'fluent', 'intermediate', 'beginner'];
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
+const proficiencyKeys: Record<LanguageEntry['proficiency'], string> = {
+  native: 'languagesForm.native',
+  fluent: 'languagesForm.fluent',
+  intermediate: 'languagesForm.intermediate',
+  beginner: 'languagesForm.beginner',
 };
 
 export function LanguageEntryForm({ entry }: Props) {
+  const { t } = useTranslation();
   const updateLanguage = useCVStore((s) => s.updateLanguage);
 
   return (
     <div className="space-y-2">
-      <FormField label="Language" value={entry.language} onChange={(v) => updateLanguage(entry.id, 'language', v)} placeholder="e.g. English" />
+      <FormField label={t('languagesForm.language')} value={entry.language} onChange={(v) => updateLanguage(entry.id, 'language', v)} placeholder={t('languagesForm.languagePlaceholder')} />
       <div className="space-y-1">
-        <label className="block text-xs font-medium text-gray-600">Proficiency</label>
+        <label className="block text-xs font-medium text-gray-600">{t('languagesForm.proficiency')}</label>
         <div className="flex gap-1">
           {proficiencyLevels.map((level) => (
             <button
@@ -35,7 +37,7 @@ export function LanguageEntryForm({ entry }: Props) {
                   : 'bg-white text-gray-600 border-gray-300 hover:border-primary/50'
               }`}
             >
-              {proficiencyLabels[level]}
+              {t(proficiencyKeys[level])}
             </button>
           ))}
         </div>

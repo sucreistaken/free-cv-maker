@@ -1,4 +1,5 @@
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { ExperienceBlock } from './shared/ExperienceBlock';
@@ -33,11 +34,18 @@ export function ModernTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'languages']);
   const mainSections = visibleSections.filter((s) => !sidebarTypes.has(s.type));
+
+  const getHref = (icon: LucideIcon, value: string): string | null => {
+    if (icon === Mail) return `mailto:${value}`;
+    if (icon === Phone) return `tel:${value}`;
+    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    return null;
+  };
 
   const contactItems = [
     { icon: MapPin, value: personalInfo.location },
@@ -132,11 +140,11 @@ export function ModernTemplate() {
   };
 
   return (
-    <div className="a4-page flex" style={{ fontFamily, zoom, lineHeight }}>
+    <div className="a4-page flex" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px` }}>
       {/* Sidebar */}
       <div className="w-[220px] shrink-0 px-5 py-8 text-white" style={{ backgroundColor: primaryColor }}>
         {personalInfo.profilePhoto && photoVisible ? (
-          <img src={personalInfo.profilePhoto} alt="" className="object-cover mx-auto mb-4 border-2 border-white/30" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-4 border-2 border-white/30" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         ) : (
           <div className="bg-white/20 mx-auto mb-4 flex items-center justify-center text-2xl font-bold" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }}>
             {personalInfo.fullName.split(' ').map((n) => n[0]).join('')}
@@ -151,12 +159,19 @@ export function ModernTemplate() {
         {/* Contact */}
         <div className="space-y-2 mb-6">
           <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-70">Contact</h3>
-          {contactItems.map((item, i) => (
-            <div key={i} className="flex items-start gap-2 text-[9.5px] opacity-90">
-              <item.icon size={10} className="mt-0.5 shrink-0" />
-              <span className="break-all">{item.value}</span>
-            </div>
-          ))}
+          {contactItems.map((item, i) => {
+            const href = getHref(item.icon, item.value!);
+            return (
+              <div key={i} className="flex items-start gap-2 text-[9.5px] opacity-90">
+                <item.icon size={10} className="mt-0.5 shrink-0" />
+                {href ? (
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="break-all hover:underline">{item.value}</a>
+                ) : (
+                  <span className="break-all">{item.value}</span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Skills */}

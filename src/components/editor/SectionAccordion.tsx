@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, Eye, EyeOff, GripVertical } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -19,6 +20,7 @@ export function SectionAccordion({
   dragHandleProps,
   defaultOpen = false,
 }: SectionAccordionProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -45,7 +47,7 @@ export function SectionAccordion({
           type="button"
           onClick={onToggleVisibility}
           className="text-gray-400 hover:text-gray-600 p-0.5"
-          title={visible ? 'Hide section' : 'Show section'}
+          title={visible ? t('sectionAccordion.hideSection') : t('sectionAccordion.showSection')}
         >
           {visible ? <Eye size={14} /> : <EyeOff size={14} />}
         </button>

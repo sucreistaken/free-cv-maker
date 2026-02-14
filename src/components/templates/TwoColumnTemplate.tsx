@@ -15,7 +15,7 @@ export function TwoColumnTemplate() {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['skills', 'education', 'languages', 'certifications']);
@@ -90,7 +90,7 @@ export function TwoColumnTemplate() {
                 <div key={p.id}>
                   <h3 className="text-[11px] font-bold text-gray-800">{p.name}</h3>
                   <div className="text-[9px] text-gray-400">
-                    {p.link && <span>{p.link}</span>}
+                    {p.link && <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{p.link}</a>}
                     {p.date && <span> · {p.date}</span>}
                   </div>
                   <BulletList bullets={p.bullets} />
@@ -219,12 +219,12 @@ export function TwoColumnTemplate() {
   };
 
   return (
-    <div className="a4-page" style={{ fontFamily, zoom, lineHeight }}>
+    <div className="a4-page" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px` }}>
       {/* Header */}
       <div className="pt-8 pb-4" style={{ paddingLeft: margin, paddingRight: margin }}>
         <div className="flex items-center gap-4">
           {personalInfo.profilePhoto && photoVisible && (
-            <img src={personalInfo.profilePhoto} alt="" className="object-cover shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+            <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
           )}
           <div>
             <h1 className="text-[20px] font-bold" style={{ color: primaryColor }}>{personalInfo.fullName}</h1>
@@ -238,24 +238,24 @@ export function TwoColumnTemplate() {
                 </span>
               )}
               {personalInfo.email && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Mail size={9} />{personalInfo.email}
-                </span>
+                </a>
               )}
               {personalInfo.phone && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Phone size={9} />{personalInfo.phone}
-                </span>
+                </a>
               )}
               {personalInfo.linkedin && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Linkedin size={9} />{personalInfo.linkedin}
-                </span>
+                </a>
               )}
               {personalInfo.website && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Globe size={9} />{personalInfo.website}
-                </span>
+                </a>
               )}
             </div>
           </div>

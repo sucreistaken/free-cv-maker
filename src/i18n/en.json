@@ -1,0 +1,254 @@
+{
+  "header": {
+    "brand": "NextCV",
+    "byAuthor": "Kadir Ay",
+    "cv": "CV",
+    "coverLetter": "Cover Letter",
+    "manageProfiles": "Manage Profiles",
+    "exportJson": "Export JSON",
+    "importJson": "Import JSON",
+    "importPdf": "Import PDF",
+    "reset": "Reset to default",
+    "printPdf": "Print / PDF"
+  },
+  "footer": {
+    "copyright": "© {{year}} NextCV",
+    "madeBy": "Made by Kadir Ay",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "kvkk": "KVKK"
+  },
+  "sections": {
+    "personalInfo": "Personal Info",
+    "summary": "Summary",
+    "experience": "Experience",
+    "projects": "Projects",
+    "education": "Education",
+    "involvement": "Involvement",
+    "skills": "Skills",
+    "certifications": "Certifications",
+    "languages": "Languages",
+    "awards": "Awards",
+    "hobbies": "Hobbies",
+    "references": "References"
+  },
+  "personalInfoForm": {
+    "profilePhoto": "Profile Photo",
+    "remove": "Remove",
+    "uploadPhoto": "Upload Photo",
+    "fullName": "Full Name",
+    "jobTitle": "Job Title",
+    "jobTitlePlaceholder": "e.g. Software Engineer",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Istanbul, Turkey",
+    "email": "Email",
+    "phone": "Phone",
+    "linkedin": "LinkedIn",
+    "linkedinPlaceholder": "e.g. in/username",
+    "github": "GitHub",
+    "githubPlaceholder": "e.g. github.com/username",
+    "website": "Website",
+    "nationality": "Nationality",
+    "nationalityPlaceholder": "e.g. Turkish",
+    "drivingLicense": "Driving License",
+    "drivingLicensePlaceholder": "e.g. B"
+  },
+  "summaryForm": {
+    "label": "Professional Summary",
+    "placeholder": "Write a brief professional summary..."
+  },
+  "experienceForm": {
+    "add": "Add Experience",
+    "jobTitle": "Job Title",
+    "company": "Company",
+    "location": "Location",
+    "startDate": "Start Date",
+    "startDatePlaceholder": "e.g. Jan 2024",
+    "endDate": "End Date",
+    "endDatePlaceholder": "e.g. Present",
+    "bullets": "Bullet Points",
+    "addBullet": "Add bullet"
+  },
+  "educationForm": {
+    "add": "Add Education",
+    "degree": "Degree / Field",
+    "institution": "Institution",
+    "year": "Year",
+    "yearPlaceholder": "e.g. 2021"
+  },
+  "projectsForm": {
+    "add": "Add Project",
+    "projectName": "Project Name",
+    "link": "Link",
+    "linkPlaceholder": "e.g. github.com/user/repo",
+    "date": "Date",
+    "datePlaceholder": "e.g. Oct 2024 - Present"
+  },
+  "involvementForm": {
+    "add": "Add Involvement",
+    "role": "Role",
+    "organization": "Organization",
+    "institution": "Institution"
+  },
+  "skillsForm": {
+    "add": "Add Skill Category",
+    "untitledCategory": "Untitled Category",
+    "category": "Category",
+    "categoryPlaceholder": "e.g. Technical",
+    "skills": "Skills (comma-separated)",
+    "skillsPlaceholder": "e.g. JavaScript, React, Node.js"
+  },
+  "certificationsForm": {
+    "add": "Add Certification",
+    "name": "Certification Name",
+    "issuer": "Issuer",
+    "issuerPlaceholder": "e.g. harvard.edu",
+    "year": "Year",
+    "description": "Description"
+  },
+  "languagesForm": {
+    "add": "Add Language",
+    "language": "Language",
+    "languagePlaceholder": "e.g. English",
+    "proficiency": "Proficiency",
+    "native": "Native",
+    "fluent": "Fluent",
+    "intermediate": "Intermediate",
+    "beginner": "Beginner"
+  },
+  "awardsForm": {
+    "add": "Add Award",
+    "title": "Award Title",
+    "issuer": "Issuer",
+    "issuerPlaceholder": "e.g. Google",
+    "year": "Year",
+    "description": "Description"
+  },
+  "hobbiesForm": {
+    "label": "Hobbies & Interests",
+    "placeholder": "e.g. Photography, Hiking, Open-source contribution..."
+  },
+  "referencesForm": {
+    "add": "Add Reference",
+    "name": "Name",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Senior Developer",
+    "company": "Company",
+    "email": "Email",
+    "phone": "Phone"
+  },
+  "coverLetterForm": {
+    "title": "Cover Letter",
+    "recipientName": "Recipient Name",
+    "recipientNamePlaceholder": "e.g. John Smith",
+    "recipientTitle": "Recipient Title",
+    "recipientTitlePlaceholder": "e.g. Hiring Manager",
+    "company": "Company",
+    "companyPlaceholder": "e.g. Acme Inc.",
+    "address": "Address",
+    "addressPlaceholder": "e.g. 123 Main St, City",
+    "date": "Date",
+    "greeting": "Greeting",
+    "greetingPlaceholder": "Dear Hiring Manager,",
+    "body": "Body",
+    "bodyPlaceholder": "Write your cover letter content here...",
+    "closing": "Closing",
+    "closingPlaceholder": "Sincerely,",
+    "signature": "Signature (Name)",
+    "signaturePlaceholder": "Your full name"
+  },
+  "theme": {
+    "title": "Theme & Settings",
+    "primaryColor": "Primary Color",
+    "accentColor": "Accent Color",
+    "fontFamily": "Font Family",
+    "fontSize": "Font Size",
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large",
+    "lineSpacing": "Line Spacing",
+    "compact": "Compact",
+    "normal": "Normal",
+    "relaxed": "Relaxed",
+    "pageMargins": "Page Margins",
+    "narrow": "Narrow",
+    "wide": "Wide",
+    "sectionTitleStyle": "Section Title Style",
+    "upper": "UPPER",
+    "capitalize": "Capitalize",
+    "sectionSpacing": "Section Spacing",
+    "tight": "Tight",
+    "loose": "Loose",
+    "photoDisplay": "Photo Display",
+    "showPhoto": "Show photo",
+    "size": "Size",
+    "shape": "Shape",
+    "circle": "Circle",
+    "rounded": "Rounded",
+    "square": "Square"
+  },
+  "preview": {
+    "fit": "Fit",
+    "togglePageBreaks": "Show/hide page breaks",
+    "pageCount": "{{count}} pages",
+    "calibration": "Page break calibration",
+    "reset": "Reset",
+    "page": "Page {{n1}} | Page {{n2}}"
+  },
+  "profileManager": {
+    "title": "Manage Profiles",
+    "newProfilePlaceholder": "New profile name...",
+    "create": "Create",
+    "defaultName": "Profile {{n}}",
+    "updated": "Updated {{date}}",
+    "rename": "Rename",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this profile?"
+  },
+  "templateSelector": {
+    "title": "Choose Template"
+  },
+  "templates": {
+    "classic": "Classic",
+    "classicDesc": "Clean single-column layout with bold headings and horizontal lines",
+    "modern": "Modern",
+    "modernDesc": "Sidebar layout with dark panel for contact and skills",
+    "minimalist": "Minimalist",
+    "minimalistDesc": "Serif fonts, generous whitespace, minimal decoration",
+    "creative": "Creative",
+    "creativeDesc": "Colorful banner header with accent bars and timeline layout",
+    "academic": "Academic",
+    "academicDesc": "Two-column sidebar layout with serif fonts and academic styling",
+    "compact": "Compact",
+    "compactDesc": "Dense single-column layout to fit maximum content on one page",
+    "twoColumn": "Two-Column",
+    "twoColumnDesc": "Main content area with colored sidebar for skills and education"
+  },
+  "sectionAccordion": {
+    "hideSection": "Hide section",
+    "showSection": "Show section"
+  },
+  "toast": {
+    "importFailed": "Import failed: {{error}}",
+    "pdfImportFailed": "PDF import failed: {{error}}",
+    "imageError": "Failed to process image.",
+    "backupReminder": "Don't forget to backup your changes!",
+    "backupNow": "Backup Now"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please refresh the page or click the button below.",
+    "retry": "Try Again",
+    "reload": "Refresh Page"
+  },
+  "mobile": {
+    "editor": "Editor",
+    "preview": "Preview"
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service",
+    "kvkkTitle": "KVKK Notice"
+  }
+}

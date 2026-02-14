@@ -7,6 +7,16 @@ export function usePdfExport() {
   const handlePrint = useReactToPrint({
     contentRef,
     documentTitle: 'CV',
+    pageStyle: `
+      @page {
+        size: 210mm 297mm;
+        margin: 0;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    `,
   });
 
   return { contentRef, handlePrint };

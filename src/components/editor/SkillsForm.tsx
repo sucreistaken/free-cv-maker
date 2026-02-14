@@ -1,10 +1,12 @@
 import { Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { SkillCategoryForm } from './SkillCategoryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function SkillsForm() {
+  const { t } = useTranslation();
   const { skills, addSkillCategory, removeSkillCategory, reorderSkills } = useCVStore();
 
   return (
@@ -14,7 +16,7 @@ export function SkillsForm() {
         onReorder={reorderSkills}
         renderItem={(entry, dragHandleProps) => (
           <EntryCard
-            title={entry.category || 'Untitled Category'}
+            title={entry.category || t('skillsForm.untitledCategory')}
             onRemove={() => removeSkillCategory(entry.id)}
             dragHandleProps={dragHandleProps}
           >
@@ -28,7 +30,7 @@ export function SkillsForm() {
         className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark font-medium w-full justify-center py-2 border border-dashed border-gray-300 rounded-lg hover:border-primary/50 transition-colors"
       >
         <Plus size={16} />
-        Add Skill Category
+        {t('skillsForm.add')}
       </button>
     </div>
   );

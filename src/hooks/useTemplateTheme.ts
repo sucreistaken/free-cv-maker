@@ -1,7 +1,8 @@
 import { useAppStore } from '../store/useAppStore';
 import type React from 'react';
 
-const fontSizeScale = { small: 0.92, medium: 1, large: 1.08 } as const;
+export const fontSizeScale = { small: 0.92, medium: 1, large: 1.08 } as const;
+export const A4_HEIGHT_DEFAULT = 1121;
 const lineHeightMap = { compact: 1.3, normal: 1.5, relaxed: 1.7 } as const;
 const marginMap = { narrow: '30px', normal: '50px', wide: '70px' } as const;
 const sectionSpacingMap = { tight: '8px', normal: '12px', loose: '20px' } as const;
@@ -20,7 +21,10 @@ export function useTemplateTheme() {
     photoVisible: rawTheme.photoVisible ?? true,
   };
 
+  const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
   const zoom = fontSizeScale[theme.fontSize];
+  const pageBreakHeight = pageBreakHeights?.[theme.fontSize] || A4_HEIGHT_DEFAULT;
+  const effectiveA4Height = pageBreakHeight / zoom;
   const lineHeight = lineHeightMap[theme.lineSpacing];
   const margin = marginMap[theme.pageMargins];
   const sectionGap = sectionSpacingMap[theme.sectionSpacing];
@@ -39,6 +43,8 @@ export function useTemplateTheme() {
   return {
     theme,
     zoom,
+    pageBreakHeight,
+    effectiveA4Height,
     lineHeight,
     margin,
     sectionGap,

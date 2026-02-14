@@ -1,8 +1,10 @@
 import { PenLine, Eye } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
 import { cn } from '../../utils/cn';
 
 export function MobileTabBar() {
+  const { t } = useTranslation();
   const { activeTab, setActiveTab } = useAppStore();
 
   return (
@@ -17,7 +19,7 @@ export function MobileTabBar() {
         )}
       >
         <PenLine size={16} />
-        Editor
+        {t('mobile.editor')}
       </button>
       <button
         onClick={() => setActiveTab('preview')}
@@ -29,7 +31,7 @@ export function MobileTabBar() {
         )}
       >
         <Eye size={16} />
-        Preview
+        {t('mobile.preview')}
       </button>
     </div>
   );

@@ -6,9 +6,16 @@ interface DialogProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  size?: 'md' | 'lg' | 'xl';
 }
 
-export function Dialog({ open, onClose, title, children }: DialogProps) {
+const sizeClasses = {
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-2xl',
+};
+
+export function Dialog({ open, onClose, title, children, size = 'md' }: DialogProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,7 +37,7 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
         if (e.target === backdropRef.current) onClose();
       }}
     >
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
+      <div className={`bg-white rounded-xl shadow-2xl w-full ${sizeClasses[size]} mx-4 max-h-[80vh] flex flex-col`}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <h2 className="text-base font-semibold text-gray-900">{title}</h2>
           <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">

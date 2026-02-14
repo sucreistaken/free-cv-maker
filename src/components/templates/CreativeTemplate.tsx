@@ -1,4 +1,5 @@
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
@@ -26,9 +27,16 @@ export function CreativeTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
+
+  const getHref = (icon: LucideIcon, value: string): string | null => {
+    if (icon === Mail) return `mailto:${value}`;
+    if (icon === Phone) return `tel:${value}`;
+    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    return null;
+  };
 
   const contactItems = [
     { icon: MapPin, value: personalInfo.location },
@@ -118,7 +126,7 @@ export function CreativeTemplate() {
             {projects.map((p: ProjectEntry) => (
               <TimelineEntry key={p.id} date={p.date || ''}>
                 <h3 className="text-[11.5px] font-bold text-gray-800">{p.name}</h3>
-                {p.link && <p className="text-[9.5px]" style={{ color: accentColor }}>{p.link}</p>}
+                {p.link && <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`} target="_blank" rel="noopener noreferrer" className="text-[9.5px] hover:underline block" style={{ color: accentColor }}>{p.link}</a>}
                 <BulletList bullets={p.bullets} />
               </TimelineEntry>
             ))}
@@ -253,12 +261,12 @@ export function CreativeTemplate() {
   };
 
   return (
-    <div className="a4-page" style={{ fontFamily, zoom, lineHeight }}>
+    <div className="a4-page" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px` }}>
       {/* Banner Header */}
       <div style={{ paddingLeft: margin, paddingRight: margin, paddingTop: '24px', paddingBottom: '24px', backgroundColor: accentColor }} className="text-white">
         <div className="flex items-center gap-4">
           {personalInfo.profilePhoto && photoVisible && (
-            <img src={personalInfo.profilePhoto} alt="" className="object-cover border-2 border-white/40 shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+            <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover border-2 border-white/40 shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
           )}
           <div>
             <h1 className="text-[24px] font-bold">{personalInfo.fullName}</h1>
@@ -266,12 +274,20 @@ export function CreativeTemplate() {
           <p className="text-[12px] opacity-85 mt-0.5">{personalInfo.jobTitle}</p>
         )}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
-          {contactItems.map((item, i) => (
-            <span key={i} className="flex items-center gap-1 text-[9.5px] opacity-90">
-              <item.icon size={10} />
-              {item.value}
-            </span>
-          ))}
+          {contactItems.map((item, i) => {
+            const href = getHref(item.icon, item.value!);
+            return href ? (
+              <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9.5px] opacity-90 hover:underline">
+                <item.icon size={10} />
+                {item.value}
+              </a>
+            ) : (
+              <span key={i} className="flex items-center gap-1 text-[9.5px] opacity-90">
+                <item.icon size={10} />
+                {item.value}
+              </span>
+            );
+          })}
         </div>
           </div>
         </div>

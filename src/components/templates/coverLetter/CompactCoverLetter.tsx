@@ -5,13 +5,13 @@ export function CompactCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
   const { fontFamily, margin, accentColor } = useTemplateTheme();
 
-  const contactParts = [
-    personalInfo.email,
-    personalInfo.phone,
-    personalInfo.location,
-    personalInfo.linkedin,
-    personalInfo.website,
-  ].filter(Boolean);
+  const contactParts: { value: string; href: string | null }[] = [
+    { value: personalInfo.email || '', href: personalInfo.email ? `mailto:${personalInfo.email}` : null },
+    { value: personalInfo.phone || '', href: personalInfo.phone ? `tel:${personalInfo.phone}` : null },
+    { value: personalInfo.location || '', href: null },
+    { value: personalInfo.linkedin || '', href: personalInfo.linkedin ? (personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`) : null },
+    { value: personalInfo.website || '', href: personalInfo.website ? (personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`) : null },
+  ].filter((p) => p.value);
 
   return (
     <div
@@ -33,7 +33,16 @@ export function CompactCoverLetter() {
           <p className="text-[9.5px] text-gray-600">{personalInfo.jobTitle}</p>
         )}
         <p className="text-[8.5px] text-gray-400 mt-0.5">
-          {contactParts.join(' | ')}
+          {contactParts.map((part, i) => (
+            <span key={i}>
+              {i > 0 && ' | '}
+              {part.href ? (
+                <a href={part.href} target="_blank" rel="noopener noreferrer" className="hover:underline">{part.value}</a>
+              ) : (
+                part.value
+              )}
+            </span>
+          ))}
         </p>
       </div>
 

@@ -1,5 +1,6 @@
 import { Palette } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
 import { useCVStore } from '../../store/useCVStore';
 import { ColorPicker } from '../ui/ColorPicker';
@@ -43,6 +44,7 @@ function OptionGroup<T extends string>({
 }
 
 export function ThemePanel() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useAppStore();
   const profilePhoto = useCVStore((s) => s.personalInfo.profilePhoto);
@@ -55,22 +57,22 @@ export function ThemePanel() {
         className="flex items-center gap-2 w-full px-3 py-2.5 text-left"
       >
         <Palette size={16} className="text-gray-400" />
-        <span className="text-sm font-semibold text-gray-800">Theme & Settings</span>
+        <span className="text-sm font-semibold text-gray-800">{t('theme.title')}</span>
       </button>
       {open && (
         <div className="px-3 pb-3 pt-1 border-t border-gray-100 space-y-3">
           <ColorPicker
-            label="Primary Color"
+            label={t('theme.primaryColor')}
             value={theme.primaryColor}
             onChange={(color) => setTheme({ primaryColor: color })}
           />
           <ColorPicker
-            label="Accent Color"
+            label={t('theme.accentColor')}
             value={theme.accentColor}
             onChange={(color) => setTheme({ accentColor: color })}
           />
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-gray-600">Font Family</label>
+            <label className="block text-xs font-medium text-gray-600">{t('theme.fontFamily')}</label>
             <select
               value={theme.fontFamily}
               onChange={(e) => setTheme({ fontFamily: e.target.value })}
@@ -83,55 +85,55 @@ export function ThemePanel() {
           </div>
 
           <OptionGroup
-            label="Font Size"
+            label={t('theme.fontSize')}
             options={[
-              { value: 'small', label: 'Small' },
-              { value: 'medium', label: 'Medium' },
-              { value: 'large', label: 'Large' },
+              { value: 'small', label: t('theme.small') },
+              { value: 'medium', label: t('theme.medium') },
+              { value: 'large', label: t('theme.large') },
             ]}
             value={theme.fontSize}
             onChange={(v) => setTheme({ fontSize: v })}
           />
 
           <OptionGroup
-            label="Line Spacing"
+            label={t('theme.lineSpacing')}
             options={[
-              { value: 'compact', label: 'Compact' },
-              { value: 'normal', label: 'Normal' },
-              { value: 'relaxed', label: 'Relaxed' },
+              { value: 'compact', label: t('theme.compact') },
+              { value: 'normal', label: t('theme.normal') },
+              { value: 'relaxed', label: t('theme.relaxed') },
             ]}
             value={theme.lineSpacing}
             onChange={(v) => setTheme({ lineSpacing: v })}
           />
 
           <OptionGroup
-            label="Page Margins"
+            label={t('theme.pageMargins')}
             options={[
-              { value: 'narrow', label: 'Narrow' },
-              { value: 'normal', label: 'Normal' },
-              { value: 'wide', label: 'Wide' },
+              { value: 'narrow', label: t('theme.narrow') },
+              { value: 'normal', label: t('theme.normal') },
+              { value: 'wide', label: t('theme.wide') },
             ]}
             value={theme.pageMargins}
             onChange={(v) => setTheme({ pageMargins: v })}
           />
 
           <OptionGroup
-            label="Section Title Style"
+            label={t('theme.sectionTitleStyle')}
             options={[
-              { value: 'uppercase', label: 'UPPER' },
-              { value: 'capitalize', label: 'Capitalize' },
-              { value: 'normal', label: 'Normal' },
+              { value: 'uppercase', label: t('theme.upper') },
+              { value: 'capitalize', label: t('theme.capitalize') },
+              { value: 'normal', label: t('theme.normal') },
             ]}
             value={theme.sectionTitleStyle}
             onChange={(v) => setTheme({ sectionTitleStyle: v })}
           />
 
           <OptionGroup
-            label="Section Spacing"
+            label={t('theme.sectionSpacing')}
             options={[
-              { value: 'tight', label: 'Tight' },
-              { value: 'normal', label: 'Normal' },
-              { value: 'loose', label: 'Loose' },
+              { value: 'tight', label: t('theme.tight') },
+              { value: 'normal', label: t('theme.normal') },
+              { value: 'loose', label: t('theme.loose') },
             ]}
             value={theme.sectionSpacing}
             onChange={(v) => setTheme({ sectionSpacing: v })}
@@ -139,30 +141,30 @@ export function ThemePanel() {
 
           {profilePhoto && (
             <div className="space-y-3 pt-2 border-t border-gray-100">
-              <label className="block text-xs font-semibold text-gray-700">Photo Display</label>
+              <label className="block text-xs font-semibold text-gray-700">{t('theme.photoDisplay')}</label>
               <Toggle
-                label="Show photo"
+                label={t('theme.showPhoto')}
                 checked={theme.photoVisible ?? true}
                 onChange={(v) => setTheme({ photoVisible: v })}
               />
               {(theme.photoVisible ?? true) && (
                 <>
                   <OptionGroup
-                    label="Size"
+                    label={t('theme.size')}
                     options={[
-                      { value: 'sm', label: 'Small' },
-                      { value: 'md', label: 'Medium' },
-                      { value: 'lg', label: 'Large' },
+                      { value: 'sm', label: t('theme.small') },
+                      { value: 'md', label: t('theme.medium') },
+                      { value: 'lg', label: t('theme.large') },
                     ]}
                     value={theme.photoSize ?? 'md'}
                     onChange={(v) => setTheme({ photoSize: v })}
                   />
                   <OptionGroup
-                    label="Shape"
+                    label={t('theme.shape')}
                     options={[
-                      { value: 'circle', label: 'Circle' },
-                      { value: 'rounded', label: 'Rounded' },
-                      { value: 'square', label: 'Square' },
+                      { value: 'circle', label: t('theme.circle') },
+                      { value: 'rounded', label: t('theme.rounded') },
+                      { value: 'square', label: t('theme.square') },
                     ]}
                     value={theme.photoShape ?? 'circle'}
                     onChange={(v) => setTheme({ photoShape: v })}

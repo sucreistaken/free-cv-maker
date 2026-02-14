@@ -4,15 +4,15 @@ import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function TwoColumnCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   return (
-    <div className="a4-page" style={{ fontFamily, zoom, lineHeight }}>
+    <div className="a4-page" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px` }}>
       {/* Header */}
       <div className="pt-8 pb-4" style={{ paddingLeft: margin, paddingRight: margin }}>
         <div className="flex items-center gap-4">
           {personalInfo.profilePhoto && photoVisible && (
-            <img src={personalInfo.profilePhoto} alt="" className="object-cover shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+            <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
           )}
           <div>
             <h1 className="text-[20px] font-bold" style={{ color: primaryColor }}>{personalInfo.fullName}</h1>
@@ -21,14 +21,14 @@ export function TwoColumnCoverLetter() {
             )}
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               {personalInfo.email && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Mail size={9} />{personalInfo.email}
-                </span>
+                </a>
               )}
               {personalInfo.phone && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Phone size={9} />{personalInfo.phone}
-                </span>
+                </a>
               )}
               {personalInfo.location && (
                 <span className="flex items-center gap-1 text-[9px] text-gray-400">
@@ -36,9 +36,9 @@ export function TwoColumnCoverLetter() {
                 </span>
               )}
               {personalInfo.linkedin && (
-                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Linkedin size={9} />{personalInfo.linkedin}
-                </span>
+                </a>
               )}
             </div>
           </div>

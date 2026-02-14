@@ -37,3 +37,6 @@ nul
 
 # Coverage & testing
 coverage
+
+# Claude
+.claude/

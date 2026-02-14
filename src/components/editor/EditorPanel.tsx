@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { useAppStore } from '../../store/useAppStore';
 import { SectionAccordion } from './SectionAccordion';
@@ -34,6 +35,7 @@ const sectionForms: Record<SectionType, React.ComponentType> = {
 };
 
 export function EditorPanel() {
+  const { t } = useTranslation();
   const { sections, toggleSectionVisibility, reorderSections } = useCVStore();
   const activeDocument = useAppStore((s) => s.activeDocument);
 
@@ -57,7 +59,7 @@ export function EditorPanel() {
             const FormComponent = sectionForms[section.type];
             return (
               <SectionAccordion
-                title={section.title}
+                title={t(`sections.${section.type}`)}
                 visible={section.visible}
                 onToggleVisibility={() => toggleSectionVisibility(section.id)}
                 dragHandleProps={dragHandleProps}
