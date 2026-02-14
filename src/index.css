@@ -63,6 +63,9 @@ body {
   .print-area,
   .print-area * {
     visibility: visible;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
   .print-area {
@@ -83,6 +86,9 @@ body {
   background: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   position: relative;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
 }
 
 /* Prevent entries from breaking across pages */
