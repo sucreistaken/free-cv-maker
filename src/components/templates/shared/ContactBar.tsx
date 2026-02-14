@@ -7,10 +7,20 @@ interface ContactBarProps {
   iconColor?: string;
 }
 
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
 function getHref(icon: LucideIcon, value: string): string | null {
   if (icon === Mail) return `mailto:${value}`;
-  if (icon === Phone) return `tel:${value}`;
+  if (icon === Phone) return `tel:${value.replace(/[^\d+\-() ]/g, '')}`;
   if (icon === Linkedin || icon === Globe) {
+    if (!isSafeUrl(value)) return null;
     return value.startsWith('http') ? value : `https://${value}`;
   }
   return null;
