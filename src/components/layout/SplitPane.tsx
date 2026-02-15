@@ -6,7 +6,7 @@ interface SplitPaneProps {
 }
 
 export function SplitPane({ left, right }: SplitPaneProps) {
-  const [leftWidth, setLeftWidth] = useState(45);
+  const [leftWidth, setLeftWidth] = useState(25);
   const isDragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
