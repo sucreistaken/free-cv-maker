@@ -1,5 +1,4 @@
 import { useAppStore } from '../store/useAppStore';
-import type React from 'react';
 
 export const fontSizeScale = { small: 0.92, medium: 1, large: 1.08 } as const;
 export const A4_HEIGHT_DEFAULT = 1121;
@@ -29,12 +28,13 @@ export function useTemplateTheme() {
   const margin = marginMap[theme.pageMargins];
   const sectionGap = sectionSpacingMap[theme.sectionSpacing];
 
-  const titleTransform: React.CSSProperties['textTransform'] =
-    theme.sectionTitleStyle === 'uppercase'
-      ? 'uppercase'
-      : theme.sectionTitleStyle === 'capitalize'
-        ? 'capitalize'
-        : 'none';
+  const language = useAppStore((s) => s.language);
+
+  const transformTitle = (title: string): string => {
+    if (theme.sectionTitleStyle === 'uppercase') return title.toLocaleUpperCase(language);
+    if (theme.sectionTitleStyle === 'capitalize') return title.replace(/\b\w/g, (c) => c.toLocaleUpperCase(language));
+    return title;
+  };
 
   const photoSize = photoSizeMap[theme.photoSize];
   const photoShape = photoShapeMap[theme.photoShape];
@@ -48,7 +48,7 @@ export function useTemplateTheme() {
     lineHeight,
     margin,
     sectionGap,
-    titleTransform,
+    transformTitle,
     primaryColor: theme.primaryColor,
     accentColor: theme.accentColor,
     photoSize,

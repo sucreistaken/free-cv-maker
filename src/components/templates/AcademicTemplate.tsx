@@ -16,7 +16,7 @@ export function AcademicTemplate() {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'education', 'languages']);
@@ -44,9 +44,9 @@ export function AcademicTemplate() {
     <div className="mb-2">
       <h2
         className="text-[12px] font-bold tracking-wider border-b pb-1"
-        style={{ color: primaryColor, textTransform: titleTransform, borderColor: accentColor + '40' }}
+        style={{ color: primaryColor, borderColor: accentColor + '40' }}
       >
-        {title}
+        {transformTitle(title)}
       </h2>
     </div>
   );

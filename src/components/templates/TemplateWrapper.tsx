@@ -6,7 +6,7 @@ interface TemplateWrapperProps {
 }
 
 export function TemplateWrapper({ children }: TemplateWrapperProps) {
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, titleTransform, primaryColor, accentColor } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, primaryColor, accentColor } = useTemplateTheme();
 
   return (
     <div
@@ -24,7 +24,6 @@ export function TemplateWrapper({ children }: TemplateWrapperProps) {
         ['--cv-primary' as string]: primaryColor,
         ['--cv-accent' as string]: accentColor,
         ['--cv-section-gap' as string]: sectionGap,
-        ['--cv-title-transform' as string]: titleTransform,
       }}
     >
       {children}

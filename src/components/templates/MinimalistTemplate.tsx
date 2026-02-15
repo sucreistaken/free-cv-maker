@@ -10,7 +10,7 @@ const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
 };
 
 export function MinimalistTemplate() {
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, titleTransform, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, transformTitle, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
   const {
     personalInfo,
     summary,
@@ -34,10 +34,9 @@ export function MinimalistTemplate() {
       className="text-[14px] font-normal tracking-[0.2em] mb-3 pb-1"
       style={{
         color: primaryColor,
-        textTransform: titleTransform,
       }}
     >
-      {title}
+      {transformTitle(title)}
     </h2>
   );
 

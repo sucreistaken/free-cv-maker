@@ -14,16 +14,16 @@ export function CompactTemplate() {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, primaryColor, accentColor, titleTransform, sectionGap, margin } = useTemplateTheme();
+  const { fontFamily, primaryColor, accentColor, transformTitle, sectionGap, margin } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
 
   const SectionTitle = ({ title }: { title: string }) => (
     <h2
       className="text-[10px] font-bold tracking-wider mb-1 pb-0.5 border-b"
-      style={{ color: primaryColor, textTransform: titleTransform, borderColor: accentColor + '40' }}
+      style={{ color: primaryColor, borderColor: accentColor + '40' }}
     >
-      {title}
+      {transformTitle(title)}
     </h2>
   );
 

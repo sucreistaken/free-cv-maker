@@ -27,7 +27,7 @@ export function CreativeTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
 
@@ -54,9 +54,8 @@ export function CreativeTemplate() {
       <div className="w-1 h-5 rounded-full" style={{ backgroundColor: accentColor }} />
       <h2
         className="text-[13px] font-bold tracking-wider text-gray-800"
-        style={{ textTransform: titleTransform }}
       >
-        {title}
+        {transformTitle(title)}
       </h2>
     </div>
   );

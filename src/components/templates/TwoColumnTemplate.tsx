@@ -15,7 +15,7 @@ export function TwoColumnTemplate() {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['skills', 'education', 'languages', 'certifications']);
@@ -26,9 +26,9 @@ export function TwoColumnTemplate() {
     <div className="mb-2">
       <h2
         className="text-[13px] font-bold tracking-wider"
-        style={{ color: primaryColor, textTransform: titleTransform }}
+        style={{ color: primaryColor }}
       >
-        {title}
+        {transformTitle(title)}
       </h2>
       <div className="border-b-2 mt-0.5" style={{ borderColor: accentColor, opacity: 0.3 }} />
     </div>
@@ -37,9 +37,9 @@ export function TwoColumnTemplate() {
   const SidebarSectionTitle = ({ title }: { title: string }) => (
     <h2
       className="text-[11px] font-bold tracking-wider mb-1.5"
-      style={{ color: primaryColor, textTransform: titleTransform }}
+      style={{ color: primaryColor }}
     >
-      {title}
+      {transformTitle(title)}
     </h2>
   );
 

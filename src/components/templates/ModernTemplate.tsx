@@ -34,7 +34,7 @@ export function ModernTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, titleTransform, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'languages']);
@@ -62,9 +62,9 @@ export function ModernTemplate() {
     <div className="mb-2">
       <h2
         className="text-[13px] font-bold tracking-wider"
-        style={{ color: primaryColor, textTransform: titleTransform }}
+        style={{ color: primaryColor }}
       >
-        {title}
+        {transformTitle(title)}
       </h2>
       <div className="border-b-2 mt-1" style={{ borderColor: accentColor, opacity: 0.3 }} />
     </div>

@@ -1,21 +1,15 @@
-import type React from 'react';
-
 interface SectionHeadingProps {
   title: string;
   className?: string;
   color?: string;
-  textTransform?: React.CSSProperties['textTransform'];
 }
 
-export function SectionHeading({ title, className, color, textTransform = 'uppercase' }: SectionHeadingProps) {
+export function SectionHeading({ title, className, color }: SectionHeadingProps) {
   return (
     <div className={className}>
       <h2
         className="text-[13px] font-bold tracking-wider"
-        style={{
-          color: color || undefined,
-          textTransform,
-        }}
+        style={{ color: color || undefined }}
       >
         {title}
       </h2>

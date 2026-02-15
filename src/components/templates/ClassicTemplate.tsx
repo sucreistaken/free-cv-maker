@@ -14,7 +14,7 @@ import { AwardsBlock } from './shared/AwardsBlock';
 import { ReferencesBlock } from './shared/ReferencesBlock';
 
 export function ClassicTemplate() {
-  const { primaryColor, accentColor, titleTransform, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { primaryColor, accentColor, transformTitle, photoSize, photoShape, photoVisible } = useTemplateTheme();
   const {
     personalInfo,
     summary,
@@ -38,14 +38,14 @@ export function ClassicTemplate() {
       case 'summary':
         return summary ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{summary}</p>
           </div>
         ) : null;
       case 'experience':
         return experience.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <ExperienceBlock entries={experience} />
             </div>
@@ -54,7 +54,7 @@ export function ClassicTemplate() {
       case 'projects':
         return projects.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <ProjectBlock entries={projects} />
             </div>
@@ -63,7 +63,7 @@ export function ClassicTemplate() {
       case 'education':
         return education.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <EducationBlock entries={education} />
             </div>
@@ -72,7 +72,7 @@ export function ClassicTemplate() {
       case 'involvement':
         return involvement.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <InvolvementBlock entries={involvement} />
             </div>
@@ -81,7 +81,7 @@ export function ClassicTemplate() {
       case 'skills':
         return skills.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <SkillsBlock categories={skills} />
             </div>
@@ -90,7 +90,7 @@ export function ClassicTemplate() {
       case 'certifications':
         return certifications.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <CertificationBlock entries={certifications} />
             </div>
@@ -99,7 +99,7 @@ export function ClassicTemplate() {
       case 'languages':
         return languages.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <LanguagesBlock entries={languages} accentColor={accentColor} />
             </div>
@@ -108,7 +108,7 @@ export function ClassicTemplate() {
       case 'awards':
         return awards.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <AwardsBlock entries={awards} />
             </div>
@@ -117,14 +117,14 @@ export function ClassicTemplate() {
       case 'hobbies':
         return hobbies ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{hobbies}</p>
           </div>
         ) : null;
       case 'references':
         return references.length > 0 ? (
           <div>
-            <SectionHeading title={title} color={primaryColor} textTransform={titleTransform} />
+            <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
               <ReferencesBlock entries={references} />
             </div>
