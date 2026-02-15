@@ -184,7 +184,7 @@ export const useCVStore = create<CVStore>()(
       // Education
       addEducation: () => {
         set((state) => {
-          const updated = [...state.education, { id: generateId(), degree: '', institution: '', year: '' }];
+          const updated = [...state.education, { id: generateId(), degree: '', institution: '', startDate: '', year: '', gpa: '' }];
           useProfileStore.getState().updateActiveCVData({ education: updated });
           return { education: updated };
         });

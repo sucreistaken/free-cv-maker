@@ -212,6 +212,7 @@ function parsePersonalInfo(lines: string[]): CVData['personalInfo'] {
     website: '',
     nationality: '',
     drivingLicense: '',
+    birthDate: '',
     profilePhoto: '',
   };
 
@@ -420,7 +421,9 @@ function parseEducation(lines: string[]): EducationEntry[] {
         id: generateId(),
         degree: current.degree || '',
         institution: current.institution || '',
+        startDate: current.startDate || '',
         year: current.year || '',
+        gpa: current.gpa || '',
       });
     }
   };

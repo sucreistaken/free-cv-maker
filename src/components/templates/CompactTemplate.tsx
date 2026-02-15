@@ -92,7 +92,9 @@ export function CompactTemplate() {
             <SectionTitle title={title} />
             {education.map((e) => (
               <p key={e.id} className="text-[9px] text-gray-700">
-                <span className="font-bold">{e.degree}</span> — {e.institution}{e.year ? `, ${e.year}` : ''}
+                <span className="font-bold">{e.degree}</span> — {e.institution}
+                {(e.startDate || e.year) && `, ${e.startDate && e.year ? `${e.startDate} – ${e.year}` : e.year || e.startDate}`}
+                {e.gpa && ` (GPA: ${e.gpa})`}
               </p>
             ))}
           </div>
@@ -205,6 +207,7 @@ export function CompactTemplate() {
     { value: personalInfo.website || '', href: personalInfo.website ? (personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`) : null },
     { value: personalInfo.nationality || '', href: null },
     { value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '', href: null },
+    { value: personalInfo.birthDate || '', href: null },
   ].filter((p) => p.value);
 
   return (

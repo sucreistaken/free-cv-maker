@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
@@ -46,6 +46,7 @@ export function CreativeTemplate() {
     { icon: Globe, value: personalInfo.website },
     { icon: Flag, value: personalInfo.nationality },
     { icon: Car, value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '' },
+    { icon: CalendarDays, value: personalInfo.birthDate || '' },
   ].filter((item) => item.value);
 
   const SectionTitle = ({ title }: { title: string }) => (
@@ -136,12 +137,18 @@ export function CreativeTemplate() {
         return education.length > 0 ? (
           <div>
             <SectionTitle title={title} />
-            {education.map((e) => (
-              <TimelineEntry key={e.id} date={e.year || ''}>
-                <h3 className="text-[11.5px] font-bold text-gray-800">{e.degree}</h3>
-                <p className="text-[10px] text-gray-500">{e.institution}</p>
-              </TimelineEntry>
-            ))}
+            {education.map((e) => {
+              const dateStr = e.startDate && e.year ? `${e.startDate} – ${e.year}` : e.year || e.startDate || '';
+              return (
+                <TimelineEntry key={e.id} date={dateStr}>
+                  <h3 className="text-[11.5px] font-bold text-gray-800">{e.degree}</h3>
+                  <p className="text-[10px] text-gray-500">
+                    {e.institution}
+                    {e.gpa && <span className="text-gray-400"> • GPA: {e.gpa}</span>}
+                  </p>
+                </TimelineEntry>
+              );
+            })}
           </div>
         ) : null;
       case 'involvement':

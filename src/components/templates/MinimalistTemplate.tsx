@@ -112,7 +112,7 @@ export function MinimalistTemplate() {
                 <span className="text-[11px] font-semibold text-gray-800">
                   {e.degree}
                 </span>
-                <span className="text-[10px] text-gray-500"> — {e.institution}{e.year ? `, ${e.year}` : ''}</span>
+                <span className="text-[10px] text-gray-500"> — {e.institution}{(e.startDate || e.year) ? `, ${e.startDate && e.year ? `${e.startDate} – ${e.year}` : e.year || e.startDate}` : ''}{e.gpa ? ` (GPA: ${e.gpa})` : ''}</span>
               </div>
             ))}
           </div>
@@ -262,6 +262,7 @@ export function MinimalistTemplate() {
           {personalInfo.website && <><span>·</span><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.website}</a></>}
           {personalInfo.nationality && <><span>·</span><span>{personalInfo.nationality}</span></>}
           {personalInfo.drivingLicense && <><span>·</span><span>License: {personalInfo.drivingLicense}</span></>}
+          {personalInfo.birthDate && <><span>·</span><span>{personalInfo.birthDate}</span></>}
         </div>
       </div>
 

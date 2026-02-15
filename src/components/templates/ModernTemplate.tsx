@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
@@ -55,6 +55,7 @@ export function ModernTemplate() {
     { icon: Globe, value: personalInfo.website },
     { icon: Flag, value: personalInfo.nationality },
     { icon: Car, value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '' },
+    { icon: CalendarDays, value: personalInfo.birthDate || '' },
   ].filter((item) => item.value);
 
   const SectionTitle = ({ title }: { title: string }) => (

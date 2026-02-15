@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Globe, Flag, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
@@ -37,6 +37,7 @@ export function AcademicTemplate() {
     { icon: Linkedin, value: personalInfo.linkedin },
     { icon: Globe, value: personalInfo.website },
     { icon: Flag, value: personalInfo.nationality },
+    { icon: CalendarDays, value: personalInfo.birthDate || '' },
   ].filter((item) => item.value);
 
   const SectionTitle = ({ title }: { title: string }) => (
@@ -67,13 +68,17 @@ export function AcademicTemplate() {
         return education.length > 0 ? (
           <div>
             <SectionTitle title={title} />
-            {education.map((e) => (
-              <div key={e.id} className="mb-2">
-                <p className="text-[10px] font-semibold text-gray-800">{e.degree}</p>
-                <p className="text-[9px] text-gray-500">{e.institution}</p>
-                {e.year && <p className="text-[9px] text-gray-400">{e.year}</p>}
-              </div>
-            ))}
+            {education.map((e) => {
+              const dateStr = e.startDate && e.year ? `${e.startDate} – ${e.year}` : e.year || e.startDate || '';
+              return (
+                <div key={e.id} className="mb-2">
+                  <p className="text-[10px] font-semibold text-gray-800">{e.degree}</p>
+                  <p className="text-[9px] text-gray-500">{e.institution}</p>
+                  {dateStr && <p className="text-[9px] text-gray-400">{dateStr}</p>}
+                  {e.gpa && <p className="text-[9px] text-gray-400">GPA: {e.gpa}</p>}
+                </div>
+              );
+            })}
           </div>
         ) : null;
       case 'skills':

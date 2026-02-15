@@ -76,6 +76,7 @@ export function PersonalInfoForm() {
       <FormField label={t('personalInfoForm.website')} value={personalInfo.website} onChange={(v) => updatePersonalInfo('website', v)} />
       <FormField label={t('personalInfoForm.nationality')} value={personalInfo.nationality} onChange={(v) => updatePersonalInfo('nationality', v)} placeholder={t('personalInfoForm.nationalityPlaceholder')} />
       <FormField label={t('personalInfoForm.drivingLicense')} value={personalInfo.drivingLicense} onChange={(v) => updatePersonalInfo('drivingLicense', v)} placeholder={t('personalInfoForm.drivingLicensePlaceholder')} />
+      <FormField label={t('personalInfoForm.birthDate')} value={personalInfo.birthDate || ''} onChange={(v) => updatePersonalInfo('birthDate', v)} placeholder={t('personalInfoForm.birthDatePlaceholder')} />
     </div>
   );
 }

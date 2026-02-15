@@ -9,7 +9,8 @@
     "importJson": "Import JSON",
     "importPdf": "Import PDF",
     "reset": "Reset to default",
-    "printPdf": "Print / PDF"
+    "printPdf": "Print / PDF",
+    "howToUse": "How to Use?"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -51,7 +52,9 @@
     "nationality": "Nationality",
     "nationalityPlaceholder": "e.g. Turkish",
     "drivingLicense": "Driving License",
-    "drivingLicensePlaceholder": "e.g. B"
+    "drivingLicensePlaceholder": "e.g. B",
+    "birthDate": "Date of Birth",
+    "birthDatePlaceholder": "e.g. 03/15/2000"
   },
   "summaryForm": {
     "label": "Professional Summary",
@@ -73,8 +76,12 @@
     "add": "Add Education",
     "degree": "Degree / Field",
     "institution": "Institution",
-    "year": "Year",
-    "yearPlaceholder": "e.g. 2021"
+    "startDate": "Start",
+    "startDatePlaceholder": "e.g. 2018",
+    "year": "End",
+    "yearPlaceholder": "e.g. 2022",
+    "gpa": "GPA",
+    "gpaPlaceholder": "e.g. 3.5/4.0"
   },
   "projectsForm": {
     "add": "Add Project",
@@ -250,5 +257,23 @@
     "privacyTitle": "Privacy Policy",
     "termsTitle": "Terms of Service",
     "kvkkTitle": "KVKK Notice"
+  },
+  "onboarding": {
+    "welcomeTitle": "Welcome to NextCV!",
+    "welcomeDesc": "Easily create, edit and download your professional CV as PDF.",
+    "templatesTitle": "Choose a Template",
+    "templatesDesc": "Classic, Modern, Creative, Minimalist and more — pick from 7 different templates.",
+    "documentsTitle": "CV & Cover Letter",
+    "documentsDesc": "Switch between your CV and cover letter using the tabs in the top bar.",
+    "exportImportTitle": "Export / Import",
+    "exportImportDesc": "Save and restore your CV data as JSON — never lose your work.",
+    "pdfImportTitle": "Import from PDF",
+    "pdfImportDesc": "Upload your existing PDF CV and let it be parsed automatically.",
+    "printTitle": "Print as PDF",
+    "printDesc": "Use the \"Print / PDF\" button or Ctrl+P to download your CV as PDF.",
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back",
+    "start": "Get Started!"
   }
 }

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users } from 'lucide-react';
+import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/Toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -12,6 +12,7 @@ import { exportToJson, downloadJsonFile, validateImportData } from '../../utils/
 import { parsePdfToCV } from '../../utils/pdfImport';
 import { markExported } from '../../hooks/useExportReminder';
 import { ProfileManager } from './ProfileManager';
+import { OnboardingTour } from '../ui/OnboardingTour';
 
 interface HeaderProps {
   onPrint: () => void;
@@ -26,6 +27,7 @@ export function Header({ onPrint }: HeaderProps) {
   const pdfInputRef = useRef<HTMLInputElement>(null);
   const [showProfileManager, setShowProfileManager] = useState(false);
   const [pdfImporting, setPdfImporting] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleExport = () => {
     const cvState = useCVStore.getState();
@@ -121,13 +123,38 @@ export function Header({ onPrint }: HeaderProps) {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-1.5">
-            {/* Language toggle */}
+            {/* How to use */}
             <button
-              onClick={() => setLanguage(language === 'tr' ? 'en' : 'tr')}
-              className="px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+              onClick={() => setShowTutorial(true)}
+              className="p-1 sm:p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              title={t('header.howToUse')}
             >
-              {language === 'tr' ? 'EN' : 'TR'}
+              <HelpCircle size={16} />
             </button>
+
+            {/* Language toggle */}
+            <div className="flex rounded-md border border-gray-300 overflow-hidden">
+              <button
+                onClick={() => setLanguage('tr')}
+                className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors ${
+                  language === 'tr'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                TR
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors border-l border-gray-300 ${
+                  language === 'en'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                EN
+              </button>
+            </div>
 
             <Button variant="ghost" size="sm" onClick={handleExport} title={t('header.exportJson')}>
               <Download size={15} />
@@ -197,6 +224,7 @@ export function Header({ onPrint }: HeaderProps) {
       </header>
 
       <ProfileManager open={showProfileManager} onClose={() => setShowProfileManager(false)} />
+      <OnboardingTour open={showTutorial} onClose={() => setShowTutorial(false)} />
     </>
   );
 }

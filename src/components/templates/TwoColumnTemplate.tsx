@@ -180,13 +180,17 @@ export function TwoColumnTemplate() {
         return education.length > 0 ? (
           <div>
             <SidebarSectionTitle title={title} />
-            {education.map((e) => (
-              <div key={e.id} className="mb-2">
-                <p className="text-[10px] font-semibold text-gray-800">{e.degree}</p>
-                <p className="text-[9px] text-gray-500">{e.institution}</p>
-                {e.year && <p className="text-[9px] text-gray-400">{e.year}</p>}
-              </div>
-            ))}
+            {education.map((e) => {
+              const dateStr = e.startDate && e.year ? `${e.startDate} – ${e.year}` : e.year || e.startDate || '';
+              return (
+                <div key={e.id} className="mb-2">
+                  <p className="text-[10px] font-semibold text-gray-800">{e.degree}</p>
+                  <p className="text-[9px] text-gray-500">{e.institution}</p>
+                  {dateStr && <p className="text-[9px] text-gray-400">{dateStr}</p>}
+                  {e.gpa && <p className="text-[9px] text-gray-400">GPA: {e.gpa}</p>}
+                </div>
+              );
+            })}
           </div>
         ) : null;
       case 'languages':
@@ -256,6 +260,11 @@ export function TwoColumnTemplate() {
                 <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   <Globe size={9} />{personalInfo.website}
                 </a>
+              )}
+              {personalInfo.birthDate && (
+                <span className="flex items-center gap-1 text-[9px] text-gray-400">
+                  {personalInfo.birthDate}
+                </span>
               )}
             </div>
           </div>

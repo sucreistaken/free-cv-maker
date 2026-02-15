@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { TemplateType, ThemeConfig, DocumentType } from '../types/cv';
 import { useProfileStore } from './useProfileStore';
 import i18n from '../i18n';
+import { useCVStore } from './useCVStore';
 
 interface AppStore {
   template: TemplateType;
@@ -59,6 +60,13 @@ export const useAppStore = create<AppStore>()(
         set({ language });
         i18n.changeLanguage(language);
         document.documentElement.lang = language;
+        // Update CV section titles to match new language
+        const cvState = useCVStore.getState();
+        const updated = cvState.sections.map((s) => ({
+          ...s,
+          title: i18n.t(`sections.${s.type}`) || s.title,
+        }));
+        cvState.reorderSections(updated);
       },
       setPageBreakHeight: (size, h) => set((state) => ({
         pageBreakHeights: { ...state.pageBreakHeights, [size]: h },

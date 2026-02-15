@@ -9,7 +9,8 @@
     "importJson": "JSON İçe Aktar",
     "importPdf": "PDF İçe Aktar",
     "reset": "Varsayılana Sıfırla",
-    "printPdf": "Yazdır / PDF"
+    "printPdf": "Yazdır / PDF",
+    "howToUse": "Nasıl Kullanılır?"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -51,7 +52,9 @@
     "nationality": "Uyruk",
     "nationalityPlaceholder": "ör. Türk",
     "drivingLicense": "Ehliyet",
-    "drivingLicensePlaceholder": "ör. B"
+    "drivingLicensePlaceholder": "ör. B",
+    "birthDate": "Doğum Tarihi",
+    "birthDatePlaceholder": "ör. 15.03.2000"
   },
   "summaryForm": {
     "label": "Profesyonel Özet",
@@ -73,8 +76,12 @@
     "add": "Eğitim Ekle",
     "degree": "Derece / Alan",
     "institution": "Kurum",
-    "year": "Yıl",
-    "yearPlaceholder": "ör. 2021"
+    "startDate": "Başlangıç",
+    "startDatePlaceholder": "ör. 2018",
+    "year": "Bitiş",
+    "yearPlaceholder": "ör. 2022",
+    "gpa": "Not Ort.",
+    "gpaPlaceholder": "ör. 3.5/4.0"
   },
   "projectsForm": {
     "add": "Proje Ekle",
@@ -250,5 +257,23 @@
     "privacyTitle": "Gizlilik Politikası",
     "termsTitle": "Kullanım Koşulları",
     "kvkkTitle": "KVKK Aydınlatma Metni"
+  },
+  "onboarding": {
+    "welcomeTitle": "NextCV'ye Hoş Geldin!",
+    "welcomeDesc": "Profesyonel CV'ni kolayca oluştur, düzenle ve PDF olarak indir.",
+    "templatesTitle": "Şablon Seç",
+    "templatesDesc": "Classic, Modern, Creative, Minimalist ve daha fazlası — 7 farklı şablondan birini seç.",
+    "documentsTitle": "CV & Ön Yazı",
+    "documentsDesc": "Üst bardaki sekmelerden CV ve kapak mektubu arasında kolayca geçiş yap.",
+    "exportImportTitle": "Dışa / İçe Aktar",
+    "exportImportDesc": "CV verilerini JSON olarak kaydet ve geri yükle — verilerini asla kaybetme.",
+    "pdfImportTitle": "PDF'den İçe Aktar",
+    "pdfImportDesc": "Mevcut PDF CV'ni yükle, içeriği otomatik olarak ayrıştırılsın.",
+    "printTitle": "PDF Yazdır",
+    "printDesc": "\"Yazdır / PDF\" butonu veya Ctrl+P ile CV'ni PDF olarak indir.",
+    "skip": "Atla",
+    "next": "İleri",
+    "back": "Geri",
+    "start": "Başla!"
   }
 }

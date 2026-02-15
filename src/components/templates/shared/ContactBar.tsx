@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { PersonalInfo } from '../../../types/cv';
 import type { LucideIcon } from 'lucide-react';
 
@@ -35,6 +35,7 @@ export function ContactBar({ info, iconColor }: ContactBarProps) {
     { icon: Globe, value: info.website },
     { icon: Flag, value: info.nationality },
     { icon: Car, value: info.drivingLicense ? `License: ${info.drivingLicense}` : '' },
+    { icon: CalendarDays, value: info.birthDate || '' },
   ].filter((item) => item.value);
 
   return (

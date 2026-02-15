@@ -9,6 +9,7 @@ export interface PersonalInfo {
   website: string;
   nationality: string;
   drivingLicense: string;
+  birthDate: string;
   profilePhoto: string;
 }
 
@@ -34,7 +35,9 @@ export interface EducationEntry {
   id: string;
   degree: string;
   institution: string;
+  startDate: string;
   year: string;
+  gpa: string;
 }
 
 export interface InvolvementEntry {

@@ -13,6 +13,7 @@ export const defaultCV: CVData = {
     website: 'alexmorgan.dev',
     nationality: '',
     drivingLicense: '',
+    birthDate: '',
     profilePhoto: '',
   },
   summary:
@@ -82,7 +83,9 @@ export const defaultCV: CVData = {
       id: generateId(),
       degree: 'B.Sc. Computer Science',
       institution: 'Technical University of Munich',
+      startDate: '2016',
       year: '2020',
+      gpa: '3.7/4.0',
     },
   ],
   involvement: [

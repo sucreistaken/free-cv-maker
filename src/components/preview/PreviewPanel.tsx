@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ZoomIn, ZoomOut, Scissors, Settings2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Scissors } from 'lucide-react';
 import { CVDocument } from './CVDocument';
 import { CoverLetterDocument } from './CoverLetterDocument';
 import { useAppStore } from '../../store/useAppStore';
@@ -16,12 +16,10 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.6);
   const [showPageBreaks, setShowPageBreaks] = useState(true);
-  const [showCalibration, setShowCalibration] = useState(false);
   const [pageCount, setPageCount] = useState(1);
   const activeDocument = useAppStore((s) => s.activeDocument);
   const fontSize = useAppStore((s) => s.theme.fontSize);
   const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
-  const setPageBreakHeight = useAppStore((s) => s.setPageBreakHeight);
   const a4Height = pageBreakHeights?.[fontSize] || A4_HEIGHT_DEFAULT;
 
   // Auto-fit preview scale
@@ -103,61 +101,7 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
           )}
         </button>
 
-        {/* Calibration toggle */}
-        <button
-          onClick={() => setShowCalibration((v) => !v)}
-          className={`p-1 rounded text-xs ${showCalibration
-            ? 'bg-amber-100 text-amber-700'
-            : 'hover:bg-gray-200 text-gray-400'
-            }`}
-          title={t('preview.calibration')}
-        >
-          <Settings2 size={14} />
-        </button>
       </div>
-
-      {/* Calibration panel */}
-      {showCalibration && (
-        <div className="flex items-center justify-center gap-4 px-4 py-1.5 bg-amber-50 border-b border-amber-200 shrink-0">
-          {(['small', 'medium', 'large'] as const).map((size) => {
-            const label = size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L';
-            const val = pageBreakHeights?.[size] || A4_HEIGHT_DEFAULT;
-            const isActive = fontSize === size;
-            return (
-              <div key={size} className={`flex items-center gap-1.5 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
-                <span className={`text-[10px] font-bold w-3 ${isActive ? 'text-amber-800' : 'text-amber-600'}`}>
-                  {label}
-                </span>
-                <input
-                  type="number"
-                  min={1080}
-                  max={1280}
-                  value={val}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    if (v >= 1080 && v <= 1280) setPageBreakHeight(size, v);
-                  }}
-                  className={`w-14 text-[11px] text-center border rounded px-1 py-0.5 font-mono ${isActive
-                    ? 'border-amber-400 bg-white text-amber-900'
-                    : 'border-amber-200 bg-amber-50 text-amber-600'
-                    }`}
-                />
-              </div>
-            );
-          })}
-          <span className="text-[10px] text-amber-500">px</span>
-          <button
-            onClick={() => {
-              setPageBreakHeight('small', A4_HEIGHT_DEFAULT);
-              setPageBreakHeight('medium', A4_HEIGHT_DEFAULT);
-              setPageBreakHeight('large', A4_HEIGHT_DEFAULT);
-            }}
-            className="text-[10px] text-amber-600 hover:text-amber-800 underline"
-          >
-            {t('preview.reset')}
-          </button>
-        </div>
-      )}
 
       {/* Preview area */}
       <div
