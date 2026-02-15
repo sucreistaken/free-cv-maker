@@ -29,10 +29,11 @@ export function Header({ onPrint }: HeaderProps) {
   const [pdfImporting, setPdfImporting] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const canFullscreen = document.fullscreenEnabled;
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
+      document.documentElement.requestFullscreen().catch(() => {});
       setIsFullscreen(true);
     } else {
       document.exitFullscreen();
@@ -135,16 +136,18 @@ export function Header({ onPrint }: HeaderProps) {
 
           <div className="flex items-center gap-1 sm:gap-1.5">
             {/* Fullscreen */}
-            <button
-              onClick={toggleFullscreen}
-              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
-            >
-              {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
-              <span className="hidden sm:inline text-[10px] sm:text-xs font-medium">
-                {isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
-              </span>
-            </button>
+            {canFullscreen && (
+              <button
+                onClick={toggleFullscreen}
+                className="flex items-center gap-1 px-1.5 sm:px-2 py-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+              >
+                {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+                <span className="hidden sm:inline text-[10px] sm:text-xs font-medium">
+                  {isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+                </span>
+              </button>
+            )}
 
             {/* How to use */}
             <button
