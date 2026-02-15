@@ -10,7 +10,9 @@
     "importPdf": "PDF İçe Aktar",
     "reset": "Varsayılana Sıfırla",
     "printPdf": "Yazdır / PDF",
-    "howToUse": "Nasıl Kullanılır?"
+    "howToUse": "Nasıl Kullanılır?",
+    "fullscreen": "Tam Ekran",
+    "exitFullscreen": "Tam Ekrandan Çık"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",

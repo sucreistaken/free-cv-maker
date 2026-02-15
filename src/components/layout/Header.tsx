@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle } from 'lucide-react';
+import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle, Maximize, Minimize } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/Toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -28,6 +28,17 @@ export function Header({ onPrint }: HeaderProps) {
   const [showProfileManager, setShowProfileManager] = useState(false);
   const [pdfImporting, setPdfImporting] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
 
   const handleExport = () => {
     const cvState = useCVStore.getState();
@@ -123,6 +134,18 @@ export function Header({ onPrint }: HeaderProps) {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Fullscreen */}
+            <button
+              onClick={toggleFullscreen}
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+            >
+              {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+              <span className="hidden sm:inline text-[10px] sm:text-xs font-medium">
+                {isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
+              </span>
+            </button>
+
             {/* How to use */}
             <button
               onClick={() => setShowTutorial(true)}

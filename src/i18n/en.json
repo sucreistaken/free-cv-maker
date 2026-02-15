@@ -10,7 +10,9 @@
     "importPdf": "Import PDF",
     "reset": "Reset to default",
     "printPdf": "Print / PDF",
-    "howToUse": "How to Use?"
+    "howToUse": "How to Use?",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
