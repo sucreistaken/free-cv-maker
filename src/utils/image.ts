@@ -1,4 +1,4 @@
-const MAX_RAW_SIZE = 500 * 1024; // 500KB
+const MAX_RAW_SIZE = 5 * 1024 * 1024; // 5MB
 const TARGET_SIZE = 200;
 const JPEG_QUALITY = 0.85;
 
@@ -7,7 +7,7 @@ export function validateImageFile(file: File): string | null {
     return 'Please select an image file.';
   }
   if (file.size > MAX_RAW_SIZE) {
-    return 'Image is too large. Maximum size is 500KB.';
+    return 'Image is too large. Maximum size is 5MB.';
   }
   return null;
 }
