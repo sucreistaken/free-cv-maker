@@ -11,6 +11,7 @@ export function SummaryForm() {
       label={t('summaryForm.label')}
       value={summary}
       onChange={(e) => updateSummary(e.target.value)}
+      onValueChange={updateSummary}
       rows={5}
       placeholder={t('summaryForm.placeholder')}
     />

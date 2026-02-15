@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { TemplateWrapper } from './TemplateWrapper';
@@ -39,7 +40,7 @@ export function ClassicTemplate() {
         return summary ? (
           <div>
             <SectionHeading title={transformTitle(title)} color={primaryColor} />
-            <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{summary}</p>
+            <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -118,7 +119,7 @@ export function ClassicTemplate() {
         return hobbies ? (
           <div>
             <SectionHeading title={transformTitle(title)} color={primaryColor} />
-            <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{hobbies}</p>
+            <p className="text-[10.5px] text-gray-700 mt-2 leading-relaxed">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':
@@ -138,18 +139,20 @@ export function ClassicTemplate() {
   return (
     <TemplateWrapper>
       {/* Header */}
-      <div className="text-center mb-2">
+      <div className={`mb-2 ${personalInfo.profilePhoto && photoVisible ? 'flex items-center gap-4' : 'text-center'}`}>
         {personalInfo.profilePhoto && photoVisible && (
-          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
+          <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover shrink-0" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
-        <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p className="text-[12px] text-gray-600 mt-0.5">{personalInfo.jobTitle}</p>
-        )}
-        <div className="mt-1">
-          <ContactBar info={personalInfo} iconColor={accentColor} />
+        <div>
+          <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">
+            {personalInfo.fullName}
+          </h1>
+          {personalInfo.jobTitle && (
+            <p className="text-[12px] text-gray-600 mt-0.5">{personalInfo.jobTitle}</p>
+          )}
+          <div className="mt-1">
+            <ContactBar info={personalInfo} iconColor={accentColor} />
+          </div>
         </div>
       </div>
 

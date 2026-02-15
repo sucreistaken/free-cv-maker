@@ -1,4 +1,5 @@
 import type { ExperienceEntry } from '../../../types/cv';
+import { parseFormattedText } from '../../../utils/formatText';
 
 interface ExperienceBlockProps {
   entries: ExperienceEntry[];
@@ -22,7 +23,7 @@ export function ExperienceBlock({ entries }: ExperienceBlockProps) {
               {entry.bullets.filter(b => b).map((bullet, i) => (
                 <li key={`${bullet}-${i}`} className="text-[10.5px] text-gray-700 flex">
                   <span className="mr-1.5 shrink-0">•</span>
-                  <span>{bullet}</span>
+                  <span>{parseFormattedText(bullet)}</span>
                 </li>
               ))}
             </ul>

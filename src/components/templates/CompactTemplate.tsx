@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
@@ -33,7 +34,7 @@ export function CompactTemplate() {
         return summary ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[9px] text-gray-700 leading-[1.3]">{summary}</p>
+            <p className="text-[9px] text-gray-700 leading-[1.3]">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -52,7 +53,7 @@ export function CompactTemplate() {
                     {e.bullets.filter(Boolean).map((b, i) => (
                       <li key={i} className="text-[9px] text-gray-700 flex leading-[1.2]">
                         <span className="mr-1 shrink-0">-</span>
-                        <span>{b}</span>
+                        <span>{parseFormattedText(b)}</span>
                       </li>
                     ))}
                   </ul>
@@ -77,7 +78,7 @@ export function CompactTemplate() {
                     {p.bullets.filter(Boolean).map((b, i) => (
                       <li key={i} className="text-[9px] text-gray-700 flex leading-[1.2]">
                         <span className="mr-1 shrink-0">-</span>
-                        <span>{b}</span>
+                        <span>{parseFormattedText(b)}</span>
                       </li>
                     ))}
                   </ul>
@@ -115,7 +116,7 @@ export function CompactTemplate() {
                     {inv.bullets.filter(Boolean).map((b, i) => (
                       <li key={i} className="text-[9px] text-gray-700 flex leading-[1.2]">
                         <span className="mr-1 shrink-0">-</span>
-                        <span>{b}</span>
+                        <span>{parseFormattedText(b)}</span>
                       </li>
                     ))}
                   </ul>
@@ -176,7 +177,7 @@ export function CompactTemplate() {
         return hobbies ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[9px] text-gray-700 leading-[1.2]">{hobbies}</p>
+            <p className="text-[9px] text-gray-700 leading-[1.2]">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':

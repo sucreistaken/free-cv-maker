@@ -260,6 +260,10 @@
     "termsTitle": "Kullanım Koşulları",
     "kvkkTitle": "KVKK Aydınlatma Metni"
   },
+  "formatting": {
+    "bold": "Kalın",
+    "italic": "İtalik"
+  },
   "onboarding": {
     "welcomeTitle": "NextCV'ye Hoş Geldin!",
     "welcomeDesc": "Profesyonel CV'ni kolayca oluştur, düzenle ve PDF olarak indir.",

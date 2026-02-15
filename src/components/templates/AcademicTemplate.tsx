@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
@@ -56,7 +57,7 @@ export function AcademicTemplate() {
       {bullets.filter(Boolean).map((b, i) => (
         <li key={i} className="text-[10px] text-gray-700 flex leading-relaxed">
           <span className="mr-1.5 shrink-0">•</span>
-          <span>{b}</span>
+          <span>{parseFormattedText(b)}</span>
         </li>
       ))}
     </ul>
@@ -116,7 +117,7 @@ export function AcademicTemplate() {
         return summary ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10px] text-gray-700 leading-relaxed">{summary}</p>
+            <p className="text-[10px] text-gray-700 leading-relaxed">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -207,7 +208,7 @@ export function AcademicTemplate() {
         return hobbies ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10px] text-gray-700 leading-relaxed">{hobbies}</p>
+            <p className="text-[10px] text-gray-700 leading-relaxed">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':

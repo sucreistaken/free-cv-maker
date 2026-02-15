@@ -11,6 +11,7 @@ export function HobbiesForm() {
       label={t('hobbiesForm.label')}
       value={hobbies}
       onChange={(e) => updateHobbies(e.target.value)}
+      onValueChange={updateHobbies}
       rows={4}
       placeholder={t('hobbiesForm.placeholder')}
     />

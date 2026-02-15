@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
@@ -45,7 +46,7 @@ export function MinimalistTemplate() {
       {bullets.filter(Boolean).map((b, i) => (
         <li key={i} className="text-[10.5px] text-gray-600 flex leading-relaxed">
           <span className="mr-2 shrink-0">—</span>
-          <span>{b}</span>
+          <span>{parseFormattedText(b)}</span>
         </li>
       ))}
     </ul>
@@ -57,7 +58,7 @@ export function MinimalistTemplate() {
         return summary ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-600 leading-relaxed italic">{summary}</p>
+            <p className="text-[10.5px] text-gray-600 leading-relaxed italic">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -201,7 +202,7 @@ export function MinimalistTemplate() {
         return hobbies ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-600 leading-relaxed">{hobbies}</p>
+            <p className="text-[10.5px] text-gray-600 leading-relaxed">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':

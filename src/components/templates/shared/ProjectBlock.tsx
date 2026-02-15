@@ -1,4 +1,5 @@
 import type { ProjectEntry } from '../../../types/cv';
+import { parseFormattedText } from '../../../utils/formatText';
 
 interface ProjectBlockProps {
   entries: ProjectEntry[];
@@ -21,7 +22,7 @@ export function ProjectBlock({ entries }: ProjectBlockProps) {
               {entry.bullets.filter(b => b).map((bullet, i) => (
                 <li key={`${bullet}-${i}`} className="text-[10.5px] text-gray-700 flex">
                   <span className="mr-1.5 shrink-0">•</span>
-                  <span>{bullet}</span>
+                  <span>{parseFormattedText(bullet)}</span>
                 </li>
               ))}
             </ul>

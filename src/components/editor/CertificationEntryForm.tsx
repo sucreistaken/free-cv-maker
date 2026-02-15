@@ -21,6 +21,7 @@ export function CertificationEntryForm({ entry }: Props) {
         label={t('certificationsForm.description')}
         value={entry.description}
         onChange={(e) => updateCertification(entry.id, 'description', e.target.value)}
+        onValueChange={(v) => updateCertification(entry.id, 'description', v)}
         rows={3}
       />
     </div>

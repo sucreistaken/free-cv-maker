@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
@@ -76,7 +77,7 @@ export function ModernTemplate() {
         return summary ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-700 leading-relaxed">{summary}</p>
+            <p className="text-[10.5px] text-gray-700 leading-relaxed">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -125,7 +126,7 @@ export function ModernTemplate() {
         return hobbies ? (
           <div>
             <SectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-700 leading-relaxed">{hobbies}</p>
+            <p className="text-[10.5px] text-gray-700 leading-relaxed">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':

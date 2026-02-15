@@ -21,6 +21,7 @@ export function AwardEntryForm({ entry }: Props) {
         label={t('awardsForm.description')}
         value={entry.description}
         onChange={(e) => updateAward(entry.id, 'description', e.target.value)}
+        onValueChange={(v) => updateAward(entry.id, 'description', v)}
         rows={3}
       />
     </div>

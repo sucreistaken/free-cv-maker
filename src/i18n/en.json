@@ -260,6 +260,10 @@
     "termsTitle": "Terms of Service",
     "kvkkTitle": "KVKK Notice"
   },
+  "formatting": {
+    "bold": "Bold",
+    "italic": "Italic"
+  },
   "onboarding": {
     "welcomeTitle": "Welcome to NextCV!",
     "welcomeDesc": "Easily create, edit and download your professional CV as PDF.",

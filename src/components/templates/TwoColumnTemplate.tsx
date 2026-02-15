@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Globe } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
@@ -48,7 +49,7 @@ export function TwoColumnTemplate() {
       {bullets.filter(Boolean).map((b, i) => (
         <li key={i} className="text-[10px] text-gray-700 flex leading-relaxed">
           <span className="mr-1.5 shrink-0" style={{ color: accentColor }}>•</span>
-          <span>{b}</span>
+          <span>{parseFormattedText(b)}</span>
         </li>
       ))}
     </ul>
@@ -60,7 +61,7 @@ export function TwoColumnTemplate() {
         return summary ? (
           <div>
             <MainSectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-700 leading-relaxed">{summary}</p>
+            <p className="text-[10.5px] text-gray-700 leading-relaxed">{parseFormattedText(summary)}</p>
           </div>
         ) : null;
       case 'experience':
@@ -136,7 +137,7 @@ export function TwoColumnTemplate() {
         return hobbies ? (
           <div>
             <MainSectionTitle title={title} />
-            <p className="text-[10.5px] text-gray-700 leading-relaxed">{hobbies}</p>
+            <p className="text-[10.5px] text-gray-700 leading-relaxed">{parseFormattedText(hobbies)}</p>
           </div>
         ) : null;
       case 'references':

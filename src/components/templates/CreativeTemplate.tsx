@@ -1,3 +1,4 @@
+import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
@@ -65,7 +66,7 @@ export function CreativeTemplate() {
       {bullets.filter(Boolean).map((b, i) => (
         <li key={i} className="text-[10.5px] text-gray-700 flex">
           <span className="mr-1.5 shrink-0" style={{ color: accentColor }}>&#9656;</span>
-          <span>{b}</span>
+          <span>{parseFormattedText(b)}</span>
         </li>
       ))}
     </ul>
@@ -99,7 +100,7 @@ export function CreativeTemplate() {
           <div>
             <SectionTitle title={title} />
             <p className="text-[10.5px] text-gray-700 leading-relaxed pl-3 border-l-2" style={{ borderColor: accentColor + '40' }}>
-              {summary}
+              {parseFormattedText(summary)}
             </p>
           </div>
         ) : null;
@@ -241,7 +242,7 @@ export function CreativeTemplate() {
           <div>
             <SectionTitle title={title} />
             <p className="text-[10.5px] text-gray-700 leading-relaxed pl-3 border-l-2" style={{ borderColor: accentColor + '40' }}>
-              {hobbies}
+              {parseFormattedText(hobbies)}
             </p>
           </div>
         ) : null;
