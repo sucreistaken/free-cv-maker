@@ -252,6 +252,7 @@ export function MinimalistTemplate() {
           {personalInfo.email && <><span>·</span><a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.email}</a></>}
           {personalInfo.phone && <><span>·</span><a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.phone}</a></>}
           {personalInfo.linkedin && <><span>·</span><a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.linkedin}</a></>}
+          {personalInfo.github && <><span>·</span><a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.github}</a></>}
           {personalInfo.website && <><span>·</span><a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{personalInfo.website}</a></>}
           {personalInfo.nationality && <><span>·</span><span>{personalInfo.nationality}</span></>}
           {personalInfo.drivingLicense && <><span>·</span><span>License: {personalInfo.drivingLicense}</span></>}

@@ -208,6 +208,7 @@ export function CompactTemplate() {
     { value: personalInfo.email || '', href: personalInfo.email ? `mailto:${personalInfo.email}` : null },
     { value: personalInfo.phone || '', href: personalInfo.phone ? `tel:${personalInfo.phone}` : null },
     { value: personalInfo.linkedin || '', href: personalInfo.linkedin ? (personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`) : null },
+    { value: personalInfo.github || '', href: personalInfo.github ? (personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`) : null },
     { value: personalInfo.website || '', href: personalInfo.website ? (personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`) : null },
     { value: personalInfo.nationality || '', href: null },
     { value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '', href: null },

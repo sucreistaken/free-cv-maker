@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, Globe } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../../store/useCVStore';
 import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
@@ -10,7 +10,7 @@ export function ModernCoverLetter() {
   const getHref = (icon: LucideIcon, value: string): string | null => {
     if (icon === Mail) return `mailto:${value}`;
     if (icon === Phone) return `tel:${value}`;
-    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    if (icon === Linkedin || icon === Github || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
     return null;
   };
 
@@ -19,6 +19,7 @@ export function ModernCoverLetter() {
     { icon: Mail, value: personalInfo.email },
     { icon: Phone, value: personalInfo.phone },
     { icon: Linkedin, value: personalInfo.linkedin },
+    { icon: Github, value: personalInfo.github },
     { icon: Globe, value: personalInfo.website },
   ].filter((item) => item.value);
 

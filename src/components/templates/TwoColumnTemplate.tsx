@@ -1,5 +1,5 @@
 import { parseFormattedText } from '../../utils/formatText';
-import { MapPin, Mail, Phone, Linkedin, Globe } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, Globe } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
@@ -248,6 +248,11 @@ export function TwoColumnTemplate() {
               {personalInfo.linkedin && (
                 <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   {showIcons && <Linkedin size={9} />}{personalInfo.linkedin}
+                </a>
+              )}
+              {personalInfo.github && (
+                <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
+                  {showIcons && <Github size={9} />}{personalInfo.github}
                 </a>
               )}
               {personalInfo.website && (

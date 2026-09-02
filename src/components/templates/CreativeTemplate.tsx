@@ -1,5 +1,5 @@
 import { parseFormattedText } from '../../utils/formatText';
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
@@ -28,7 +28,7 @@ export function CreativeTemplate() {
   const getHref = (icon: LucideIcon, value: string): string | null => {
     if (icon === Mail) return `mailto:${value}`;
     if (icon === Phone) return `tel:${value}`;
-    if (icon === Linkedin || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
+    if (icon === Linkedin || icon === Github || icon === Globe) return value.startsWith('http') ? value : `https://${value}`;
     return null;
   };
 
@@ -37,6 +37,7 @@ export function CreativeTemplate() {
     { icon: Mail, value: personalInfo.email },
     { icon: Phone, value: personalInfo.phone },
     { icon: Linkedin, value: personalInfo.linkedin },
+    { icon: Github, value: personalInfo.github },
     { icon: Globe, value: personalInfo.website },
     { icon: Flag, value: personalInfo.nationality },
     { icon: Car, value: personalInfo.drivingLicense ? `License: ${personalInfo.drivingLicense}` : '' },

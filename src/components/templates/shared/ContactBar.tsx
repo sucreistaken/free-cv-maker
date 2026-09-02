@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin, Globe, Flag, Car, CalendarDays } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { PersonalInfo } from '../../../types/cv';
 import type { LucideIcon } from 'lucide-react';
 
@@ -21,7 +21,7 @@ function isSafeUrl(url: string): boolean {
 function getHref(icon: LucideIcon, value: string): string | null {
   if (icon === Mail) return `mailto:${value}`;
   if (icon === Phone) return `tel:${value.replace(/[^\d+\-() ]/g, '')}`;
-  if (icon === Linkedin || icon === Globe) {
+  if (icon === Linkedin || icon === Github || icon === Globe) {
     if (!isSafeUrl(value)) return null;
     return value.startsWith('http') ? value : `https://${value}`;
   }
@@ -34,6 +34,7 @@ export function ContactBar({ info, iconColor, showIcons = true }: ContactBarProp
     { icon: Mail, value: info.email },
     { icon: Phone, value: info.phone },
     { icon: Linkedin, value: info.linkedin },
+    { icon: Github, value: info.github },
     { icon: Globe, value: info.website },
     { icon: Flag, value: info.nationality },
     { icon: Car, value: info.drivingLicense ? `License: ${info.drivingLicense}` : '' },

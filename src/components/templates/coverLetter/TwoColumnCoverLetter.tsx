@@ -1,4 +1,4 @@
-import { MapPin, Mail, Phone, Linkedin } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github } from 'lucide-react';
 import { useCVStore } from '../../../store/useCVStore';
 import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
@@ -38,6 +38,11 @@ export function TwoColumnCoverLetter() {
               {personalInfo.linkedin && (
                 <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
                   {showIcons && <Linkedin size={9} />}{personalInfo.linkedin}
+                </a>
+              )}
+              {personalInfo.github && (
+                <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
+                  {showIcons && <Github size={9} />}{personalInfo.github}
                 </a>
               )}
             </div>
