@@ -15,7 +15,7 @@ import { AwardsBlock } from './shared/AwardsBlock';
 import { ReferencesBlock } from './shared/ReferencesBlock';
 
 export function ClassicTemplate() {
-  const { primaryColor, accentColor, transformTitle, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { primaryColor, accentColor, transformTitle, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
   const {
     personalInfo,
     summary,
@@ -102,7 +102,7 @@ export function ClassicTemplate() {
           <div>
             <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
-              <LanguagesBlock entries={languages} accentColor={accentColor} />
+              <LanguagesBlock entries={languages} accentColor={accentColor} labels={proficiencyLabels} showIcons={showIcons} />
             </div>
           </div>
         ) : null;
@@ -151,7 +151,7 @@ export function ClassicTemplate() {
             <p className="text-[12px] text-gray-600 mt-0.5">{personalInfo.jobTitle}</p>
           )}
           <div className="mt-1">
-            <ContactBar info={personalInfo} iconColor={accentColor} />
+            <ContactBar info={personalInfo} iconColor={accentColor} showIcons={showIcons} />
           </div>
         </div>
       </div>

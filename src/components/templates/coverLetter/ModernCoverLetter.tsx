@@ -5,7 +5,7 @@ import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function ModernCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, photoSize, photoShape, photoVisible, showIcons } = useTemplateTheme();
 
   const getHref = (icon: LucideIcon, value: string): string | null => {
     if (icon === Mail) return `mailto:${value}`;
@@ -45,7 +45,7 @@ export function ModernCoverLetter() {
             const href = getHref(item.icon, item.value!);
             return (
               <div key={i} className="flex items-start gap-2 text-[9.5px] opacity-90">
-                <item.icon size={10} className="mt-0.5 shrink-0" />
+                {showIcons && <item.icon size={10} className="mt-0.5 shrink-0" />}
                 {href ? (
                   <a href={href} target="_blank" rel="noopener noreferrer" className="break-all hover:underline">{item.value}</a>
                 ) : (

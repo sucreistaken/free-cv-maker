@@ -14,7 +14,7 @@ export function ProjectBlock({ entries }: ProjectBlockProps) {
             <h3 className="text-[11.5px] font-bold text-gray-800">{entry.name}</h3>
           </div>
           <div className="flex items-center gap-2 text-[10px] text-gray-500">
-            {entry.link && <a href={entry.link.startsWith('http') ? entry.link : `https://${entry.link}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{entry.link}</a>}
+            {entry.link && <a href={entry.link.startsWith('http') ? entry.link : `https://${entry.link}`} target="_blank" rel="noopener noreferrer" className="text-gray-800 hover:underline">{entry.link}</a>}
             {entry.date && <span>• {entry.date}</span>}
           </div>
           {entry.bullets.length > 0 && (

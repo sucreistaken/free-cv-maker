@@ -26,6 +26,7 @@ export function migrateToProfiles(): { profiles: CVProfile[]; activeProfileId: s
       sectionSpacing: 'normal',
       photoSize: 'md',
       photoShape: 'circle',
+      showIcons: true,
       photoVisible: true,
     },
   };

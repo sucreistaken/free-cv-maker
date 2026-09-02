@@ -5,7 +5,7 @@ import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function AcademicCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible, showIcons } = useTemplateTheme();
 
   const getHref = (icon: LucideIcon, value: string): string | null => {
     if (icon === Mail) return `mailto:${value}`;
@@ -53,12 +53,12 @@ export function AcademicCoverLetter() {
             const href = getHref(item.icon, item.value!);
             return href ? (
               <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-500 hover:underline">
-                <item.icon size={9} />
+                {showIcons && <item.icon size={9} />}
                 {item.value}
               </a>
             ) : (
               <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
-                <item.icon size={9} />
+                {showIcons && <item.icon size={9} />}
                 {item.value}
               </span>
             );

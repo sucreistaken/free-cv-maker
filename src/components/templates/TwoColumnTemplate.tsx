@@ -4,19 +4,12 @@ import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
-
 export function TwoColumnTemplate() {
   const {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['skills', 'education', 'languages', 'certifications']);
@@ -239,27 +232,27 @@ export function TwoColumnTemplate() {
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               {personalInfo.location && (
                 <span className="flex items-center gap-1 text-[9px] text-gray-400">
-                  <MapPin size={9} />{personalInfo.location}
+                  {showIcons && <MapPin size={9} />}{personalInfo.location}
                 </span>
               )}
               {personalInfo.email && (
                 <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Mail size={9} />{personalInfo.email}
+                  {showIcons && <Mail size={9} />}{personalInfo.email}
                 </a>
               )}
               {personalInfo.phone && (
                 <a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Phone size={9} />{personalInfo.phone}
+                  {showIcons && <Phone size={9} />}{personalInfo.phone}
                 </a>
               )}
               {personalInfo.linkedin && (
                 <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Linkedin size={9} />{personalInfo.linkedin}
+                  {showIcons && <Linkedin size={9} />}{personalInfo.linkedin}
                 </a>
               )}
               {personalInfo.website && (
                 <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Globe size={9} />{personalInfo.website}
+                  {showIcons && <Globe size={9} />}{personalInfo.website}
                 </a>
               )}
               {personalInfo.birthDate && (

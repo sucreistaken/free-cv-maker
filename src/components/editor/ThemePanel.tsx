@@ -1,4 +1,4 @@
-import { Palette } from 'lucide-react';
+import { Palette, Sparkles, Type } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
@@ -138,6 +138,18 @@ export function ThemePanel() {
             value={theme.sectionSpacing}
             onChange={(v) => setTheme({ sectionSpacing: v })}
           />
+
+          <div className="space-y-1.5 pt-1">
+            <button
+              type="button"
+              onClick={() => setTheme({ showIcons: !(theme.showIcons ?? true) })}
+              className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg text-xs font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              {(theme.showIcons ?? true) ? <Type size={14} /> : <Sparkles size={14} />}
+              {(theme.showIcons ?? true) ? t('theme.hideIcons') : t('theme.showIconsAction')}
+            </button>
+            <p className="text-[11px] text-gray-400 leading-snug">{t('theme.iconsHint')}</p>
+          </div>
 
           {profilePhoto && (
             <div className="space-y-3 pt-2 border-t border-gray-100">

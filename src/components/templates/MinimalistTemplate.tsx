@@ -3,15 +3,8 @@ import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
-
 export function MinimalistTemplate() {
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, transformTitle, primaryColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, sectionGap, transformTitle, primaryColor, photoSize, photoShape, photoVisible, proficiencyLabels } = useTemplateTheme();
   const {
     personalInfo,
     summary,

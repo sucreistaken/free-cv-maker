@@ -101,6 +101,7 @@ export function mergeWithDefaults(partial: Partial<ExportData>): ExportData {
       photoSize: 'md' as const,
       photoShape: 'circle' as const,
       photoVisible: true,
+      showIcons: true,
     },
   };
 

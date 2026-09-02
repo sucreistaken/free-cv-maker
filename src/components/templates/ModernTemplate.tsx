@@ -10,14 +10,6 @@ import { InvolvementBlock } from './shared/InvolvementBlock';
 import { CertificationBlock } from './shared/CertificationBlock';
 import { AwardsBlock } from './shared/AwardsBlock';
 import { ReferencesBlock } from './shared/ReferencesBlock';
-import type { LanguageEntry } from '../../types/cv';
-
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
 
 export function ModernTemplate() {
   const {
@@ -35,7 +27,7 @@ export function ModernTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'languages']);
@@ -165,7 +157,7 @@ export function ModernTemplate() {
             const href = getHref(item.icon, item.value!);
             return (
               <div key={i} className="flex items-start gap-2 text-[9.5px] opacity-90">
-                <item.icon size={10} className="mt-0.5 shrink-0" />
+                {showIcons && <item.icon size={10} className="mt-0.5 shrink-0" />}
                 {href ? (
                   <a href={href} target="_blank" rel="noopener noreferrer" className="break-all hover:underline">{item.value}</a>
                 ) : (

@@ -5,13 +5,6 @@ import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
-
 export function CreativeTemplate() {
   const {
     personalInfo,
@@ -28,7 +21,7 @@ export function CreativeTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
 
@@ -285,12 +278,12 @@ export function CreativeTemplate() {
             const href = getHref(item.icon, item.value!);
             return href ? (
               <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9.5px] opacity-90 hover:underline">
-                <item.icon size={10} />
+                {showIcons ? <item.icon size={10} /> : i > 0 && <span className="opacity-50">|</span>}
                 {item.value}
               </a>
             ) : (
               <span key={i} className="flex items-center gap-1 text-[9.5px] opacity-90">
-                <item.icon size={10} />
+                {showIcons ? <item.icon size={10} /> : i > 0 && <span className="opacity-50">|</span>}
                 {item.value}
               </span>
             );

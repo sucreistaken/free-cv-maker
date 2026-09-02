@@ -38,6 +38,7 @@ export const useAppStore = create<AppStore>()(
         photoSize: 'md',
         photoShape: 'circle',
         photoVisible: true,
+        showIcons: true,
       },
       activeTab: 'editor',
       activeDocument: 'cv',

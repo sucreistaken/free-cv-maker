@@ -138,6 +138,8 @@ export interface ThemeConfig {
   photoSize: 'sm' | 'md' | 'lg';
   photoShape: 'circle' | 'rounded' | 'square';
   photoVisible: boolean;
+  /** When false the CV drops every icon and badge in favour of plain text. */
+  showIcons: boolean;
 }
 
 export interface ExportData {

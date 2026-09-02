@@ -4,7 +4,7 @@ import { useTemplateTheme } from '../../../hooks/useTemplateTheme';
 
 export function TwoColumnCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, photoSize, photoShape, photoVisible, showIcons } = useTemplateTheme();
 
   return (
     <div className="a4-page" style={{ fontFamily, zoom, lineHeight, minHeight: `${effectiveA4Height}px`, ['--a4-break-height' as string]: `${effectiveA4Height}px` }}>
@@ -22,22 +22,22 @@ export function TwoColumnCoverLetter() {
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               {personalInfo.email && (
                 <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Mail size={9} />{personalInfo.email}
+                  {showIcons && <Mail size={9} />}{personalInfo.email}
                 </a>
               )}
               {personalInfo.phone && (
                 <a href={`tel:${personalInfo.phone}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Phone size={9} />{personalInfo.phone}
+                  {showIcons && <Phone size={9} />}{personalInfo.phone}
                 </a>
               )}
               {personalInfo.location && (
                 <span className="flex items-center gap-1 text-[9px] text-gray-400">
-                  <MapPin size={9} />{personalInfo.location}
+                  {showIcons && <MapPin size={9} />}{personalInfo.location}
                 </span>
               )}
               {personalInfo.linkedin && (
                 <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-400 hover:underline">
-                  <Linkedin size={9} />{personalInfo.linkedin}
+                  {showIcons && <Linkedin size={9} />}{personalInfo.linkedin}
                 </a>
               )}
             </div>

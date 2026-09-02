@@ -5,19 +5,12 @@ import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
-
 export function AcademicTemplate() {
   const {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'education', 'languages']);
@@ -252,12 +245,12 @@ export function AcademicTemplate() {
             const href = getHref(item.icon, item.value!);
             return href ? (
               <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-gray-500 hover:underline">
-                <item.icon size={9} />
+                {showIcons ? <item.icon size={9} /> : i > 0 && <span className="text-gray-300">|</span>}
                 {item.value}
               </a>
             ) : (
               <span key={i} className="flex items-center gap-1 text-[9px] text-gray-500">
-                <item.icon size={9} />
+                {showIcons ? <item.icon size={9} /> : i > 0 && <span className="text-gray-300">|</span>}
                 {item.value}
               </span>
             );

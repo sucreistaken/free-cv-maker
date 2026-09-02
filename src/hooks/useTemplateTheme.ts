@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
+import type { LanguageEntry } from '../types/cv';
 
 export const fontSizeScale = { small: 0.92, medium: 1, large: 1.08 } as const;
 export const A4_HEIGHT_DEFAULT = 1121;
@@ -13,11 +15,14 @@ const fontAliases: Record<string, string> = { 'Source Sans Pro': 'Source Sans 3'
 export function useTemplateTheme() {
   const rawTheme = useAppStore((s) => s.theme);
 
+  const { t } = useTranslation();
+
   const theme = {
     ...rawTheme,
     photoSize: rawTheme.photoSize ?? 'md',
     photoShape: rawTheme.photoShape ?? 'circle',
     photoVisible: rawTheme.photoVisible ?? true,
+    showIcons: rawTheme.showIcons ?? true,
   };
 
   const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
@@ -40,8 +45,19 @@ export function useTemplateTheme() {
   const photoShape = photoShapeMap[theme.photoShape];
   const photoVisible = theme.photoVisible;
 
+  // Templates used to each hardcode these in English, so switching the UI to
+  // Turkish left the CV reading "Fluent"/"Native". Resolve them centrally.
+  const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
+    native: t('languagesForm.native'),
+    fluent: t('languagesForm.fluent'),
+    intermediate: t('languagesForm.intermediate'),
+    beginner: t('languagesForm.beginner'),
+  };
+
   return {
     theme,
+    showIcons: theme.showIcons,
+    proficiencyLabels,
     zoom,
     pageBreakHeight,
     effectiveA4Height,

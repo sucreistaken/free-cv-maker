@@ -3,19 +3,12 @@ import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
 
-const proficiencyLabels: Record<LanguageEntry['proficiency'], string> = {
-  native: 'Native',
-  fluent: 'Fluent',
-  intermediate: 'Intermediate',
-  beginner: 'Beginner',
-};
-
 export function CompactTemplate() {
   const {
     personalInfo, summary, experience, projects, education, involvement,
     skills, certifications, languages, awards, hobbies, references, sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, primaryColor, accentColor, transformTitle, sectionGap, margin } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, primaryColor, accentColor, transformTitle, sectionGap, margin, proficiencyLabels } = useTemplateTheme();
 
   // Compact keeps a tighter rhythm than the other templates: 0.8x of the theme
   // value maps "normal" (1.5) back to this template's original 1.2.

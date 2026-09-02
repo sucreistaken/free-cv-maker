@@ -5,7 +5,7 @@ import { ContactBar } from '../shared/ContactBar';
 
 export function ClassicCoverLetter() {
   const { personalInfo, coverLetterData } = useCVStore();
-  const { accentColor, photoSize, photoShape, photoVisible } = useTemplateTheme();
+  const { accentColor, photoSize, photoShape, photoVisible, showIcons } = useTemplateTheme();
 
   return (
     <TemplateWrapper>
@@ -21,7 +21,7 @@ export function ClassicCoverLetter() {
           <p className="text-[12px] text-gray-600 mt-0.5">{personalInfo.jobTitle}</p>
         )}
         <div className="mt-1">
-          <ContactBar info={personalInfo} iconColor={accentColor} />
+          <ContactBar info={personalInfo} iconColor={accentColor} showIcons={showIcons} />
         </div>
       </div>
       <div className="border-b border-gray-300 mb-6" />

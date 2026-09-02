@@ -51,6 +51,7 @@ function createDefaultProfile(): CVProfile {
         photoSize: 'md',
         photoShape: 'circle',
         photoVisible: true,
+        showIcons: true,
       },
     },
   };

@@ -5,6 +5,8 @@ import type { LucideIcon } from 'lucide-react';
 interface ContactBarProps {
   info: PersonalInfo;
   iconColor?: string;
+  /** When false, items are plain text separated by a vertical rule. */
+  showIcons?: boolean;
 }
 
 function isSafeUrl(url: string): boolean {
@@ -26,7 +28,7 @@ function getHref(icon: LucideIcon, value: string): string | null {
   return null;
 }
 
-export function ContactBar({ info, iconColor }: ContactBarProps) {
+export function ContactBar({ info, iconColor, showIcons = true }: ContactBarProps) {
   const items = [
     { icon: MapPin, value: info.location },
     { icon: Mail, value: info.email },
@@ -39,19 +41,29 @@ export function ContactBar({ info, iconColor }: ContactBarProps) {
   ].filter((item) => item.value);
 
   return (
-    <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600 flex-wrap">
+    <div
+      className={`flex items-center justify-center text-[10px] text-gray-600 flex-wrap ${
+        showIcons ? 'gap-4' : 'gap-x-2 gap-y-1'
+      }`}
+    >
       {items.map((item, i) => {
         const href = getHref(item.icon, item.value!);
-        const iconEl = <item.icon size={10} style={{ color: iconColor || undefined }} className={iconColor ? '' : 'text-gray-500'} />;
-        return href ? (
-          <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:underline">
-            {iconEl}
+        const label = href ? (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:underline">
+            {showIcons && <item.icon size={10} style={{ color: iconColor || undefined }} className={iconColor ? '' : 'text-gray-500'} />}
             {item.value}
           </a>
         ) : (
-          <span key={i} className="flex items-center gap-1">
-            {iconEl}
+          <span className="flex items-center gap-1">
+            {showIcons && <item.icon size={10} style={{ color: iconColor || undefined }} className={iconColor ? '' : 'text-gray-500'} />}
             {item.value}
+          </span>
+        );
+
+        return (
+          <span key={i} className="flex items-center gap-x-2">
+            {!showIcons && i > 0 && <span className="text-gray-300">|</span>}
+            {label}
           </span>
         );
       })}
