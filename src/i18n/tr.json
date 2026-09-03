@@ -197,7 +197,9 @@
     "shape": "Şekil",
     "circle": "Daire",
     "rounded": "Yuvarlak",
-    "square": "Kare"
+    "square": "Kare",
+    "fineTune": "İnce ayar",
+    "reset": "Sıfırla"
   },
   "preview": {
     "fit": "Sığdır",

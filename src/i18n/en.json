@@ -197,7 +197,9 @@
     "shape": "Shape",
     "circle": "Circle",
     "rounded": "Rounded",
-    "square": "Square"
+    "square": "Square",
+    "fineTune": "Fine-tune",
+    "reset": "Reset"
   },
   "preview": {
     "fit": "Fit",

@@ -140,7 +140,24 @@ export interface ThemeConfig {
   photoVisible: boolean;
   /** When false the CV drops every icon and badge in favour of plain text. */
   showIcons: boolean;
+  /**
+   * Fine-tuning overrides. The three-step presets above stay the default; when
+   * one of these is set it wins, so a user can nudge a value until the page
+   * breaks where they want. Undefined means "follow the preset".
+   */
+  fontScaleOverride?: number;
+  lineHeightOverride?: number;
+  pageMarginsOverride?: number;
+  sectionSpacingOverride?: number;
 }
+
+/** Bounds and step for each fine-tuning slider, shared by the panel and the theme hook. */
+export const fineTuneRanges = {
+  fontScale: { min: 0.8, max: 1.2, step: 0.01 },
+  lineHeight: { min: 1.1, max: 1.9, step: 0.05 },
+  pageMargins: { min: 16, max: 90, step: 2 },
+  sectionSpacing: { min: 2, max: 28, step: 1 },
+} as const;
 
 export interface ExportData {
   version: string;

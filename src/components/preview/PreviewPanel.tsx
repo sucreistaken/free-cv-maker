@@ -4,7 +4,7 @@ import { ZoomIn, ZoomOut, Scissors } from 'lucide-react';
 import { CVDocument } from './CVDocument';
 import { CoverLetterDocument } from './CoverLetterDocument';
 import { useAppStore } from '../../store/useAppStore';
-import { A4_HEIGHT_DEFAULT } from '../../hooks/useTemplateTheme';
+import { fontSizeScale, resolvePageBreakHeight } from '../../hooks/useTemplateTheme';
 
 interface PreviewPanelProps {
   contentRef: React.RefObject<HTMLDivElement | null>;
@@ -19,8 +19,9 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
   const [pageCount, setPageCount] = useState(1);
   const activeDocument = useAppStore((s) => s.activeDocument);
   const fontSize = useAppStore((s) => s.theme.fontSize);
+  const fontScaleOverride = useAppStore((s) => s.theme.fontScaleOverride);
   const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
-  const a4Height = pageBreakHeights?.[fontSize] || A4_HEIGHT_DEFAULT;
+  const a4Height = resolvePageBreakHeight(fontScaleOverride ?? fontSizeScale[fontSize], pageBreakHeights);
 
   // Auto-fit preview scale
   const calculateScale = useCallback(() => {
