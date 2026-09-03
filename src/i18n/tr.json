@@ -72,7 +72,9 @@
     "endDate": "Bitiş Tarihi",
     "endDatePlaceholder": "ör. Devam Ediyor",
     "bullets": "Madde İşaretleri",
-    "addBullet": "Madde ekle"
+    "addBullet": "Madde ekle",
+    "link": "Web Sitesi",
+    "linkPlaceholder": "ör. sirket.com"
   },
   "educationForm": {
     "add": "Eğitim Ekle",

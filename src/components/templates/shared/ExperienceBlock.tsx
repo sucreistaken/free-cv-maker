@@ -1,5 +1,6 @@
 import type { ExperienceEntry } from '../../../types/cv';
 import { parseFormattedText } from '../../../utils/formatText';
+import { CompanyName } from './CompanyName';
 
 interface ExperienceBlockProps {
   entries: ExperienceEntry[];
@@ -17,7 +18,7 @@ export function ExperienceBlock({ entries }: ExperienceBlockProps) {
               {entry.location ? `, ${entry.location}` : ''}
             </span>
           </div>
-          <p className="text-[10.5px] text-gray-600">{entry.company}</p>
+          <CompanyName company={entry.company} link={entry.link} className="text-[10.5px] text-gray-600" />
           {entry.bullets.length > 0 && (
             <ul className="mt-1 space-y-0.5">
               {entry.bullets.filter(b => b).map((bullet, i) => (

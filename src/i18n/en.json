@@ -72,7 +72,9 @@
     "endDate": "End Date",
     "endDatePlaceholder": "e.g. Present",
     "bullets": "Bullet Points",
-    "addBullet": "Add bullet"
+    "addBullet": "Add bullet",
+    "link": "Website",
+    "linkPlaceholder": "e.g. company.com"
   },
   "educationForm": {
     "add": "Add Education",

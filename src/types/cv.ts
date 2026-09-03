@@ -17,6 +17,8 @@ export interface ExperienceEntry {
   id: string;
   title: string;
   company: string;
+  /** Optional site for the employer or product, turns the company into a link. */
+  link?: string;
   location: string;
   startDate: string;
   endDate: string;

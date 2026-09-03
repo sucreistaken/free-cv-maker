@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
+import { CompanyName } from './shared/CompanyName';
 
 export function CreativeTemplate() {
   const {
@@ -108,7 +109,7 @@ export function CreativeTemplate() {
                 date={`${e.startDate}${e.endDate ? ` - ${e.endDate}` : ''}`}
               >
                 <h3 className="text-[11.5px] font-bold text-gray-800">{e.title}</h3>
-                <p className="text-[10px] text-gray-500">{e.company}{e.location ? `, ${e.location}` : ''}</p>
+                <CompanyName company={e.company} link={e.link} suffix={e.location ? `, ${e.location}` : ''} className="text-[10px] text-gray-500" />
                 <BulletList bullets={e.bullets} />
               </TimelineEntry>
             ))}

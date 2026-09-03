@@ -17,6 +17,7 @@ export function ExperienceEntryForm({ entry }: Props) {
     <div className="space-y-2">
       <FormField label={t('experienceForm.jobTitle')} value={entry.title} onChange={(v) => updateExperience(entry.id, 'title', v)} />
       <FormField label={t('experienceForm.company')} value={entry.company} onChange={(v) => updateExperience(entry.id, 'company', v)} />
+      <FormField label={t('experienceForm.link')} value={entry.link ?? ''} onChange={(v) => updateExperience(entry.id, 'link', v)} placeholder={t('experienceForm.linkPlaceholder')} />
       <FormField label={t('experienceForm.location')} value={entry.location} onChange={(v) => updateExperience(entry.id, 'location', v)} />
       <DateRangeField
         startDate={entry.startDate}

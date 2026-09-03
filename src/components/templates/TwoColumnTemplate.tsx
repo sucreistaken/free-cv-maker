@@ -3,6 +3,7 @@ import { MapPin, Mail, Phone, Linkedin, Github, Globe } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
+import { CompanyName } from './shared/CompanyName';
 
 export function TwoColumnTemplate() {
   const {
@@ -68,7 +69,7 @@ export function TwoColumnTemplate() {
                     <h3 className="text-[11px] font-bold text-gray-800">{e.title}</h3>
                     <span className="text-[9px] text-gray-400 ml-2 shrink-0">{e.startDate}{e.endDate ? ` – ${e.endDate}` : ''}</span>
                   </div>
-                  <p className="text-[9.5px] text-gray-500">{e.company}{e.location ? `, ${e.location}` : ''}</p>
+                  <CompanyName company={e.company} link={e.link} suffix={e.location ? `, ${e.location}` : ''} className="text-[9.5px] text-gray-500" />
                   <BulletList bullets={e.bullets} />
                 </div>
               ))}
