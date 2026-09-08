@@ -1,17 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ErrorBoundary } from './components/ui/ErrorBoundary'
-import { initCloudSync } from './utils/cloudSync'
-import './i18n'
 import './index.css'
 import App from './App.tsx'
 
-initCloudSync()
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
+    <App />
   </StrictMode>,
 )

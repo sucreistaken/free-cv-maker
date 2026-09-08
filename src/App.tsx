@@ -6,6 +6,7 @@ import { MobileTabBar } from './components/layout/MobileTabBar';
 import { EditorPanel } from './components/editor/EditorPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
 import { ToastContainer } from './components/ui/Toast';
+import { ConsentBanner } from './components/ui/ConsentBanner';
 import { useAppStore } from './store/useAppStore';
 import { useCVStore } from './store/useCVStore';
 import { useProfileStore } from './store/useProfileStore';
@@ -62,6 +63,7 @@ function App() {
       </main>
 
       <Footer />
+      <ConsentBanner />
     </div>
   );
 }

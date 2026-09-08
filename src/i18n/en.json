@@ -12,14 +12,22 @@
     "printPdf": "Print / PDF",
     "howToUse": "How to Use?",
     "fullscreen": "Fullscreen",
-    "exitFullscreen": "Exit Fullscreen"
+    "exitFullscreen": "Exit Fullscreen",
+    "aiAssist": "AI CV Assistant"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
     "madeBy": "Made by Kadir Ay",
     "privacy": "Privacy",
     "terms": "Terms",
-    "kvkk": "KVKK"
+    "kvkk": "KVKK",
+    "privacyChoice": "Privacy Choice"
+  },
+  "consent": {
+    "message": "To help us improve NextCV, we'd like to save the CV content you create and how you use the app to our server.",
+    "detailsLink": "Details",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "sections": {
     "personalInfo": "Personal Info",
@@ -288,5 +296,36 @@
     "next": "Next",
     "back": "Back",
     "start": "Get Started!"
+  },
+  "ai": {
+    "modalTitle": "Build your CV with AI",
+    "intro": "Follow these steps to fill your CV using ChatGPT — no writing required, just answer its questions.",
+    "outputLangLabel": "What language should the CV content be in?",
+    "outputLangHint": "English is recommended for international applications.",
+    "step1Title": "1. Copy this prompt",
+    "step1Desc": "Copy the prompt below — it tells ChatGPT how to interview you and build your CV.",
+    "copyButton": "Copy prompt",
+    "copyButtonCopied": "Copied!",
+    "copySuccessToast": "Prompt copied to clipboard.",
+    "copyErrorToast": "Couldn't copy automatically — select the text below and copy it manually.",
+    "viewPromptToggle": "Show / hide full prompt text",
+    "step2Title": "2. Open ChatGPT and paste it",
+    "step2Desc": "Open ChatGPT, paste the prompt into the chat box (Ctrl/Cmd+V) and send it.",
+    "openChatGPTButton": "Open ChatGPT",
+    "step3Title": "3. Answer its questions",
+    "step3Desc": "ChatGPT will introduce itself and ask you about your experience, education, skills and more — skip anything that doesn't apply. When you're done, it will reply with your CV as a JSON code block.",
+    "step4Title": "4. Paste the result here",
+    "step4Desc": "Copy ChatGPT's final reply (the whole thing, including the code block) and paste it below.",
+    "textareaPlaceholder": "Paste ChatGPT's response here...",
+    "applyButton": "Fill my CV",
+    "applying": "Filling...",
+    "overwriteWarning": "This will replace your current CV content.",
+    "overwriteConfirm": "Applying this will replace your current CV content. Continue?",
+    "successToast": "Your CV has been filled from ChatGPT's response!",
+    "errorEmpty": "Paste ChatGPT's response first.",
+    "errorNoJson": "Couldn't find a JSON block in the pasted text. Make sure you copied ChatGPT's entire final answer.",
+    "errorInvalidJson": "This doesn't look like valid JSON. Double-check you copied the full response.",
+    "errorNotCvShaped": "This JSON doesn't look like CV data. Ask ChatGPT to resend it in the requested format.",
+    "retryHint": "You can edit the pasted text and try again, or copy the prompt again and restart the chat."
   }
 }

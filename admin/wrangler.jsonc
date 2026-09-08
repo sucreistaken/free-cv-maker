@@ -1,0 +1,31 @@
+{
+  // NOT: bu değerleri kendi Cloudflare hesabından doğrula/güncelle.
+  "name": "nextcv-admin",
+  "compatibility_date": "2024-09-23",
+  "pages_build_output_dir": "dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nextcv-db",
+      // Ana projedeki (../wrangler.jsonc) ile AYNI database_id olmalı — ikisi de
+      // aynı "nextcv-db" veritabanına bağlanıyor.
+      "database_id": "REPLACE_WITH_REAL_D1_DATABASE_ID"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      // Ana projedeki (../wrangler.jsonc) ile AYNI bucket.
+      "bucket_name": "nextcv-uploads"
+    }
+  ],
+  "vars": {
+    // Cloudflare Access uygulaması kurulduktan sonra doldurulacak:
+    // - ACCESS_TEAM_DOMAIN: "https://<team-adın>.cloudflareaccess.com"
+    // - ACCESS_AUD: Access uygulamasının "Application Audience (AUD) Tag" değeri
+    // Boş bırakılırsa admin/functions/api/admin/_middleware.ts uyarı loglayıp
+    // doğrulamayı atlar (sadece edge'deki Access korumasına güvenir).
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  }
+}

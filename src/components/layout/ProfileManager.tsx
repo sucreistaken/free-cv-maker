@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { useProfileStore } from '../../store/useProfileStore';
 import { useCVStore } from '../../store/useCVStore';
 import { useAppStore } from '../../store/useAppStore';
+import { logEvent } from '../../utils/cloudSync';
 
 interface ProfileManagerProps {
   open: boolean;
@@ -26,12 +27,14 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
     // Sync facade stores
     useCVStore.getState()._syncFromProfile();
     useAppStore.getState()._syncFromProfile();
+    logEvent('profile_created');
   };
 
   const handleSwitch = (id: string) => {
     switchProfile(id);
     useCVStore.getState()._syncFromProfile();
     useAppStore.getState()._syncFromProfile();
+    logEvent('profile_switched');
   };
 
   const handleDuplicate = (id: string) => {
@@ -43,6 +46,7 @@ export function ProfileManager({ open, onClose }: ProfileManagerProps) {
   const handleDelete = (id: string) => {
     if (profiles.length <= 1) return;
     if (!confirm(t('profileManager.deleteConfirm'))) return;
+    logEvent('profile_deleted', { profileId: id });
     deleteProfile(id);
     useCVStore.getState()._syncFromProfile();
     useAppStore.getState()._syncFromProfile();

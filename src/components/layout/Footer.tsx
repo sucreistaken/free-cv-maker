@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LegalModal } from '../legal/LegalModal';
 import type { LegalPage } from '../legal/LegalModal';
+import { useConsentStore } from '../../store/useConsentStore';
 
 export function Footer() {
   const { t } = useTranslation();
   const [legalPage, setLegalPage] = useState<LegalPage | null>(null);
+  const consentStatus = useConsentStore((s) => s.status);
+  const resetConsent = useConsentStore((s) => s.reset);
 
   return (
     <>
@@ -32,6 +35,11 @@ export function Footer() {
           <button onClick={() => setLegalPage('kvkk')} className="hover:text-gray-600 transition-colors">
             {t('footer.kvkk')}
           </button>
+          {consentStatus !== 'pending' && (
+            <button onClick={resetConsent} className="hover:text-gray-600 transition-colors">
+              {t('footer.privacyChoice')}
+            </button>
+          )}
         </div>
       </footer>
 

@@ -12,14 +12,22 @@
     "printPdf": "Yazdır / PDF",
     "howToUse": "Nasıl Kullanılır?",
     "fullscreen": "Tam Ekran",
-    "exitFullscreen": "Tam Ekrandan Çık"
+    "exitFullscreen": "Tam Ekrandan Çık",
+    "aiAssist": "AI CV Asistanı"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
     "madeBy": "Made by Kadir Ay",
     "privacy": "Gizlilik",
     "terms": "Koşullar",
-    "kvkk": "KVKK"
+    "kvkk": "KVKK",
+    "privacyChoice": "Gizlilik Tercihi"
+  },
+  "consent": {
+    "message": "NextCV'yi geliştirmemize yardımcı olmak için, oluşturduğun CV içeriğini ve nasıl kullandığını sunucumuza kaydedebiliriz.",
+    "detailsLink": "Detaylar",
+    "accept": "Kabul Et",
+    "decline": "Reddet"
   },
   "sections": {
     "personalInfo": "Kişisel Bilgiler",
@@ -288,5 +296,36 @@
     "next": "İleri",
     "back": "Geri",
     "start": "Başla!"
+  },
+  "ai": {
+    "modalTitle": "Yapay Zeka ile CV Oluştur",
+    "intro": "ChatGPT ile CV'ni doldurmak için şu adımları izle — yazmana gerek yok, sadece sorularını yanıtla.",
+    "outputLangLabel": "CV içeriği hangi dilde olsun?",
+    "outputLangHint": "Yurt dışı başvurular için İngilizce önerilir.",
+    "step1Title": "1. Bu prompt'u kopyala",
+    "step1Desc": "Aşağıdaki prompt'u kopyala — ChatGPT'ye seninle nasıl konuşup CV'ni nasıl oluşturacağını anlatıyor.",
+    "copyButton": "Prompt'u kopyala",
+    "copyButtonCopied": "Kopyalandı!",
+    "copySuccessToast": "Prompt panoya kopyalandı.",
+    "copyErrorToast": "Otomatik kopyalanamadı — aşağıdaki metni seçip elle kopyalayın.",
+    "viewPromptToggle": "Prompt metnini göster / gizle",
+    "step2Title": "2. ChatGPT'yi aç ve yapıştır",
+    "step2Desc": "ChatGPT'yi aç, prompt'u sohbet kutusuna yapıştır (Ctrl/Cmd+V) ve gönder.",
+    "openChatGPTButton": "ChatGPT'yi Aç",
+    "step3Title": "3. Sorularını yanıtla",
+    "step3Desc": "ChatGPT kendini tanıtacak ve deneyimin, eğitimin, yeteneklerin gibi konularda sorular soracak — sana uymayanları atlayabilirsin. Bitince CV'ni bir JSON kod bloğu olarak dönecek.",
+    "step4Title": "4. Sonucu buraya yapıştır",
+    "step4Desc": "ChatGPT'nin son cevabını (kod bloğu dahil, tamamını) kopyala ve aşağıya yapıştır.",
+    "textareaPlaceholder": "ChatGPT'nin cevabını buraya yapıştırın...",
+    "applyButton": "CV'mi Doldur",
+    "applying": "Dolduruluyor...",
+    "overwriteWarning": "Bu işlem mevcut CV içeriğinin üzerine yazacaktır.",
+    "overwriteConfirm": "Bunu uygulamak mevcut CV içeriğinin üzerine yazacak. Devam edilsin mi?",
+    "successToast": "CV'niz ChatGPT'nin cevabıyla dolduruldu!",
+    "errorEmpty": "Önce ChatGPT'nin cevabını yapıştırın.",
+    "errorNoJson": "Yapıştırılan metinde bir JSON bloğu bulunamadı. ChatGPT'nin son cevabının tamamını kopyaladığınızdan emin olun.",
+    "errorInvalidJson": "Bu geçerli bir JSON gibi görünmüyor. Cevabın tamamını kopyaladığınızdan emin olun.",
+    "errorNotCvShaped": "Bu JSON bir CV verisine benzemiyor. ChatGPT'den JSON'u istenen formatta tekrar göndermesini isteyin.",
+    "retryHint": "Yapıştırdığınız metni düzenleyip tekrar deneyebilir ya da prompt'u tekrar kopyalayıp sohbete yeniden başlayabilirsiniz."
   }
 }

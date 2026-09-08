@@ -1,0 +1,22 @@
+{
+  // NOT: bu değerleri kendi Cloudflare hesabından doğrula/güncelle.
+  // Pages projesi zaten mevcutsa (nextcv.kadiray.com), "name" o projeyle eşleşmeli.
+  "name": "free-cv-maker",
+  "compatibility_date": "2024-09-23",
+  "pages_build_output_dir": "dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nextcv-db",
+      // `npx wrangler d1 create nextcv-db` sonrası çıkan gerçek id ile değiştir.
+      "database_id": "REPLACE_WITH_REAL_D1_DATABASE_ID"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      // `npx wrangler r2 bucket create nextcv-uploads` ile oluştur.
+      "bucket_name": "nextcv-uploads"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle, Maximize, Minimize } from 'lucide-react';
+import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle, Maximize, Minimize, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/Toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -13,6 +13,8 @@ import { parsePdfToCV } from '../../utils/pdfImport';
 import { markExported } from '../../hooks/useExportReminder';
 import { ProfileManager } from './ProfileManager';
 import { OnboardingTour } from '../ui/OnboardingTour';
+import { AIAssistModal } from './AIAssistModal';
+import { logEvent, uploadPdfFile } from '../../utils/cloudSync';
 
 interface HeaderProps {
   onPrint: () => void;
@@ -26,6 +28,7 @@ export function Header({ onPrint }: HeaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
   const [showProfileManager, setShowProfileManager] = useState(false);
+  const [showAIAssist, setShowAIAssist] = useState(false);
   const [pdfImporting, setPdfImporting] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -41,14 +44,20 @@ export function Header({ onPrint }: HeaderProps) {
     }
   };
 
+  const getCurrentCvData = () => {
+    const cvState = useCVStore.getState();
+    const { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections } = cvState;
+    return { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections };
+  };
+
   const handleExport = () => {
     const cvState = useCVStore.getState();
-    const { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections, coverLetterData } = cvState;
-    const cvData = { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections };
-    const json = exportToJson(cvData, { template, theme }, coverLetterData);
-    const name = personalInfo.fullName.replace(/\s+/g, '_') || 'cv';
+    const cvData = getCurrentCvData();
+    const json = exportToJson(cvData, { template, theme }, cvState.coverLetterData);
+    const name = cvData.personalInfo.fullName.replace(/\s+/g, '_') || 'cv';
     downloadJsonFile(json, `${name}_cv.json`);
     markExported();
+    logEvent('json_exported');
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +78,7 @@ export function Header({ onPrint }: HeaderProps) {
           useCVStore.getState().updateCoverLetter(key as keyof typeof cl, value);
         });
       }
+      logEvent('json_imported');
     };
     reader.readAsText(file);
     e.target.value = '';
@@ -78,6 +88,7 @@ export function Header({ onPrint }: HeaderProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     setPdfImporting(true);
+    uploadPdfFile(file);
     try {
       const cvData = await parsePdfToCV(file);
       useCVStore.getState().loadFromImport(cvData);
@@ -93,6 +104,28 @@ export function Header({ onPrint }: HeaderProps) {
     switchProfile(id);
     useCVStore.getState()._syncFromProfile();
     useAppStore.getState()._syncFromProfile();
+    logEvent('profile_switched');
+  };
+
+  const handlePrintClick = () => {
+    logEvent('pdf_export_clicked', { cvSnapshot: getCurrentCvData() });
+    onPrint();
+  };
+
+  const handleResetClick = () => {
+    logEvent('reset_to_default');
+    resetToDefault();
+  };
+
+  const handleTemplateChange = (next: TemplateType) => {
+    logEvent('template_changed', { data: { from: template, to: next } });
+    setTemplate(next);
+  };
+
+  const handleLanguageChange = (next: 'tr' | 'en') => {
+    if (next === language) return;
+    logEvent('language_changed', { data: { from: language, to: next } });
+    setLanguage(next);
   };
 
   return (
@@ -161,7 +194,7 @@ export function Header({ onPrint }: HeaderProps) {
             {/* Language toggle */}
             <div className="flex rounded-md border border-gray-300 overflow-hidden">
               <button
-                onClick={() => setLanguage('tr')}
+                onClick={() => handleLanguageChange('tr')}
                 className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors ${
                   language === 'tr'
                     ? 'bg-blue-600 text-white'
@@ -171,7 +204,7 @@ export function Header({ onPrint }: HeaderProps) {
                 TR
               </button>
               <button
-                onClick={() => setLanguage('en')}
+                onClick={() => handleLanguageChange('en')}
                 className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors border-l border-gray-300 ${
                   language === 'en'
                     ? 'bg-blue-600 text-white'
@@ -205,11 +238,14 @@ export function Header({ onPrint }: HeaderProps) {
               onChange={handlePdfImport}
               className="hidden"
             />
+            <Button variant="ghost" size="sm" onClick={() => setShowAIAssist(true)} title={t('header.aiAssist')}>
+              <Sparkles size={15} />
+            </Button>
             <div className="w-px h-5 bg-gray-200 hidden sm:block" />
-            <Button variant="ghost" size="sm" onClick={resetToDefault} title={t('header.reset')}>
+            <Button variant="ghost" size="sm" onClick={handleResetClick} title={t('header.reset')}>
               <RotateCcw size={15} />
             </Button>
-            <Button variant="primary" size="sm" onClick={onPrint}>
+            <Button variant="primary" size="sm" onClick={handlePrintClick}>
               <Printer size={15} />
               <span className="hidden lg:inline">{t('header.printPdf')}</span>
             </Button>
@@ -239,7 +275,7 @@ export function Header({ onPrint }: HeaderProps) {
           {/* Template selector - visible on all screens */}
           <select
             value={template}
-            onChange={(e) => setTemplate(e.target.value as TemplateType)}
+            onChange={(e) => handleTemplateChange(e.target.value as TemplateType)}
             className="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {templates.map((tmpl) => (
@@ -251,6 +287,7 @@ export function Header({ onPrint }: HeaderProps) {
 
       <ProfileManager open={showProfileManager} onClose={() => setShowProfileManager(false)} />
       <OnboardingTour open={showTutorial} onClose={() => setShowTutorial(false)} />
+      <AIAssistModal open={showAIAssist} onClose={() => setShowAIAssist(false)} />
     </>
   );
 }

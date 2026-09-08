@@ -879,7 +879,7 @@ function parseReferences(lines: string[]): ReferenceEntry[] {
 
 // ── Build sections list ──
 
-function buildSections(cvData: CVData): CVSection[] {
+export function buildSections(cvData: CVData): CVSection[] {
   const sectionDefs: { type: SectionType; title: string; hasData: boolean }[] = [
     { type: 'personalInfo', title: 'Personal Info', hasData: true },
     { type: 'summary', title: 'Summary', hasData: !!cvData.summary },
