@@ -9,7 +9,7 @@
       "database_name": "nextcv-db",
       // Ana projedeki (../wrangler.jsonc) ile AYNI database_id olmalı — ikisi de
       // aynı "nextcv-db" veritabanına bağlanıyor.
-      "database_id": "REPLACE_WITH_REAL_D1_DATABASE_ID"
+      "database_id": "5ac4eed1-fbf3-4920-87cf-dbab914281e4"
     }
   ],
   "r2_buckets": [
@@ -25,7 +25,7 @@
     // - ACCESS_AUD: Access uygulamasının "Application Audience (AUD) Tag" değeri
     // Boş bırakılırsa admin/functions/api/admin/_middleware.ts uyarı loglayıp
     // doğrulamayı atlar (sadece edge'deki Access korumasına güvenir).
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "ACCESS_TEAM_DOMAIN": "https://yellow-glade-3aea.cloudflareaccess.com",
+    "ACCESS_AUD": "247abd6d0951ecf72a6810e9c6d66a843efe026d318d747755ad44f80e6d014c"
   }
 }

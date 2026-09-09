@@ -9,7 +9,7 @@
       "binding": "DB",
       "database_name": "nextcv-db",
       // `npx wrangler d1 create nextcv-db` sonrası çıkan gerçek id ile değiştir.
-      "database_id": "REPLACE_WITH_REAL_D1_DATABASE_ID"
+      "database_id": "5ac4eed1-fbf3-4920-87cf-dbab914281e4"
     }
   ],
   "r2_buckets": [
