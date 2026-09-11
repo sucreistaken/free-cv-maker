@@ -24,10 +24,10 @@
     "privacyChoice": "Privacy Choice"
   },
   "consent": {
-    "message": "To help us improve NextCV, we'd like to save the CV content you create and how you use the app to our server.",
+    "message": "We use cookies and similar technologies. If you accept, we store your CV content and usage data.",
     "detailsLink": "Details",
-    "accept": "Accept",
-    "decline": "Decline"
+    "accept": "Accept All",
+    "decline": "Reject"
   },
   "sections": {
     "personalInfo": "Personal Info",

@@ -24,9 +24,9 @@
     "privacyChoice": "Gizlilik Tercihi"
   },
   "consent": {
-    "message": "NextCV'yi geliştirmemize yardımcı olmak için, oluşturduğun CV içeriğini ve nasıl kullandığını sunucumuza kaydedebiliriz.",
+    "message": "Çerez ve benzeri teknolojiler kullanıyoruz. Kabul edersen CV içeriğini ve kullanım verini saklarız.",
     "detailsLink": "Detaylar",
-    "accept": "Kabul Et",
+    "accept": "Tümünü Kabul Et",
     "decline": "Reddet"
   },
   "sections": {

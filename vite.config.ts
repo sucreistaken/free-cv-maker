@@ -8,6 +8,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // A deploy race let the host answer hashed asset URLs with the SPA fallback
+      // HTML, which the worker then precached, leaving returning visitors on a
+      // blank page that no reload could fix. Ship a worker that unregisters
+      // itself and drops its caches; re-enable precaching once every client has
+      // picked this up.
+      selfDestroying: true,
       registerType: 'autoUpdate',
       manifest: {
         name: 'NextCV',

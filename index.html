@@ -73,6 +73,42 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // If a deploy races a visitor's request, the host can answer a hashed asset
+      // URL with the SPA fallback HTML and a long max-age, so the browser caches
+      // HTML where the app expects JS and the app never mounts again. Reloading
+      // does not help: only a different URL or a cache-bypassing request does.
+      (function () {
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && root.childElementCount > 0) return;
+          if (sessionStorage.getItem('nextcv-asset-recovery')) return;
+          sessionStorage.setItem('nextcv-asset-recovery', '1');
+
+          var entry = document.querySelector('script[type="module"][src]');
+          var workers = navigator.serviceWorker
+            ? navigator.serviceWorker.getRegistrations().then(function (rs) {
+                return Promise.all(rs.map(function (r) { return r.unregister(); }));
+              })
+            : Promise.resolve();
+
+          var retry = function () {
+            if (!entry) return location.reload();
+            var fresh = document.createElement('script');
+            fresh.type = 'module';
+            fresh.src = entry.src + (entry.src.indexOf('?') === -1 ? '?' : '&') + 'retry=' + Date.now();
+            document.body.appendChild(fresh);
+          };
+
+          workers
+            .then(function () { return window.caches ? caches.keys() : []; })
+            .then(function (keys) {
+              return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            })
+            .then(retry, retry);
+        }, 4000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
