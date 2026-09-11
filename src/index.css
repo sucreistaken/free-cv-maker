@@ -48,34 +48,26 @@ body {
   background: #94a3b8;
 }
 
-/* @page must be top-level — NOT nested inside @media print */
+/* @page must be top-level, NOT nested inside @media print */
 @page {
   size: 210mm 297mm;
   margin: 0;
 }
 
-/* Print styles */
+/*
+ * Print color fidelity. The actual PDF export clones the resume into an
+ * isolated iframe (see src/hooks/usePdfExport.ts), so there is no longer a
+ * "hide the rest of the page" visibility hack here: that approach printed a
+ * blank page because the preview's transform/overflow wrapper clipped the
+ * absolutely-positioned print area. Keep only color-adjust so a direct browser
+ * print (Ctrl+P outside the app) still renders colors faithfully.
+ */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-
   .print-area,
   .print-area * {
-    visibility: visible;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
-  }
-
-  .print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 210mm;
-    margin: 0;
-    padding: 0;
-    transform: none !important;
   }
 }
 
