@@ -1,4 +1,5 @@
 import type { SkillCategory } from '../../../types/cv';
+import { parseFormattedText } from '../../../utils/formatText';
 
 interface SkillsBlockProps {
   categories: SkillCategory[];
@@ -10,7 +11,7 @@ export function SkillsBlock({ categories }: SkillsBlockProps) {
       {categories.map((cat) => (
         <p key={cat.id} className="break-inside-avoid text-[10.5px] text-gray-700">
           {cat.category && <span className="font-bold">{cat.category}: </span>}
-          {cat.items}
+          {parseFormattedText(cat.items)}
         </p>
       ))}
     </div>

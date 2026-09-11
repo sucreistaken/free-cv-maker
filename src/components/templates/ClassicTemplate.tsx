@@ -4,7 +4,7 @@ import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { TemplateWrapper } from './TemplateWrapper';
 import { SectionHeading } from './shared/SectionHeading';
 import { ContactBar } from './shared/ContactBar';
-import { ExperienceBlock } from './shared/ExperienceBlock';
+import { CompanyName } from './shared/CompanyName';
 import { ProjectBlock } from './shared/ProjectBlock';
 import { EducationBlock } from './shared/EducationBlock';
 import { InvolvementBlock } from './shared/InvolvementBlock';
@@ -44,11 +44,35 @@ export function ClassicTemplate() {
           </div>
         ) : null;
       case 'experience':
+        // Classic renders the employer name as the bold lead line, with the
+        // role/department title as the smaller line underneath — the reverse
+        // of the shared ExperienceBlock order used by other templates.
         return experience.length > 0 ? (
           <div>
             <SectionHeading title={transformTitle(title)} color={primaryColor} />
-            <div className="mt-2">
-              <ExperienceBlock entries={experience} />
+            <div className="mt-2 space-y-2.5">
+              {experience.map((entry) => (
+                <div key={entry.id} className="break-inside-avoid">
+                  <div className="flex justify-between items-baseline">
+                    <CompanyName company={entry.company} link={entry.link} className="text-[11.5px] font-bold text-gray-800" />
+                    <span className="text-[10px] text-gray-600 shrink-0 ml-2">
+                      {entry.startDate}{entry.endDate ? ` - ${entry.endDate}` : ''}
+                      {entry.location ? `, ${entry.location}` : ''}
+                    </span>
+                  </div>
+                  {entry.title && <p className="text-[10.5px] text-gray-600">{entry.title}</p>}
+                  {entry.bullets.length > 0 && (
+                    <ul className="mt-1 space-y-0.5">
+                      {entry.bullets.filter((b) => b).map((bullet, i) => (
+                        <li key={`${bullet}-${i}`} className="text-[10.5px] text-gray-700 flex">
+                          <span className="mr-1.5 shrink-0">•</span>
+                          <span>{parseFormattedText(bullet)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         ) : null;
