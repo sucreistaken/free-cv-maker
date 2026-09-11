@@ -256,6 +256,7 @@
   "toast": {
     "importFailed": "İçe aktarma başarısız: {{error}}",
     "pdfImportFailed": "PDF içe aktarma başarısız: {{error}}",
+    "importedToProfile": "“{{name}}” adıyla yeni bir profil oluşturuldu; mevcut CV'n değişmedi.",
     "imageError": "Görsel işlenemedi.",
     "backupReminder": "Değişikliklerinizi yedeklemeyi unutmayın!",
     "backupNow": "Şimdi Yedekle"

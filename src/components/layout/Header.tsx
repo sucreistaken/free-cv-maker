@@ -22,7 +22,7 @@ interface HeaderProps {
 
 export function Header({ onPrint }: HeaderProps) {
   const { t } = useTranslation();
-  const { template, setTemplate, theme, activeDocument, setActiveDocument, language, setLanguage, loadFromImport: loadAppSettings } = useAppStore();
+  const { template, setTemplate, theme, activeDocument, setActiveDocument, language, setLanguage } = useAppStore();
   const resetToDefault = useCVStore((s) => s.resetToDefault);
   const { profiles, activeProfileId, switchProfile } = useProfileStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +60,23 @@ export function Header({ onPrint }: HeaderProps) {
     logEvent('json_exported');
   };
 
+  /** Imports land in a fresh profile so the active CV is never overwritten. */
+  const startImportProfile = (preferredName: string, fallback: string) => {
+    const store = useProfileStore.getState();
+    const base = preferredName.trim() || fallback;
+    const taken = new Set(store.profiles.map((p) => p.name));
+    let name = base;
+    for (let n = 2; taken.has(name); n++) name = `${base} (${n})`;
+    store.createProfile(name);
+    return name;
+  };
+
+  const finishImportProfile = (name: string) => {
+    useCVStore.getState()._syncFromProfile();
+    useAppStore.getState()._syncFromProfile();
+    toast('success', t('toast.importedToProfile', { name }));
+  };
+
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -70,14 +87,12 @@ export function Header({ onPrint }: HeaderProps) {
         toast('error', t('toast.importFailed', { error: result.error }));
         return;
       }
-      useCVStore.getState().loadFromImport(result.data.cvData);
-      loadAppSettings(result.data.appSettings);
-      if (result.data.coverLetterData) {
-        const cl = result.data.coverLetterData;
-        Object.entries(cl).forEach(([key, value]) => {
-          useCVStore.getState().updateCoverLetter(key as keyof typeof cl, value);
-        });
-      }
+      const name = startImportProfile(result.data.cvData.personalInfo.fullName, file.name.replace(/\.json$/i, ''));
+      const profileStore = useProfileStore.getState();
+      profileStore.updateActiveCVData(result.data.cvData);
+      profileStore.updateActiveAppSettings(result.data.appSettings);
+      if (result.data.coverLetterData) profileStore.updateActiveCoverLetter(result.data.coverLetterData);
+      finishImportProfile(name);
       logEvent('json_imported');
     };
     reader.readAsText(file);
@@ -91,7 +106,9 @@ export function Header({ onPrint }: HeaderProps) {
     uploadPdfFile(file);
     try {
       const cvData = await parsePdfToCV(file);
-      useCVStore.getState().loadFromImport(cvData);
+      const name = startImportProfile(cvData.personalInfo.fullName, file.name.replace(/\.pdf$/i, ''));
+      useProfileStore.getState().updateActiveCVData(cvData);
+      finishImportProfile(name);
     } catch (err) {
       toast('error', t('toast.pdfImportFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
     } finally {
@@ -238,8 +255,15 @@ export function Header({ onPrint }: HeaderProps) {
               onChange={handlePdfImport}
               className="hidden"
             />
-            <Button variant="ghost" size="sm" onClick={() => setShowAIAssist(true)} title={t('header.aiAssist')}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAIAssist(true)}
+              title={t('header.aiAssist')}
+              className="gap-1.5 border-violet-300 bg-violet-50 text-violet-700 hover:bg-violet-100 focus:ring-violet-300"
+            >
               <Sparkles size={15} />
+              <span className="font-semibold">AI</span>
             </Button>
             <div className="w-px h-5 bg-gray-200 hidden sm:block" />
             <Button variant="ghost" size="sm" onClick={handleResetClick} title={t('header.reset')}>

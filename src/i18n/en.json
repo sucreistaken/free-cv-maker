@@ -256,6 +256,7 @@
   "toast": {
     "importFailed": "Import failed: {{error}}",
     "pdfImportFailed": "PDF import failed: {{error}}",
+    "importedToProfile": "Created a new profile “{{name}}”; your current CV was left untouched.",
     "imageError": "Failed to process image.",
     "backupReminder": "Don't forget to backup your changes!",
     "backupNow": "Backup Now"
