@@ -40,9 +40,15 @@ export interface LayoutLine {
   fontName: string;
   /** True for a full-width line on a two-column page (header, contact bar). */
   spanning?: boolean;
+  /** Character offset in `text` of the first wide gap (a label/value or tab column), if any. */
+  gapAt?: number;
 }
 
-export const BULLET_RE = /^[•\-*◦▪●‣⁃➢–—▸▶►▹▷○◆◇■□✓✔➤➔★✦❖]\s*/u;
+/** Month names and abbreviations (English and Turkish) as a regex source; shared with the parser. */
+export const MONTH_PATTERN =
+  '(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık|Oca|Şub|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)';
+
+export const BULLET_RE = /^[•\-*◦▪●‣⁃➢–—▸▶►▹▷○◆◇■□✓✔➤➔★✦❖\uF000-\uF8FF]\s*/u;
 
 /** Lowercases text so that Turkish dotted/dotless I variants all become plain "i". */
 export function foldTurkish(text: string): string {
@@ -134,33 +140,33 @@ function detectGutter(lines: RawLine[], pageWidth: number): Gutter | null {
   }
 
   const maxCovered = inked.length * GUTTER_MAX_COVERAGE;
-  const lo = Math.floor(pageWidth * 0.2);
+  const lo = Math.floor(pageWidth * 0.1);
   const hi = Math.ceil(pageWidth * 0.8);
-  let best: Gutter | null = null;
+  const runs: Gutter[] = [];
   let runStart = -1;
   for (let b = lo; b <= hi + 1; b++) {
     const free = b <= hi && coverage[b] <= maxCovered;
     if (free && runStart === -1) runStart = b;
     if (!free && runStart !== -1) {
-      const width = b - runStart;
-      if (width >= GUTTER_MIN_WIDTH && (!best || width > best.end - best.start)) {
-        best = { start: runStart, end: b };
-      }
+      if (b - runStart >= GUTTER_MIN_WIDTH) runs.push({ start: runStart, end: b });
       runStart = -1;
     }
   }
-  if (!best) return null;
 
-  // Both sides must carry real text, otherwise this is just a wide margin.
-  let leftLines = 0;
-  let rightLines = 0;
-  for (const line of inked) {
-    const spans = inkSpans(line);
-    if (spans.some(([, e]) => e <= best!.start + 1)) leftLines++;
-    if (spans.some(([s]) => s >= best!.end - 1)) rightLines++;
+  // The widest free strip is often just the right margin, so take the widest one that
+  // has real text on both sides.
+  const spans = inked.map(inkSpans);
+  runs.sort((a, b) => b.end - b.start - (a.end - a.start));
+  for (const run of runs) {
+    let leftLines = 0;
+    let rightLines = 0;
+    for (const lineSpans of spans) {
+      if (lineSpans.some(([, e]) => e <= run.start + 1)) leftLines++;
+      if (lineSpans.some(([s]) => s >= run.end - 1)) rightLines++;
+    }
+    if (leftLines >= GUTTER_MIN_LINES_PER_SIDE && rightLines >= GUTTER_MIN_LINES_PER_SIDE) return run;
   }
-  if (leftLines < GUTTER_MIN_LINES_PER_SIDE || rightLines < GUTTER_MIN_LINES_PER_SIDE) return null;
-  return best;
+  return null;
 }
 
 // ── Text joining ──
@@ -174,6 +180,7 @@ interface JoinedText {
   right: number;
   hasWideGap: boolean;
   fontName: string;
+  gapAt?: number;
 }
 
 /**
@@ -209,6 +216,7 @@ function joinItems(rawItems: PdfTextItem[]): JoinedText {
   let x: number | null = null;
   let right = 0;
   let hasWideGap = false;
+  let gapAt: number | undefined;
   const runs: { offset: number; item: PdfTextItem }[] = [];
 
   for (const item of items) {
@@ -222,7 +230,10 @@ function joinItems(rawItems: PdfTextItem[]): JoinedText {
       const gap = item.x - prevEnd;
       if (gap > item.fontSize * JOIN_GAP_RATIO) text += ' ';
     }
-    if (prevVisibleEnd !== null && item.x - prevVisibleEnd > item.fontSize * 3) hasWideGap = true;
+    if (prevVisibleEnd !== null && item.x - prevVisibleEnd > item.fontSize * 3) {
+      hasWideGap = true;
+      if (gapAt === undefined) gapAt = text.length;
+    }
     runs.push({ offset: text.length, item });
     text += item.str;
     prevEnd = item.x + item.width;
@@ -243,7 +254,7 @@ function joinItems(rawItems: PdfTextItem[]): JoinedText {
       textX = run.item.x + into * perChar;
     }
   }
-  return { text: trimmed, x: x ?? 0, textX, right, hasWideGap, fontName: dominantFont(items) };
+  return { text: trimmed, x: x ?? 0, textX, right, hasWideGap, fontName: dominantFont(items), gapAt };
 }
 
 // ── Continuation merging ──
@@ -260,8 +271,17 @@ function fillsColumn(prev: LayoutLine, columnRight: number): boolean {
   return !prev.hasWideGap && columnRight - prev.right < prev.fontSize * 2.5;
 }
 
+const CONTACT_LINE_RE = /@|\bwww\.|https?:\/\/|\b[\w-]+\.(?:com|org|net|dev|io|co|tr|app)\b/i;
+
+/** A short line carrying an email or URL is a contact entry, not a wrapped sentence. */
+function isContactLine(text: string): boolean {
+  return text.length <= 60 && CONTACT_LINE_RE.test(text);
+}
+
 function shouldMerge(prev: LayoutLine, next: LayoutLine, columnRight: number): boolean {
   if (prev.page !== next.page || prev.column !== next.column) return false;
+  // A line that opens with an email or URL (or a short one made of it) is a contact entry, never a wrapped sentence.
+  if (isContactLine(prev.text) || CONTACT_LINE_RE.test(next.text.slice(0, 40))) return false;
   // A full-width paragraph may wrap onto another full-width line, but never into a column line.
   if (Boolean(prev.spanning) !== Boolean(next.spanning)) return false;
   if (next.isBullet) return false;
@@ -318,6 +338,7 @@ function makeLine(items: PdfTextItem[], page: number, column: number, y: number,
     isBullet,
     hasWideGap: joined.hasWideGap,
     fontName: joined.fontName,
+    gapAt: joined.gapAt,
   };
 }
 
@@ -343,10 +364,42 @@ function isDateRail(rawLines: RawLine[], gutter: Gutter): boolean {
   return dateCount >= 3 && dateCount / leftCount >= 0.4;
 }
 
+/**
+ * Dates and places pushed to the right margin ("Company ........ Mar 2022 - Present") look
+ * like a second column to the gutter search. They are right-aligned (ragged left edge), sit
+ * on the same baseline as left text and are short, unlike a real column of flowing text.
+ */
+function isRightAlignedTabColumn(rawLines: RawLine[], gutter: Gutter): boolean {
+  const mid = (gutter.start + gutter.end) / 2;
+  const rights: number[] = [];
+  const lefts: number[] = [];
+  let withLeftText = 0;
+  let chars = 0;
+  for (const raw of rawLines) {
+    const rightItems = raw.items.filter((i) => i.str.trim() && i.x + i.width / 2 >= mid);
+    if (rightItems.length === 0) continue;
+    rights.push(Math.max(...rightItems.map((i) => i.x + i.width)));
+    lefts.push(Math.min(...rightItems.map((i) => i.x)));
+    chars += rightItems.reduce((n, i) => n + i.str.trim().length, 0);
+    if (raw.items.some((i) => i.str.trim() && i.x + i.width / 2 < mid)) withLeftText++;
+  }
+  if (rights.length < 3) return false;
+  const sorted = [...rights].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const aligned = rights.filter((r) => Math.abs(r - median) <= 3).length;
+  const ragged = Math.max(...lefts) - Math.min(...lefts) > 6;
+  return (
+    withLeftText / rights.length >= 0.8 &&
+    aligned / rights.length >= 0.8 &&
+    ragged &&
+    chars / rights.length <= 32
+  );
+}
+
 function layoutPage(page: PdfPage, pageIndex: number): LayoutLine[] {
   const rawLines = groupIntoRawLines(page.items);
   let gutter = detectGutter(rawLines, page.width);
-  if (gutter && isDateRail(rawLines, gutter)) gutter = null;
+  if (gutter && (isDateRail(rawLines, gutter) || isRightAlignedTabColumn(rawLines, gutter))) gutter = null;
   const out: LayoutLine[] = [];
 
   if (!gutter) {
@@ -360,7 +413,11 @@ function layoutPage(page: PdfPage, pageIndex: number): LayoutLine[] {
   let left: LayoutLine[] = [];
   let right: LayoutLine[] = [];
   const flush = () => {
-    out.push(...left, ...right);
+    // The column that holds the biggest text (the name) is the main one and is read first,
+    // even when a sidebar sits on its left.
+    const biggest = (lines: LayoutLine[]) => lines.reduce((m, l) => Math.max(m, l.fontSize), 0);
+    if (biggest(right) > biggest(left) + 0.5) out.push(...right, ...left);
+    else out.push(...left, ...right);
     left = [];
     right = [];
   };
@@ -388,9 +445,77 @@ function layoutPage(page: PdfPage, pageIndex: number): LayoutLine[] {
   return out;
 }
 
+const OPEN_END_START = '(?:Devam|Şu|Present|Current)';
+/** A date range cut off by a narrow date column: "Jun 2019 - Feb" + "2022 Company ...". */
+const DANGLING_DATE_RE = new RegExp(
+  `^(.*?(?:${MONTH_PATTERN}\\.?\\s*)?(?:19|20)\\d{2}\\s*[-–—]\\s*(?:${MONTH_PATTERN}\\.?|${OPEN_END_START}))(?:\\s+(.*))?$`,
+  'iu',
+);
+const YEAR_START_RE = /^((?:19|20)\d{2})(?:\s+(.*))?$/u;
+const OPEN_END_TAIL_RE = /^(Ediyor|an)(?:\s+(.*))?$/iu;
+
+/** Moves the second half of a wrapped date range back onto the line it belongs to. */
+function repairSplitDates(lines: LayoutLine[]): LayoutLine[] {
+  const out = lines.map((l) => ({ ...l }));
+  for (let i = 0; i + 1 < out.length; i++) {
+    const prev = out[i];
+    const next = out[i + 1];
+    if (prev.page !== next.page || prev.column !== next.column || Math.abs(prev.y - next.y) > prev.fontSize * 2.6) continue;
+    const head = prev.text.match(DANGLING_DATE_RE);
+    if (!head) continue;
+    const openEnd = /(?:Devam|Şu|Present|Current)$/i.test(head[1]);
+    const tail = (openEnd ? next.text.match(OPEN_END_TAIL_RE) : next.text.match(YEAR_START_RE));
+    if (!tail) continue;
+    const moved = tail[1];
+    const nextBefore = next.text.length;
+    prev.text = `${head[1]} ${moved}${head[2] ? ` ${head[2]}` : ''}`.trim();
+    next.text = (tail[2] ?? '').trim();
+    // Keep the wide-gap offsets pointing at the same characters after the text moved.
+    if (prev.gapAt !== undefined && prev.gapAt >= head[1].length) prev.gapAt += moved.length + 1;
+    if (next.gapAt !== undefined) {
+      const removed = nextBefore - next.text.length;
+      next.gapAt = next.gapAt >= removed ? next.gapAt - removed : undefined;
+    }
+  }
+  return out.filter((l) => l.text);
+}
+
+/**
+ * Some producers draw bullets as shapes, so the text has no marker. When the document has no
+ * marked bullets at all, a repeated indent inside a column is read as a bullet list.
+ */
+function inferIndentBullets(lines: LayoutLine[]): LayoutLine[] {
+  if (lines.some((l) => l.isBullet)) return lines;
+  const out = lines.map((l) => ({ ...l }));
+  const groups = new Map<string, LayoutLine[]>();
+  for (const line of out) {
+    if (line.spanning) continue;
+    const key = `${line.page}:${line.column}`;
+    groups.set(key, [...(groups.get(key) ?? []), line]);
+  }
+  for (const group of groups.values()) {
+    const counts = new Map<number, number>();
+    for (const l of group) counts.set(Math.round(l.x), (counts.get(Math.round(l.x)) ?? 0) + 1);
+    // A bullet indent is an x used by several lines that sits a little to the right of
+    // another x used by header lines (a parent level).
+    const indentX = [...counts.entries()]
+      .filter(([x, n]) => n >= 3 && [...counts.entries()].some(([px, pn]) => pn >= 2 && x - px >= 5 && x - px <= 40))
+      .sort((a, b) => b[1] - a[1])[0]?.[0];
+    if (indentX === undefined) continue;
+    for (const l of group) {
+      if (Math.abs(l.x - indentX) > 1.5 || isAllCapsText(l.text) || CONTACT_LINE_RE.test(l.text)) continue;
+      l.text = `• ${l.text}`;
+      if (l.gapAt !== undefined) l.gapAt += 2;
+      l.isBullet = true;
+      l.textX = l.x;
+    }
+  }
+  return out;
+}
+
 /** Turns per-page glyph runs into ordered, column-aware, continuation-merged lines. */
 export function buildLayoutLines(pages: PdfPage[]): LayoutLine[] {
   const lines: LayoutLine[] = [];
   pages.forEach((page, index) => lines.push(...layoutPage(page, index)));
-  return mergeContinuations(lines);
+  return inferIndentBullets(mergeContinuations(repairSplitDates(lines)));
 }

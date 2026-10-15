@@ -1,0 +1,58 @@
+{
+  "en": {
+    "name": "Jordan Rivera",
+    "title": "Senior Software Engineer",
+    "email": "jordan.rivera@example.com",
+    "phone": "+1 512 555 0147",
+    "location": "Austin, TX, USA",
+    "linkedin": "in/jordanrivera",
+    "github": "github.com/jrivera-dev",
+    "website": "jordanrivera.dev",
+    "summary": "Backend-focused engineer with 8 years of experience building distributed systems and data pipelines. Leads small teams and mentors junior developers.",
+    "experience": [
+      { "title": "Senior Software Engineer", "company": "Northwind Labs", "location": "Austin, TX", "start": "Mar 2022", "end": "Present",
+        "bullets": ["Designed an event-driven billing platform handling 2M transactions per day.", "Cut p99 latency by 45% by introducing a Redis caching layer.", "Mentored four engineers through weekly design reviews."] },
+      { "title": "Software Engineer", "company": "Contoso Systems", "location": "Seattle, WA", "start": "Jun 2019", "end": "Feb 2022",
+        "bullets": ["Built REST and gRPC services in Go for the logistics team.", "Migrated 30 services to Kubernetes with zero downtime.", "Introduced contract testing that removed most integration failures."] },
+      { "title": "Junior Developer", "company": "Fabrikam Inc.", "location": "Remote", "start": "Aug 2017", "end": "May 2019",
+        "bullets": ["Implemented internal dashboards in React and TypeScript.", "Automated nightly reports with Python scripts."] }
+    ],
+    "education": [
+      { "degree": "M.Sc. Computer Science", "institution": "University of Texas at Austin", "start": "2015", "end": "2017", "gpa": "3.8/4.0" },
+      { "degree": "B.Sc. Computer Engineering", "institution": "Texas A&M University", "start": "2011", "end": "2015", "gpa": "" }
+    ],
+    "skills": [
+      { "category": "Languages", "items": ["Python", "Go", "TypeScript", "SQL"] },
+      { "category": "Cloud & Tools", "items": ["AWS", "Docker", "Kubernetes", "Terraform", "Git"] }
+    ],
+    "languages": [ { "name": "English", "level": "native" }, { "name": "Spanish", "level": "fluent" }, { "name": "German", "level": "beginner" } ],
+    "certifications": [ { "name": "AWS Certified Solutions Architect", "issuer": "Amazon Web Services", "year": "2022" }, { "name": "Certified Kubernetes Administrator", "issuer": "CNCF", "year": "2021" } ]
+  },
+  "tr": {
+    "name": "Elif Demir",
+    "title": "Yazılım Mühendisi",
+    "email": "elif.demir@ornek.com",
+    "phone": "+90 532 555 01 47",
+    "location": "İstanbul, Türkiye",
+    "linkedin": "in/elifdemir",
+    "github": "github.com/elifdemir",
+    "website": "",
+    "summary": "Dağıtık sistemler ve veri işleme alanında 6 yıllık deneyime sahip, takım çalışmasına yatkın yazılım mühendisi.",
+    "experience": [
+      { "title": "Kıdemli Yazılım Mühendisi", "company": "Örnek Teknoloji A.Ş.", "location": "İstanbul", "start": "Ocak 2021", "end": "Devam Ediyor",
+        "bullets": ["Günlük 2 milyon işlem yapan ödeme altyapısını tasarladı.", "Önbellek katmanı ile gecikmeyi %45 azalttı."] },
+      { "title": "Yazılım Mühendisi", "company": "Deneme Yazılım Ltd. Şti.", "location": "Ankara", "start": "Haziran 2018", "end": "Aralık 2020",
+        "bullets": ["Lojistik ekibi için REST servisleri geliştirdi.", "30 servisi Kubernetes'e kesintisiz taşıdı."] }
+    ],
+    "education": [
+      { "degree": "Bilgisayar Mühendisliği Yüksek Lisans", "institution": "Boğaziçi Üniversitesi", "start": "2016", "end": "2018", "gpa": "3.7/4.0" },
+      { "degree": "Bilgisayar Mühendisliği Lisans", "institution": "İzmir Ekonomi Üniversitesi", "start": "2012", "end": "2016", "gpa": "" }
+    ],
+    "skills": [
+      { "category": "Diller", "items": ["Java", "Python", "TypeScript", "SQL"] },
+      { "category": "Araçlar", "items": ["Docker", "Kubernetes", "Git", "PostgreSQL"] }
+    ],
+    "languages": [ { "name": "Türkçe", "level": "native" }, { "name": "İngilizce", "level": "fluent" }, { "name": "Almanca", "level": "beginner" } ],
+    "certifications": [ { "name": "AWS Certified Developer", "issuer": "Amazon Web Services", "year": "2022" } ]
+  }
+}

@@ -13,7 +13,18 @@ import type {
   SectionType,
 } from '../types/cv';
 import { generateId } from './id';
-import { buildLayoutLines, foldTurkish, BULLET_RE, type LayoutLine } from './pdf/layout';
+import {
+  COMPANY_WORDS_RE,
+  RANGE_RE,
+  isDegreeLike,
+  isInstitutionLike,
+  isLocationLike,
+  isTitleLike,
+  splitAtCompany,
+  splitTokens,
+  stripDuration,
+} from './pdf/entryTokens';
+import { buildLayoutLines, foldTurkish, BULLET_RE, MONTH_PATTERN, type LayoutLine } from './pdf/layout';
 
 // ── Section keyword dictionary (TR + EN) ──
 
@@ -84,16 +95,13 @@ const LINKEDIN_RE = /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+
 const GITHUB_RE = /(?:https?:\/\/)?(?:www\.)?github\.com\/[a-zA-Z0-9_-]+/i;
 const URL_RE = /(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s,)]*)?/;
 
-const MONTH = '(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık|Oca|Şub|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)';
+const MONTH = MONTH_PATTERN;
 const DATE_TOKEN = `(?:${MONTH}\\.?\\s*\\d{4}|\\d{1,2}[./]\\d{4}|\\b(?:19|20)\\d{2}\\b)`;
 const OPEN_END = '(?:Present|Current|Now|Günümüz|Devam(?:\\s+Ediyor)?|Halen|Şu\\s+an)';
 const DATE_RANGE_RE = new RegExp(`${DATE_TOKEN}\\s*[-–—]\\s*(?:${DATE_TOKEN}|${OPEN_END})`, 'i');
 const YEAR_RE = /\b(19|20)\d{2}\b/;
 const GPA_RE = /\b(?:GPA|Not(?:\s*Ort(?:alaması|\.)?)?|Ortalama)\s*:?\s*([\d.,]+(?:\s*\/\s*[\d.,]+)?)/i;
 const SEPARATOR_RE = /\s*[•·|]\s*/;
-
-const TITLE_WORDS_RE = /\b(developer|engineer|manager|intern|analyst|designer|lead|specialist|consultant|architect|scientist|director|coordinator|officer|assistant|administrator|researcher|teacher|instructor|stajyer|mühendis(?:i)?|geliştirici(?:si)?|uzman(?:ı)?|yönetici(?:si)?|müdür(?:ü)?|danışman(?:ı)?|asistan(?:ı)?|koordinatör(?:ü)?|analist(?:i)?|tasarımcı(?:sı)?|araştırmacı(?:sı)?|öğretmen(?:i)?)\b/i;
-const COMPANY_WORDS_RE = /\b(GmbH|Inc\.?|Ltd\.?|LLC|Corp\.?|Co\.|A\.Ş\.?|Ltd\.?\s*Şti\.?|Holding|Group|Technologies|Solutions|Studio|Agency|University|Üniversitesi|Bank|Bankası)\b/i;
 
 // ── Section detection ──
 
@@ -103,19 +111,36 @@ interface Section {
   lines: string[];
 }
 
+/** Words that may accompany a heading keyword ("Technical Skills", "Work Experience & Internships"). */
+const HEADING_MODIFIERS = new Set(
+  ['technical', 'professional', 'work', 'key', 'core', 'top', 'additional', 'relevant', 'other', 'personal', 'academic', 'and', 'the', 'of',
+    'internships', 'internship', 'training', 'history', 'iş', 'kişisel', 'bilgileri', 'bilgiler', 've', 'teknik', 'diğer', 'profesyonel']
+    .map(headingKey),
+);
+const HEADING_KEYWORD_WORDS = new Set(
+  Object.keys(SECTION_KEYWORDS).flatMap((k) => k.split(/\s+/)).map(headingKey),
+);
+
 function matchHeading(text: string, allowDecorated = true): HeadingType | undefined {
   const key = headingKey(text);
   if (!key) return undefined;
   const exact = HEADING_LOOKUP[key];
   if (exact) return exact;
   if (!allowDecorated) return undefined;
-  // Decorated headings: "Work Experience & Internships", "Skills (Technical)".
-  // Sentences and titles ("Best Project, Red Bull Sustain2Solve") must not match.
-  if (/[,;.]/.test(text.replace(/\.{3}$/, '')) || text.trim().split(/\s+/).length > 5) return undefined;
+  // Decorated headings: "Work Experience & Internships", "Technical Skills". Every extra word must be a
+  // known modifier or another heading word, so job titles ("Project Manager") and sentences never match.
+  if (/[,;.:]/.test(text) || text.trim().split(/\s+/).length > 5) return undefined;
+  const words = foldTurkish(text).replace(/[&|/]/g, ' ').split(/\s+/).filter(Boolean).map(headingKey);
+  if (!words.every((w) => HEADING_MODIFIERS.has(w) || HEADING_KEYWORD_WORDS.has(w))) return undefined;
+  // "Skills & Interests" is about skills: the keyword that comes first decides, longer breaks ties.
+  let best: { index: number; known: string } | undefined;
   for (const known of HEADING_KEYS_BY_LENGTH) {
-    if (known.length >= 6 && key.includes(known)) return HEADING_LOOKUP[known];
+    if (known.length < 5) continue;
+    const index = key.indexOf(known);
+    if (index === -1) continue;
+    if (!best || index < best.index || (index === best.index && known.length > best.known.length)) best = { index, known };
   }
-  return undefined;
+  return best ? HEADING_LOOKUP[best.known] : undefined;
 }
 
 function isAllCaps(text: string): boolean {
@@ -138,6 +163,20 @@ function stripContactTokens(text: string): string {
 
 function hasContactToken(text: string): boolean {
   return EMAIL_RE.test(text) || LINKEDIN_RE.test(text) || GITHUB_RE.test(text) || URL_RE.test(text);
+}
+
+/**
+ * A wide gap inside a line (right-aligned dates, label/value tables) separates fields; keep
+ * that as an explicit " | " so the entry parsers do not have to guess where the fields end.
+ */
+function withGapMarker(line: LayoutLine): string {
+  const text = line.text.trim();
+  const at = line.gapAt;
+  if (at === undefined || at <= 0 || at >= text.length) return text;
+  const before = text.slice(0, at).trimEnd();
+  const after = text.slice(at).trimStart();
+  if (/[|•·,;:–—-]$/.test(before) || /^[|•·,;:–—-]/.test(after)) return text;
+  return `${before} | ${after}`;
 }
 
 function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; sections: Section[] } {
@@ -163,10 +202,7 @@ function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; secti
 
   for (const line of lines) {
     const text = line.text.trim();
-    // A line that merely contains a keyword only counts as a heading when it is
-    // visibly styled as one: all caps or set larger than the body text.
-    const styledAsHeading = isAllCaps(text) || line.fontSize > bodyFontSize * 1.05;
-    const matchedType = matchHeading(text, styledAsHeading);
+    const matchedType = matchHeading(text);
     const looksLikeHeading =
       text.length < 40 && !line.isBullet && (line.fontSize >= bodyFontSize * 0.95 || isAllCaps(text));
 
@@ -191,7 +227,7 @@ function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; secti
     if (inHeader || !currentSection) {
       headerLines.push(line);
     } else {
-      currentSection.lines.push(text);
+      currentSection.lines.push(withGapMarker(line));
     }
   }
 
@@ -292,11 +328,11 @@ function parsePersonalInfo(lines: LayoutLine[]): CVData['personalInfo'] {
       !PHONE_RE.test(t) &&
       t.length > 2 &&
       t.length < 60 &&
-      !isAllCaps(t) &&
+      (!isAllCaps(t) || isTitleLike(t)) &&
       (t.match(/[•|·]/g) || []).length < 2 &&
       !/,/.test(t)
     ) {
-      info.jobTitle = t;
+      info.jobTitle = normalizeName(splitAtCompany(t)?.title ?? t);
       titleIndex = i;
       break;
     }
@@ -315,7 +351,7 @@ function parsePersonalInfo(lines: LayoutLine[]): CVData['personalInfo'] {
     if (hadContact || /,/.test(rest) || knownPlaces.test(rest)) {
       // Rebuild "City, Country" punctuation lost by token stripping.
       const original = t.replace(new RegExp(EMAIL_RE.source, 'g'), ' ');
-      const commaForm = original.match(/[\p{L}.\s-]+,\s*[\p{L}.\s-]+(?:\s*\([^)]*\))?/u);
+      const commaForm = original.match(/[\p{L}.\s-]+(?:,\s*[\p{L}.\s-]+)+(?:\s*\([^)]*\))?/u);
       info.location = commaForm ? commaForm[0].trim() : rest;
       break;
     }
@@ -343,137 +379,203 @@ function extractDateRange(text: string): {
   };
 }
 
-/** "Company, City, Country" → company + location; leaves "Acme, Inc." alone. */
-function splitCompanyLocation(text: string): { company: string; location: string } {
-  // "Company | City, Country" (pipe or dot separated) keeps the whole tail as the location.
-  const sep = text.match(/\s+[|•·]\s+/);
-  if (sep && sep.index !== undefined) {
-    const company = text.slice(0, sep.index).trim();
-    const location = text.slice(sep.index + sep[0].length).trim();
-    if (company && location) return { company, location };
+// ── Experience parsing ──
+
+interface EntryBlock {
+  head: string[];
+  bullets: string[];
+}
+
+/** Sentence-like text under a header is a description, not another header line. */
+function looksLikeProse(line: string): boolean {
+  // Header lines carry dates or " | " fields, and legal suffixes end in a period ("Fabrikam Inc.").
+  if (RANGE_RE.test(line) || line.includes(' | ')) return false;
+  const words = line.split(/\s+/).length;
+  const sentenceEnd = /[.!?]$/.test(line) && !/\b(?:Inc|Ltd|Co|Corp|LLC|Şti|A\.Ş)\.$/i.test(line);
+  return line.length >= 90 || (words >= 6 && sentenceEnd);
+}
+
+/**
+ * Cuts an experience section into one block per job. A job ends where the next header starts:
+ * after its bullets, or at the next date line (taking back the header lines that precede
+ * that date, which some layouts print above it).
+ */
+function splitExperienceBlocks(lines: string[]): EntryBlock[] {
+  const blocks: EntryBlock[] = [];
+  let cur: EntryBlock = { head: [], bullets: [] };
+  const flush = () => {
+    if (cur.head.length || cur.bullets.length) blocks.push(cur);
+    cur = { head: [], bullets: [] };
+  };
+  const dateIndex = (b: EntryBlock) => b.head.findIndex((l) => RANGE_RE.test(l));
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    if (BULLET_RE.test(line) && line.replace(BULLET_RE, '').length > 0) {
+      cur.bullets.push(line.replace(BULLET_RE, '').trim());
+      continue;
+    }
+    if ((cur.bullets.length > 0 || dateIndex(cur) !== -1) && looksLikeProse(line)) {
+      cur.bullets.push(line);
+      continue;
+    }
+
+    if (cur.bullets.length > 0) {
+      flush();
+    } else if (RANGE_RE.test(line) && dateIndex(cur) !== -1) {
+      const idx = dateIndex(cur);
+      const take = idx >= 1 ? Math.min(idx, cur.head.length - idx - 1) : 0;
+      const moved = take > 0 ? cur.head.splice(cur.head.length - take, take) : [];
+      flush();
+      cur.head.push(...moved);
+    } else if (dateIndex(cur) === -1 && cur.head.length >= 3) {
+      flush();
+    }
+    cur.head.push(line);
   }
+  flush();
+  return blocks;
+}
+
+/** "Company, City" → company + location; leaves "Acme, Inc." alone. */
+function splitCompanyLocation(text: string): { company: string; location: string } {
   const idx = text.indexOf(',');
   if (idx === -1) return { company: text.trim(), location: '' };
   const head = text.slice(0, idx).trim();
   const tail = text.slice(idx + 1).trim();
-  if (/^(Inc|Ltd|LLC|GmbH|Co|Corp|A\.Ş|Şti)\.?$/i.test(tail)) return { company: text.trim(), location: '' };
+  if (/^(Inc|Ltd|LLC|GmbH|Co|Corp|A\.Ş|Şti)\.?(?:\s*,|$)/i.test(tail)) {
+    // "Acme, Inc., Austin": the legal suffix belongs to the company, the rest is the place.
+    const next = tail.indexOf(',');
+    return next === -1
+      ? { company: text.trim(), location: '' }
+      : { company: `${head}, ${tail.slice(0, next).trim()}`, location: tail.slice(next + 1).trim() };
+  }
   return { company: head, location: tail };
 }
 
-// ── Experience parsing ──
+function parseEntryHeader(head: string[]): Pick<ExperienceEntry, 'title' | 'company' | 'location' | 'startDate' | 'endDate'> {
+  let startDate = '';
+  let endDate = '';
+  let location = '';
+  const pieces: string[] = [];
 
-function parseExperience(lines: string[]): ExperienceEntry[] {
-  const entries: ExperienceEntry[] = [];
-  let current: Partial<ExperienceEntry> | null = null;
-
-  const pushCurrent = () => {
-    if (current && (current.title || current.company)) {
-      let title = current.title || '';
-      let company = current.company || '';
-      // Some templates print the employer on the lead line and the role beneath it.
-      const leadLooksLikeCompany = COMPANY_WORDS_RE.test(title) && !TITLE_WORDS_RE.test(title);
-      const secondLooksLikeTitle = TITLE_WORDS_RE.test(company) && !TITLE_WORDS_RE.test(title);
-      if (company && (leadLooksLikeCompany || secondLooksLikeTitle)) {
-        [title, company] = [company, title];
-      }
-      entries.push({
-        id: generateId(),
-        title,
-        company,
-        location: current.location || '',
-        startDate: current.startDate || '',
-        endDate: current.endDate || '',
-        bullets: current.bullets || [],
-      });
-    }
-  };
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    if (BULLET_RE.test(trimmed) && trimmed.replace(BULLET_RE, '').length > 0) {
-      if (!current) current = { title: '', company: '', location: '', startDate: '', endDate: '', bullets: [] };
-      current.bullets = current.bullets || [];
-      current.bullets.push(trimmed.replace(BULLET_RE, '').trim());
+  for (const raw of head) {
+    const line = stripDuration(raw);
+    const m = startDate ? null : line.match(RANGE_RE);
+    if (!m || m.index === undefined) {
+      pieces.push(line);
       continue;
     }
-
-    const dateInfo = extractDateRange(trimmed);
-
-    if (dateInfo) {
-      if (current && current.title && !current.startDate && !current.company && !current.bullets?.length && !dateInfo.beforeDate) {
-        // Date on its own line right after the title line.
-        current.startDate = dateInfo.startDate;
-        current.endDate = dateInfo.endDate;
-        if (dateInfo.afterDate) current.location = dateInfo.afterDate;
-        continue;
-      }
-      pushCurrent();
-      current = {
-        title: dateInfo.beforeDate,
-        company: '',
-        location: dateInfo.afterDate,
-        startDate: dateInfo.startDate,
-        endDate: dateInfo.endDate,
-        bullets: [],
-      };
-      continue;
-    }
-
-    if (current) {
-      if (current.title && !current.company) {
-        const split = current.location ? { company: trimmed, location: '' } : splitCompanyLocation(trimmed);
-        current.company = split.company;
-        if (split.location) current.location = split.location;
-      } else if (current.title && current.company && !current.location && trimmed.length < 50 && !current.bullets?.length) {
-        current.location = trimmed;
-      } else {
-        pushCurrent();
-        current = { title: trimmed, company: '', location: '', startDate: '', endDate: '', bullets: [] };
-      }
-    } else {
-      current = { title: trimmed, company: '', location: '', startDate: '', endDate: '', bullets: [] };
+    startDate = m[1].trim();
+    endDate = m[2].trim();
+    const before = line.slice(0, m.index).trim();
+    const afterRaw = line.slice(m.index + m[0].length);
+    const after = afterRaw.replace(/^[\s,|·•–—-]+/, '').trim();
+    if (before) pieces.push(before);
+    if (after) {
+      // "Mar 2023 - Present, Berlin": a comma right after the dates marks a place.
+      if (/^\s*,/.test(afterRaw)) location = after;
+      else pieces.push(after);
     }
   }
 
-  pushCurrent();
-  return entries;
+  let tokens = pieces.flatMap(splitTokens).flatMap((t) => {
+    // "Title, Company (City, ST)": peel off a trailing place, then split a title from its employer.
+    const paren = t.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    if (paren && paren[1] && !location && isLocationLike(paren[2])) {
+      location = paren[2].trim();
+      t = paren[1].trim();
+    }
+    const at = splitAtCompany(t);
+    if (at) return [at.title, at.company];
+    const comma = t.indexOf(',');
+    if (comma > 0 && isTitleLike(t.slice(0, comma))) {
+      const tail = t.slice(comma + 1).trim();
+      if (COMPANY_WORDS_RE.test(tail) || (tail.split(/\s+/).length >= 2 && !isTitleLike(tail) && !isLocationLike(tail))) {
+        return [t.slice(0, comma).trim(), tail];
+      }
+    }
+    return [t];
+  });
+
+  let title = '';
+  let company = '';
+  const strictIdx = tokens.findIndex((t) => isTitleLike(t) && !COMPANY_WORDS_RE.test(t));
+  const titleIdx = strictIdx !== -1 ? strictIdx : tokens.findIndex((t) => isTitleLike(t));
+  if (titleIdx !== -1) {
+    title = tokens[titleIdx];
+    tokens = tokens.filter((_, i) => i !== titleIdx);
+  }
+
+  if (!title && tokens.length > 0) {
+    // No job-title wording: an employer-looking piece is the company, the other leads as the title.
+    const companyIdx = tokens.length >= 2 ? tokens.findIndex((t) => COMPANY_WORDS_RE.test(t)) : -1;
+    if (companyIdx !== -1) {
+      company = tokens[companyIdx];
+      tokens = tokens.filter((_, i) => i !== companyIdx);
+    }
+    title = tokens.shift() ?? '';
+  }
+
+  if (!company && tokens.length === 1 && tokens[0].includes(',')) {
+    // A lone "Company, City" piece (a bare place would otherwise look like the company).
+    const split = splitCompanyLocation(tokens[0]);
+    company = split.company;
+    if (!location) location = split.location;
+    tokens = [];
+  }
+  const places = tokens.filter((t) => isLocationLike(t));
+  const others = tokens.filter((t) => !isLocationLike(t));
+  if (!company) company = others[0] ?? (places.length > 1 ? places.shift()! : '');
+  if (!location) location = places[0] ?? others[1] ?? '';
+  if (company.includes(',') && !location) {
+    const split = splitCompanyLocation(company);
+    company = split.company;
+    location = split.location;
+  }
+
+  return { title, company, location, startDate, endDate };
+}
+
+function parseExperience(lines: string[]): ExperienceEntry[] {
+  return splitExperienceBlocks(lines)
+    .map((block) => ({ ...parseEntryHeader(block.head), bullets: block.bullets }))
+    .filter((e) => e.title || e.company)
+    .map((e) => ({ id: generateId(), ...e }));
 }
 
 // ── Education parsing ──
 
 const YEAR_RANGE_RE = new RegExp(`\\b((?:19|20)\\d{2})\\s*[-–—]\\s*((?:19|20)\\d{2}|${OPEN_END})\\b`, 'i');
 
+type EduKind = 'institution' | 'degree' | 'unknown';
+
+function eduKind(text: string): EduKind {
+  if (isInstitutionLike(text)) return 'institution';
+  if (isDegreeLike(text)) return 'degree';
+  return 'unknown';
+}
+
 function parseEducation(lines: string[]): EducationEntry[] {
   const entries: EducationEntry[] = [];
-  let current: Partial<EducationEntry> | null = null;
-
-  const pushCurrent = () => {
-    if (current && (current.institution || current.degree)) {
-      entries.push({
-        id: generateId(),
-        degree: current.degree || '',
-        institution: current.institution || '',
-        startDate: current.startDate || '',
-        year: current.year || '',
-        gpa: current.gpa || '',
-      });
-    }
-    current = null;
+  const blank = () => ({ degree: '', institution: '', startDate: '', year: '', gpa: '' });
+  let cur = blank();
+  const filled = (e: typeof cur) => e.degree || e.institution || e.year || e.startDate;
+  const push = () => {
+    if (cur.degree || cur.institution) entries.push({ id: generateId(), ...cur });
+    cur = blank();
   };
 
   for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const texts: string[] = [];
-    let startDate = '';
-    let year = '';
-    let gpa = '';
+    let rest = line.trim();
+    if (!rest) continue;
 
     // Dates and GPA first: a spaced en dash in "2016 – 2020" must not be taken for a field separator.
-    let rest = trimmed;
+    let gpa = '';
+    let startDate = '';
+    let year = '';
     const gpaMatch = rest.match(GPA_RE);
     if (gpaMatch) {
       gpa = gpaMatch[1].replace(/\s+/g, '');
@@ -493,26 +595,37 @@ function parseEducation(lines: string[]): EducationEntry[] {
     }
     rest = rest.replace(/\(\s*\)/g, ' ');
 
-    for (const part of rest.split(/\s*[•·|]\s*|\s+[—–]\s+/)) {
-      const text = part.replace(/^[\s,|:–—-]+|[\s,|:–—-]+$/g, '').replace(/\s+/g, ' ');
-      if (text) texts.push(text);
-    }
+    let tokens = rest.split(/\s*[•·|;]\s*|\s+[—–]\s+/).map((t) => t.replace(/^[\s,|:–—-]+|[\s,|:–—-]+$/g, '').replace(/\s+/g, ' ')).filter(Boolean);
+    // "Degree, University": split on commas only when each piece is recognisably a degree or a school.
+    tokens = tokens.flatMap((t) => {
+      const parts = t.split(/\s*,\s*/).filter(Boolean);
+      return parts.length >= 2 && parts.every((p) => eduKind(p) !== 'unknown') ? parts : [t];
+    });
 
-    const startsNewEntry = texts.length > 0 && !!current && !!current.degree && !!current.institution;
-    if (startsNewEntry) pushCurrent();
-    if (!current) current = { degree: '', institution: '', startDate: '', year: '', gpa: '' };
-
-    for (const text of texts) {
-      if (!current.degree) current.degree = text;
-      else if (!current.institution) current.institution = text;
-      else current.institution += `, ${text}`;
+    if ((startDate || year) && (cur.year || cur.startDate)) push();
+    for (const token of tokens) {
+      const kind = eduKind(token);
+      if (kind === 'institution') {
+        if (cur.institution) push();
+        cur.institution = token;
+      } else if (kind === 'degree') {
+        if (cur.degree) push();
+        cur.degree = token;
+      } else if (!cur.degree) {
+        cur.degree = token;
+      } else if (!cur.institution) {
+        cur.institution = token;
+      } else {
+        push();
+        cur.degree = token;
+      }
     }
-    if (startDate && !current.startDate) current.startDate = startDate;
-    if (year && !current.year) current.year = year;
-    if (gpa && !current.gpa) current.gpa = gpa;
+    if (startDate && !cur.startDate) cur.startDate = startDate;
+    if (year && !cur.year) cur.year = year;
+    if (gpa && !cur.gpa) cur.gpa = gpa;
   }
 
-  pushCurrent();
+  if (filled(cur)) push();
   return entries;
 }
 
@@ -522,8 +635,38 @@ function toTitleCase(text: string): string {
   return text.toLowerCase().replace(/(^|\s|&)(\p{L})/gu, (m) => m.toUpperCase());
 }
 
-function parseSkills(lines: string[]): SkillCategory[] {
+/** Rows that Europass and similar formats file under "skills" but that describe languages. */
+const LANGUAGE_ROW_RE = /^(?:mother tongue|native language|other languages|foreign languages|ana dil(?:i|im)?|anadil(?:im)?|diğer diller|yabancı diller)\b/i;
+const LANGUAGE_LABEL_RE = /^(?:languages?|diller|dil|language skills|yabancı diller|dil bilgisi)$/i;
+
+/** A skills row that really lists spoken languages ("Languages: English (Native), Spanish (Fluent)"). */
+function isLanguageRow(line: string): boolean {
+  if (LANGUAGE_ROW_RE.test(line)) return true;
+  const labelled = splitLabelled(line);
+  return Boolean(labelled && LANGUAGE_LABEL_RE.test(labelled.label) && splitByProficiency(labelled.items).length >= 3);
+}
+
+/** "Label: items" or "Label | items" (a label/value table); null when the line is not one. */
+function splitLabelled(line: string): { label: string; items: string } | null {
+  const colon = line.indexOf(':');
+  if (colon > 0 && colon < 35) return { label: line.slice(0, colon).trim(), items: line.slice(colon + 1).trim() };
+  const pipe = line.indexOf(' | ');
+  if (pipe > 0 && pipe < 35) return { label: line.slice(0, pipe).trim(), items: line.slice(pipe + 3).trim() };
+  return null;
+}
+
+function parseSkills(lines: string[], sectionTitle = ''): SkillCategory[] {
   const categories: SkillCategory[] = [];
+  const cleaned = lines.map((l) => l.replace(BULLET_RE, '').trim()).filter(Boolean);
+
+  // A plain list of skills, one per line, has no category names to recover.
+  const labelled = cleaned.some((l) => splitLabelled(l));
+  if (!labelled && !cleaned.some((l) => l.includes(','))) {
+    const items = cleaned.map((l) => l.replace(/^[,\s]+|[,\s|]+$/g, '')).filter(Boolean);
+    if (items.length === 0) return [];
+    const category = sectionTitle ? (isAllCaps(sectionTitle) ? toTitleCase(sectionTitle) : sectionTitle) : 'Skills';
+    return [{ id: generateId(), category, items: items.join(', ') }];
+  }
 
   const appendToLast = (items: string) => {
     const last = categories[categories.length - 1];
@@ -534,16 +677,10 @@ function parseSkills(lines: string[]): SkillCategory[] {
     }
   };
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    // "Category: item1, item2, item3"
-    const colonIndex = trimmed.indexOf(':');
-    if (colonIndex > 0 && colonIndex < 35) {
-      const category = trimmed.substring(0, colonIndex).trim();
-      const items = trimmed.substring(colonIndex + 1).trim();
-      categories.push({ id: generateId(), category, items });
+  for (const trimmed of cleaned) {
+    const labelledLine = splitLabelled(trimmed);
+    if (labelledLine) {
+      categories.push({ id: generateId(), category: labelledLine.label, items: labelledLine.items });
       continue;
     }
 
@@ -567,49 +704,84 @@ function parseSkills(lines: string[]): SkillCategory[] {
 
 const PROFICIENCY_MAP: Record<string, LanguageEntry['proficiency']> = {
   'native': 'native', 'ana dil': 'native', 'anadil': 'native', 'mother tongue': 'native', 'c2': 'native',
+  'native or bilingual': 'native', 'bilingual': 'native',
   'fluent': 'fluent', 'ileri': 'fluent', 'advanced': 'fluent', 'akıcı': 'fluent', 'proficient': 'fluent', 'c1': 'fluent',
+  'full professional': 'fluent', 'professional working': 'fluent',
   'intermediate': 'intermediate', 'orta': 'intermediate', 'conversational': 'intermediate', 'b1': 'intermediate', 'b2': 'intermediate',
+  'limited working': 'intermediate',
   'beginner': 'beginner', 'başlangıç': 'beginner', 'basic': 'beginner',
   'temel': 'beginner', 'elementary': 'beginner', 'a1': 'beginner', 'a2': 'beginner',
 };
 
-const PROFICIENCY_LABELS = Object.keys(PROFICIENCY_MAP).sort((a, b) => b.length - a.length);
+/** Folded keys so "İleri", "Akıcı" and "ileri" all match; folding keeps string length. */
+const FOLDED_PROFICIENCY: Record<string, LanguageEntry['proficiency']> = Object.fromEntries(
+  Object.entries(PROFICIENCY_MAP).map(([k, v]) => [foldTurkish(k), v]),
+);
+const PROFICIENCY_LABELS = Object.keys(FOLDED_PROFICIENCY).sort((a, b) => b.length - a.length);
 const PROFICIENCY_SPLIT_RE = new RegExp(
   `\\s*[(:\\-–—]?\\s*(${PROFICIENCY_LABELS.map((l) => l.replace(/\s+/g, '\\s+')).join('|')})\\)?(?=[,;\\s]|$)`,
-  'iu',
+  'giu',
 );
 
 function lookupProficiency(label: string): LanguageEntry['proficiency'] {
-  return PROFICIENCY_MAP[foldTurkish(label).replace(/\s+/g, ' ')] || PROFICIENCY_MAP[label.toLowerCase()] || 'intermediate';
+  return FOLDED_PROFICIENCY[foldTurkish(label).replace(/\s+/g, ' ')] || 'intermediate';
 }
+
+/** Splits "English (Native), German (Basic)" into [lang, level, lang, level, ..., tail] pieces. */
+function splitByProficiency(text: string): string[] {
+  const folded = foldTurkish(text);
+  const pieces: string[] = [];
+  let last = 0;
+  for (const m of folded.matchAll(PROFICIENCY_SPLIT_RE)) {
+    const label = m[1];
+    const labelStart = m.index + m[0].indexOf(label);
+    pieces.push(text.slice(last, m.index), text.slice(labelStart, labelStart + label.length));
+    last = m.index + m[0].length;
+  }
+  pieces.push(text.slice(last));
+  return pieces;
+}
+
+const NATIVE_ROW_RE = /^(?:mother tongue|ana dil(?:i|im)?|anadil(?:im)?)\s*[:|]?\s*/i;
+const OTHER_ROW_RE = /^(?:other languages|foreign languages|diğer diller|yabancı diller)\s*[:|]?\s*/i;
 
 function parseLanguages(lines: string[]): LanguageEntry[] {
   const entries: LanguageEntry[] = [];
+  const strip = (s: string) => s.replace(/^[,;|\s]+|[,;|\s]+$/g, '');
 
-  for (const line of lines) {
-    const trimmed = line.trim();
+  for (const raw of lines) {
+    let trimmed = raw.replace(BULLET_RE, '').replace(/\s+\|\s+/g, ' ').trim();
     if (!trimmed) continue;
 
-    const pieces = trimmed.split(new RegExp(PROFICIENCY_SPLIT_RE.source, 'giu'));
+    // Europass-style rows: "Mother tongue English" / "Other languages Spanish (Fluent), German (Basic)".
+    let defaultLevel: LanguageEntry['proficiency'] = 'intermediate';
+    if (NATIVE_ROW_RE.test(trimmed)) {
+      defaultLevel = 'native';
+      trimmed = trimmed.replace(NATIVE_ROW_RE, '');
+    } else {
+      trimmed = trimmed.replace(OTHER_ROW_RE, '');
+    }
+
+    const pieces = splitByProficiency(trimmed);
     if (pieces.length >= 3) {
       // [lang, label, lang, label, ..., tail]
       for (let i = 0; i + 1 < pieces.length; i += 2) {
-        const language = pieces[i].replace(/^[,;\s]+|[,;\s]+$/g, '');
+        const language = strip(pieces[i]);
         if (!language) continue;
         entries.push({ id: generateId(), language, proficiency: lookupProficiency(pieces[i + 1]) });
       }
-      const tail = pieces[pieces.length - 1].replace(/^[,;\s]+|[,;\s]+$/g, '');
+      const tail = strip(pieces[pieces.length - 1]);
       if (tail && pieces.length % 2 === 1) {
         for (const p of tail.split(/[,;]/).map((s) => s.trim()).filter(Boolean)) {
-          entries.push({ id: generateId(), language: p, proficiency: 'intermediate' });
+          entries.push({ id: generateId(), language: p, proficiency: defaultLevel });
         }
       }
       continue;
     }
 
     for (const part of trimmed.split(/[,;]/)) {
-      const p = part.trim();
-      if (p.length > 1 && p.length < 30) entries.push({ id: generateId(), language: p, proficiency: 'intermediate' });
+      const p = strip(part);
+      if (p.length > 1 && p.length < 30) entries.push({ id: generateId(), language: p, proficiency: defaultLevel });
     }
   }
 
@@ -717,16 +889,39 @@ function parseCertifications(lines: string[]): CertificationEntry[] {
 
   const startEntry = (text: string): Partial<CertificationEntry> => {
     const entry: Partial<CertificationEntry> = { name: text, issuer: '', year: '', description: '' };
-    // One-line form: "Name — Issuer, 2023".
-    const dashed = text.split(/\s+[—–]\s+/);
-    if (dashed.length === 2 && dashed[0].trim() && dashed[1].trim()) {
-      const tail = dashed[1].trim();
-      const yearMatch = tail.match(YEAR_RE);
-      entry.name = dashed[0].trim();
-      entry.issuer = tail.replace(YEAR_RE, '').replace(/^[\s,|•·]+|[\s,|•·]+$/g, '').trim();
-      if (yearMatch) entry.year = yearMatch[0];
+    const clean = (t: string) => t.replace(/^[\s,|•·;]+|[\s,|•·;]+$/g, '').trim();
+    // "2022 | Name" (year column first)
+    const lead = text.match(/^((?:19|20)\d{2})\s*(?:\||[-–—:])?\s+(.+)$/);
+    if (lead && !YEAR_RE.test(lead[2])) {
+      const inner = startEntry(lead[2]);
+      return { ...inner, year: inner.year || lead[1] };
+    }
+    const yearOnly = (t: string) => /^(?:19|20)\d{2}$/.test(t.trim());
+
+    // "Name (Issuer, 2023)"
+    const paren = text.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    if (paren && (YEAR_RE.test(paren[2]) || paren[2].includes(','))) {
+      entry.name = clean(paren[1]);
+      const inner = paren[2].split(',').map(clean).filter(Boolean);
+      entry.year = inner.find(yearOnly) ?? '';
+      entry.issuer = inner.filter((p) => !yearOnly(p)).join(', ');
       return entry;
     }
+
+    // "Name - Issuer, 2023" / "Name | Issuer | 2023" / "Name, Issuer, 2023"
+    const dashed = text.split(/\s+[—–-]\s+|\s+\|\s+/).map(clean).filter(Boolean);
+    const parts = dashed.length >= 2 ? dashed : text.split(/\s*,\s*/).map(clean).filter(Boolean);
+    const lastIsYear = parts.length >= 2 && yearOnly(parts[parts.length - 1]);
+    if (parts.length >= 3 || (parts.length === 2 && (lastIsYear || dashed.length >= 2))) {
+      const tail = lastIsYear ? parts.slice(1, -1) : parts.slice(1);
+      entry.name = parts[0];
+      if (lastIsYear) entry.year = parts[parts.length - 1];
+      const tailYear = tail.map((t) => t.match(YEAR_RE)?.[0]).find(Boolean);
+      if (!entry.year && tailYear) entry.year = tailYear;
+      entry.issuer = tail.map((t) => clean(t.replace(YEAR_RE, ''))).filter(Boolean).join(', ');
+      return entry;
+    }
+
     const yearMatch = text.match(YEAR_RE);
     if (yearMatch) {
       entry.year = yearMatch[0];
@@ -749,7 +944,7 @@ function parseCertifications(lines: string[]): CertificationEntry[] {
       current = startEntry(trimmed);
     } else if (!current.issuer) {
       // "issuer • year" format from app
-      const parts = trimmed.split(SEPARATOR_RE).map((p) => p.trim()).filter(Boolean);
+      const parts = trimmed.split(/\s*[•·|]\s*|,\s*(?=(?:19|20)\d{2}$)/).map((p) => p.trim()).filter(Boolean);
       const yearPart = parts.find((p) => YEAR_RE.test(p));
       const issuerPart = parts.find((p) => !YEAR_RE.test(p));
       current.issuer = issuerPart || '';
@@ -880,7 +1075,7 @@ function parseAwards(lines: string[]): AwardEntry[] {
     if (!current) {
       current = startEntry(trimmed);
     } else if (!current.issuer) {
-      const parts = trimmed.split(SEPARATOR_RE).map((p) => p.trim()).filter(Boolean);
+      const parts = trimmed.split(/\s*[•·|]\s*|,\s*(?=(?:19|20)\d{2}$)/).map((p) => p.trim()).filter(Boolean);
       const yearPart = parts.find((p) => YEAR_RE.test(p));
       current.issuer = parts.find((p) => !YEAR_RE.test(p)) || (yearPart ? '' : trimmed);
       if (yearPart && !current.year) current.year = yearPart.match(YEAR_RE)![0];
@@ -1015,9 +1210,12 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
       case 'education':
         education = education.concat(parseEducation(section.lines));
         break;
-      case 'skills':
-        skills = skills.concat(parseSkills(section.lines));
+      case 'skills': {
+        const languageRows = section.lines.filter(isLanguageRow);
+        skills = skills.concat(parseSkills(section.lines.filter((l) => !isLanguageRow(l)), section.title));
+        languages = languages.concat(parseLanguages(languageRows.map((l) => (LANGUAGE_ROW_RE.test(l) ? l : (splitLabelled(l)?.items ?? l)))));
         break;
+      }
       case 'projects':
         projects = projects.concat(parseProjects(section.lines));
         break;
