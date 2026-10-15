@@ -212,9 +212,11 @@ export function Header({ onPrint }: HeaderProps) {
             </button>
 
             {/* Language toggle */}
-            <div className="flex rounded-md border border-gray-300 overflow-hidden">
+            <div className="flex rounded-md border border-gray-300 overflow-hidden" role="group" aria-label={t('header.interfaceLanguage')} title={t('header.interfaceLanguage')}>
               <button
                 onClick={() => handleLanguageChange('tr')}
+                aria-pressed={language === 'tr'}
+                aria-label="Türkçe"
                 className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors ${
                   language === 'tr'
                     ? 'bg-blue-600 text-white'
@@ -225,6 +227,8 @@ export function Header({ onPrint }: HeaderProps) {
               </button>
               <button
                 onClick={() => handleLanguageChange('en')}
+                aria-pressed={language === 'en'}
+                aria-label="English"
                 className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-semibold transition-colors border-l border-gray-300 ${
                   language === 'en'
                     ? 'bg-blue-600 text-white'

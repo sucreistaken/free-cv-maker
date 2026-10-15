@@ -17,7 +17,8 @@
     "resetConfirmTitle": "CV sıfırlansın mı?",
     "resetConfirmBody": "Aktif profildeki tüm içerik varsayılan örneğe döner. Bu işlem geri alınamaz. Önce JSON olarak dışa aktarmanı öneririz.",
     "resetConfirm": "Sıfırla",
-    "resetCancel": "Vazgeç"
+    "resetCancel": "Vazgeç",
+    "interfaceLanguage": "Arayüz dili"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -137,7 +138,16 @@
     "native": "Ana Dil",
     "fluent": "Akıcı",
     "intermediate": "Orta",
-    "beginner": "Başlangıç"
+    "beginner": "Başlangıç",
+    "quickAdd": "Hızlı ekle:",
+    "suggestions": [
+      "İngilizce",
+      "Almanca",
+      "Fransızca",
+      "İspanyolca",
+      "Arapça",
+      "Rusça"
+    ]
   },
   "awardsForm": {
     "add": "Ödül Ekle",
@@ -337,5 +347,12 @@
     "errorInvalidJson": "Bu geçerli bir JSON gibi görünmüyor. Cevabın tamamını kopyaladığınızdan emin olun.",
     "errorNotCvShaped": "Bu JSON bir CV verisine benzemiyor. ChatGPT'den JSON'u istenen formatta tekrar göndermesini isteyin.",
     "retryHint": "Yapıştırdığınız metni düzenleyip tekrar deneyebilir ya da prompt'u tekrar kopyalayıp sohbete yeniden başlayabilirsiniz."
+  },
+  "entryCard": {
+    "untitled": "Adsız",
+    "reorder": "Sırayı değiştirmek için sürükle",
+    "collapse": "Daralt",
+    "expand": "Genişlet",
+    "remove": "Sil"
   }
 }

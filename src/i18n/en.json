@@ -17,7 +17,8 @@
     "resetConfirmTitle": "Reset your CV?",
     "resetConfirmBody": "All content in the active profile returns to the default sample. This cannot be undone. Consider exporting to JSON first.",
     "resetConfirm": "Reset",
-    "resetCancel": "Cancel"
+    "resetCancel": "Cancel",
+    "interfaceLanguage": "Interface language"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -137,7 +138,16 @@
     "native": "Native",
     "fluent": "Fluent",
     "intermediate": "Intermediate",
-    "beginner": "Beginner"
+    "beginner": "Beginner",
+    "quickAdd": "Quick add:",
+    "suggestions": [
+      "English",
+      "German",
+      "French",
+      "Spanish",
+      "Arabic",
+      "Russian"
+    ]
   },
   "awardsForm": {
     "add": "Add Award",
@@ -337,5 +347,12 @@
     "errorInvalidJson": "This doesn't look like valid JSON. Double-check you copied the full response.",
     "errorNotCvShaped": "This JSON doesn't look like CV data. Ask ChatGPT to resend it in the requested format.",
     "retryHint": "You can edit the pasted text and try again, or copy the prompt again and restart the chat."
+  },
+  "entryCard": {
+    "untitled": "Untitled",
+    "reorder": "Drag to reorder",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "remove": "Remove"
   }
 }
