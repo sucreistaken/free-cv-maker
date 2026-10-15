@@ -13,7 +13,11 @@
     "howToUse": "Nasıl Kullanılır?",
     "fullscreen": "Tam Ekran",
     "exitFullscreen": "Tam Ekrandan Çık",
-    "aiAssist": "AI CV Asistanı"
+    "aiAssist": "AI CV Asistanı",
+    "resetConfirmTitle": "CV sıfırlansın mı?",
+    "resetConfirmBody": "Aktif profildeki tüm içerik varsayılan örneğe döner. Bu işlem geri alınamaz. Önce JSON olarak dışa aktarmanı öneririz.",
+    "resetConfirm": "Sıfırla",
+    "resetCancel": "Vazgeç"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -217,7 +221,11 @@
     "pageCount": "{{count}} sayfa",
     "calibration": "Sayfa kırılım kalibrasyonu",
     "reset": "Sıfırla",
-    "page": "Sayfa {{n1}} | Sayfa {{n2}}"
+    "page": "Sayfa {{n1}} | Sayfa {{n2}}",
+    "openForm": "Formu aç",
+    "done": "Bitti",
+    "inlineHint": "Enter: bitti, Esc: kapat",
+    "inlineHintMulti": "Cmd/Ctrl+Enter: bitti, Esc: kapat"
   },
   "profileManager": {
     "title": "Profilleri Yönet",
@@ -259,7 +267,8 @@
     "importedToProfile": "“{{name}}” adıyla yeni bir profil oluşturuldu; mevcut CV'n değişmedi.",
     "imageError": "Görsel işlenemedi.",
     "backupReminder": "Değişikliklerinizi yedeklemeyi unutmayın!",
-    "backupNow": "Şimdi Yedekle"
+    "backupNow": "Şimdi Yedekle",
+    "pdfNotCv": "Bu PDF bir CV'ye benzemiyor (bölüm başlığı veya iletişim bilgisi bulunamadı). CV'ni içeren bir PDF seç."
   },
   "errorBoundary": {
     "title": "Bir şeyler ters gitti",

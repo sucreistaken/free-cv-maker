@@ -13,7 +13,11 @@
     "howToUse": "How to Use?",
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
-    "aiAssist": "AI CV Assistant"
+    "aiAssist": "AI CV Assistant",
+    "resetConfirmTitle": "Reset your CV?",
+    "resetConfirmBody": "All content in the active profile returns to the default sample. This cannot be undone. Consider exporting to JSON first.",
+    "resetConfirm": "Reset",
+    "resetCancel": "Cancel"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -217,7 +221,11 @@
     "pageCount": "{{count}} pages",
     "calibration": "Page break calibration",
     "reset": "Reset",
-    "page": "Page {{n1}} | Page {{n2}}"
+    "page": "Page {{n1}} | Page {{n2}}",
+    "openForm": "Open form",
+    "done": "Done",
+    "inlineHint": "Enter: done, Esc: close",
+    "inlineHintMulti": "Cmd/Ctrl+Enter: done, Esc: close"
   },
   "profileManager": {
     "title": "Manage Profiles",
@@ -259,7 +267,8 @@
     "importedToProfile": "Created a new profile “{{name}}”; your current CV was left untouched.",
     "imageError": "Failed to process image.",
     "backupReminder": "Don't forget to backup your changes!",
-    "backupNow": "Backup Now"
+    "backupNow": "Backup Now",
+    "pdfNotCv": "This PDF doesn't look like a CV (no section headings or contact details found). Choose a PDF that contains your CV."
   },
   "errorBoundary": {
     "title": "Something went wrong",

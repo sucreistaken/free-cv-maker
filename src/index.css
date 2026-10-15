@@ -103,3 +103,14 @@ body {
 .animate-toast-in {
   animation: toast-in 0.25s ease-out;
 }
+/* Clicking the preview jumps to the matching editor form (screen only, not print) */
+@media screen {
+  .preview-clickable .print-area {
+    cursor: pointer;
+  }
+  .preview-clickable h1:hover,
+  .preview-clickable h2:hover {
+    outline: 2px dashed rgba(59, 130, 246, 0.6);
+    outline-offset: 2px;
+  }
+}

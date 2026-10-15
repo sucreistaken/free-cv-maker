@@ -9,9 +9,10 @@ import { useProfileStore } from '../../store/useProfileStore';
 import { templates } from '../../constants/templates';
 import type { TemplateType, DocumentType } from '../../types/cv';
 import { exportToJson, downloadJsonFile, validateImportData } from '../../utils/export';
-import { parsePdfToCV } from '../../utils/pdfImport';
+import { parsePdfToCV, PdfNotCvError } from '../../utils/pdfImport';
 import { markExported } from '../../hooks/useExportReminder';
 import { ProfileManager } from './ProfileManager';
+import { Dialog } from '../ui/Dialog';
 import { OnboardingTour } from '../ui/OnboardingTour';
 import { AIAssistModal } from './AIAssistModal';
 import { logEvent, uploadPdfFile } from '../../utils/cloudSync';
@@ -31,6 +32,7 @@ export function Header({ onPrint }: HeaderProps) {
   const [showAIAssist, setShowAIAssist] = useState(false);
   const [pdfImporting, setPdfImporting] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const canFullscreen = document.fullscreenEnabled;
 
@@ -110,7 +112,7 @@ export function Header({ onPrint }: HeaderProps) {
       useProfileStore.getState().updateActiveCVData(cvData);
       finishImportProfile(name);
     } catch (err) {
-      toast('error', t('toast.pdfImportFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
+      toast('error', err instanceof PdfNotCvError ? t('toast.pdfNotCv') : t('toast.pdfImportFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
     } finally {
       setPdfImporting(false);
       e.target.value = '';
@@ -129,7 +131,8 @@ export function Header({ onPrint }: HeaderProps) {
     onPrint();
   };
 
-  const handleResetClick = () => {
+  const handleResetConfirm = () => {
+    setShowResetConfirm(false);
     logEvent('reset_to_default');
     resetToDefault();
   };
@@ -232,10 +235,10 @@ export function Header({ onPrint }: HeaderProps) {
               </button>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={handleExport} title={t('header.exportJson')}>
+            <Button variant="ghost" size="sm" onClick={handleExport} title={t('header.exportJson')} aria-label={t('header.exportJson')}>
               <Download size={15} />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} title={t('header.importJson')}>
+            <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} title={t('header.importJson')} aria-label={t('header.importJson')}>
               <Upload size={15} />
             </Button>
             <input
@@ -245,7 +248,7 @@ export function Header({ onPrint }: HeaderProps) {
               onChange={handleImport}
               className="hidden"
             />
-            <Button variant="ghost" size="sm" onClick={() => pdfInputRef.current?.click()} title={t('header.importPdf')} disabled={pdfImporting}>
+            <Button variant="ghost" size="sm" onClick={() => pdfInputRef.current?.click()} title={t('header.importPdf')} aria-label={t('header.importPdf')} disabled={pdfImporting}>
               {pdfImporting ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
             </Button>
             <input
@@ -266,7 +269,7 @@ export function Header({ onPrint }: HeaderProps) {
               <span className="font-semibold">AI</span>
             </Button>
             <div className="w-px h-5 bg-gray-200 hidden sm:block" />
-            <Button variant="ghost" size="sm" onClick={handleResetClick} title={t('header.reset')}>
+            <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} title={t('header.reset')} aria-label={t('header.reset')}>
               <RotateCcw size={15} />
             </Button>
             <Button variant="primary" size="sm" onClick={handlePrintClick}>
@@ -311,6 +314,17 @@ export function Header({ onPrint }: HeaderProps) {
 
       <ProfileManager open={showProfileManager} onClose={() => setShowProfileManager(false)} />
       <OnboardingTour open={showTutorial} onClose={() => setShowTutorial(false)} />
+      <Dialog open={showResetConfirm} onClose={() => setShowResetConfirm(false)} title={t('header.resetConfirmTitle')}>
+        <p className="text-sm text-gray-600 mb-4">{t('header.resetConfirmBody')}</p>
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setShowResetConfirm(false)}>
+            {t('header.resetCancel')}
+          </Button>
+          <Button variant="danger" size="sm" onClick={handleResetConfirm}>
+            {t('header.resetConfirm')}
+          </Button>
+        </div>
+      </Dialog>
       <AIAssistModal open={showAIAssist} onClose={() => setShowAIAssist(false)} />
     </>
   );

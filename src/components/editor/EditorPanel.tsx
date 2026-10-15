@@ -59,6 +59,7 @@ export function EditorPanel() {
             const FormComponent = sectionForms[section.type];
             return (
               <SectionAccordion
+                sectionId={section.id}
                 title={t(`sections.${section.type}`)}
                 visible={section.visible}
                 onToggleVisibility={() => toggleSectionVisibility(section.id)}

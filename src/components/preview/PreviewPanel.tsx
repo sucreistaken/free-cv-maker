@@ -4,6 +4,11 @@ import { ZoomIn, ZoomOut, Scissors } from 'lucide-react';
 import { CVDocument } from './CVDocument';
 import { CoverLetterDocument } from './CoverLetterDocument';
 import { useAppStore } from '../../store/useAppStore';
+import { useCVStore } from '../../store/useCVStore';
+import { useEditorFocusStore } from '../../store/useEditorFocusStore';
+import { InlineEditPopover } from './InlineEditPopover';
+import { buildPreviewFields, matchPreviewFields, normalizeForMatch } from '../../utils/previewFields';
+import type { PreviewField } from '../../utils/previewFields';
 import { fontSizeScale, resolvePageBreakHeight } from '../../hooks/useTemplateTheme';
 
 interface PreviewPanelProps {
@@ -17,11 +22,83 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
   const [scale, setScale] = useState(0.6);
   const [showPageBreaks, setShowPageBreaks] = useState(true);
   const [pageCount, setPageCount] = useState(1);
+  const [editing, setEditing] = useState<{ field: PreviewField; anchor: DOMRect } | null>(null);
   const activeDocument = useAppStore((s) => s.activeDocument);
   const fontSize = useAppStore((s) => s.theme.fontSize);
   const fontScaleOverride = useAppStore((s) => s.theme.fontScaleOverride);
   const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
   const a4Height = resolvePageBreakHeight(fontScaleOverride ?? fontSizeScale[fontSize], pageBreakHeights);
+
+  /**
+   * Finds the CV field behind a clicked piece of text. Walks up from the click
+   * until an element's text equals a field value; duplicate values are told
+   * apart by their position among the matching elements.
+   */
+  const findClickedField = (target: HTMLElement, root: HTMLElement) => {
+    const fields = buildPreviewFields(useCVStore.getState());
+    let el: HTMLElement | null = target;
+    while (el && root.contains(el) && el !== root) {
+      const candidates = matchPreviewFields(fields, el.textContent ?? '');
+      if (candidates.length > 0) {
+        const text = normalizeForMatch(el.textContent ?? '');
+        // Deepest elements carrying exactly this text, in document order.
+        const same = Array.from(root.querySelectorAll<HTMLElement>('*')).filter(
+          (n) =>
+            normalizeForMatch(n.textContent ?? '') === text &&
+            !Array.from(n.children).some((c) => normalizeForMatch(c.textContent ?? '') === text),
+        );
+        const deepest = same.find((n) => n === el || n.contains(el!) || el!.contains(n)) ?? el;
+        const index = Math.max(0, same.indexOf(deepest));
+        return { field: candidates[index] ?? candidates[0], rect: el.getBoundingClientRect() };
+      }
+      el = el.parentElement;
+    }
+    return null;
+  };
+
+  // Click text in the preview to edit it in place; anything else opens the matching form.
+  // A click belongs to the closest heading that precedes it in document order;
+  // anything before the first section heading (name, contacts, photo) is personal info.
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    if (activeDocument !== 'cv') return;
+    const target = e.target as HTMLElement;
+    const root = target.closest<HTMLElement>('.print-area');
+    if (!root) return;
+
+    const hit = findClickedField(target, root);
+    if (hit) {
+      setEditing({ field: hit.field, anchor: hit.rect });
+      return;
+    }
+
+    const { sections } = useCVStore.getState();
+    // Headings are upper-cased with the UI locale, so fold Turkish dotted/dotless i before comparing.
+    const norm = (v: string) => v.trim().toLowerCase().replace(/\u0307/g, '').replace(/ı/g, 'i');
+
+    let owner: HTMLElement | null = target.closest('h2');
+    if (!owner) {
+      const headings = Array.from(root.querySelectorAll<HTMLElement>('h2'));
+      for (const h of headings) {
+        if (h.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING) owner = h;
+        else break;
+      }
+    }
+    const section = owner
+      ? sections.find((s) => norm(s.title) === norm(owner.textContent ?? ''))
+      : sections.find((s) => s.type === 'personalInfo');
+    if (!section) return;
+    useAppStore.getState().setActiveTab('editor');
+    useEditorFocusStore.getState().focusSection(section.id);
+  };
+
+  const openFormForEditing = () => {
+    if (!editing) return;
+    const section = useCVStore.getState().sections.find((s) => s.type === editing.field.key);
+    setEditing(null);
+    if (!section) return;
+    useAppStore.getState().setActiveTab('editor');
+    useEditorFocusStore.getState().focusSection(section.id);
+  };
 
   // Auto-fit preview scale
   const calculateScale = useCallback(() => {
@@ -64,6 +141,7 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
       <div className="flex items-center justify-center gap-2 py-2 bg-gray-100 border-b border-gray-200 shrink-0">
         <button
           onClick={() => setScale((s) => Math.max(s - 0.1, 0.3))}
+          aria-label="Zoom out"
           className="p-1 rounded hover:bg-gray-200 text-gray-600"
         >
           <ZoomOut size={16} />
@@ -73,6 +151,7 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
         </span>
         <button
           onClick={() => setScale((s) => Math.min(s + 0.1, 1.5))}
+          aria-label="Zoom in"
           className="p-1 rounded hover:bg-gray-200 text-gray-600"
         >
           <ZoomIn size={16} />
@@ -111,6 +190,8 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
       >
         <div
           ref={pageRef}
+          onClick={handlePreviewClick}
+          className={activeDocument === 'cv' ? 'preview-clickable' : undefined}
           style={{
             transform: `scale(${scale})`,
             transformOrigin: 'top center',
@@ -151,6 +232,15 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
             })}
         </div>
       </div>
+      {editing && (
+        <InlineEditPopover
+          key={`${editing.field.key}-${editing.field.entryId ?? ''}-${editing.field.field ?? ''}-${editing.field.bulletIndex ?? ''}`}
+          field={editing.field}
+          anchor={editing.anchor}
+          onClose={() => setEditing(null)}
+          onOpenForm={openFormForEditing}
+        />
+      )}
     </div>
   );
 }
