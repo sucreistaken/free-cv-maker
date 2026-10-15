@@ -265,7 +265,8 @@
     "compact": "Kompakt",
     "compactDesc": "Tek sayfaya maksimum içerik sığdırmak için yoğun tek sütun düzeni",
     "twoColumn": "İki Sütun",
-    "twoColumnDesc": "Beceriler ve eğitim için renkli kenar çubuğuyla ana içerik alanı"
+    "twoColumnDesc": "Beceriler ve eğitim için renkli kenar çubuğuyla ana içerik alanı",
+    "contactHeading": "İletişim"
   },
   "sectionAccordion": {
     "hideSection": "Bölümü gizle",

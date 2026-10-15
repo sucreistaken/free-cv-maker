@@ -60,7 +60,7 @@ export function CreativeTemplate() {
     <ul className="mt-1 space-y-0.5">
       {bullets.filter(Boolean).map((b, i) => (
         <li key={i} className="text-[10.5px] text-gray-700 flex">
-          <span className="mr-1.5 shrink-0" style={{ color: accentColor }}>&#9656;</span>
+          <span className="mr-1.5 shrink-0" style={{ color: accentColor }}>&bull;</span>
           <span>{parseFormattedText(b)}</span>
         </li>
       ))}

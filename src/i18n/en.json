@@ -265,7 +265,8 @@
     "compact": "Compact",
     "compactDesc": "Dense single-column layout to fit maximum content on one page",
     "twoColumn": "Two-Column",
-    "twoColumnDesc": "Main content area with colored sidebar for skills and education"
+    "twoColumnDesc": "Main content area with colored sidebar for skills and education",
+    "contactHeading": "Contact"
   },
   "sectionAccordion": {
     "hideSection": "Hide section",

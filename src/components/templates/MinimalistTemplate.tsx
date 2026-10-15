@@ -26,7 +26,7 @@ export function MinimalistTemplate() {
 
   const SectionTitle = ({ title }: { title: string }) => (
     <h2
-      className="text-[14px] font-normal tracking-[0.2em] mb-3 pb-1"
+      className="text-[14px] font-normal tracking-[0.08em] mb-3 pb-1"
       style={{
         color: primaryColor,
       }}
@@ -242,7 +242,7 @@ export function MinimalistTemplate() {
         {personalInfo.profilePhoto && photoVisible && (
           <img src={personalInfo.profilePhoto} alt="Profile photo" className="object-cover mx-auto mb-2" style={{ width: photoSize, height: photoSize, borderRadius: photoShape }} />
         )}
-        <h1 className="text-[24px] font-normal tracking-[0.15em] text-gray-800 uppercase">
+        <h1 className="text-[24px] font-normal tracking-[0.06em] text-gray-800 uppercase">
           {personalInfo.fullName}
         </h1>
         {personalInfo.jobTitle && (

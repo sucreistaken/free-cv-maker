@@ -1,6 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
 import type { LanguageEntry } from '../types/cv';
+import en from '../i18n/en.json';
+
+/** Section names as written in English, so they are upper-cased with English rules even in a Turkish UI. */
+const ENGLISH_SECTION_TITLES = new Set(Object.values(en.sections).map((t) => t.toLowerCase()));
 
 export const fontSizeScale = { small: 0.92, medium: 1, large: 1.08 } as const;
 export const A4_HEIGHT_DEFAULT = 1121;
@@ -74,11 +78,19 @@ export function useTemplateTheme() {
 
   const language = useAppStore((s) => s.language);
 
+  // Upper-casing English text with the Turkish locale turns "Education" into "EDUCATİON",
+  // which neither readers nor applicant tracking systems recognise as a heading.
+  const localeFor = (title: string) =>
+    language === 'tr' && ENGLISH_SECTION_TITLES.has(title.trim().toLowerCase()) ? 'en' : language;
+
   const transformTitle = (title: string): string => {
-    if (theme.sectionTitleStyle === 'uppercase') return title.toLocaleUpperCase(language);
-    if (theme.sectionTitleStyle === 'capitalize') return title.replace(/\b\w/g, (c) => c.toLocaleUpperCase(language));
+    if (theme.sectionTitleStyle === 'uppercase') return title.toLocaleUpperCase(localeFor(title));
+    if (theme.sectionTitleStyle === 'capitalize') return title.replace(/\b\w/g, (c) => c.toLocaleUpperCase(localeFor(title)));
     return title;
   };
+
+  /** Always upper-case (sidebar labels), with the same locale rule as `transformTitle`. */
+  const upperTitle = (title: string): string => title.toLocaleUpperCase(localeFor(title));
 
   const photoSize = photoSizeMap[theme.photoSize];
   const photoShape = photoShapeMap[theme.photoShape];
@@ -104,6 +116,7 @@ export function useTemplateTheme() {
     margin,
     sectionGap,
     transformTitle,
+    upperTitle,
     primaryColor: theme.primaryColor,
     accentColor: theme.accentColor,
     photoSize,

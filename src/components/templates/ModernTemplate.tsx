@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Github, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -12,6 +13,7 @@ import { AwardsBlock } from './shared/AwardsBlock';
 import { ReferencesBlock } from './shared/ReferencesBlock';
 
 export function ModernTemplate() {
+  const { t } = useTranslation();
   const {
     personalInfo,
     summary,
@@ -27,9 +29,10 @@ export function ModernTemplate() {
     references,
     sections,
   } = useCVStore();
-  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
+  const { fontFamily, zoom, effectiveA4Height, lineHeight, margin, primaryColor, accentColor, transformTitle, upperTitle, sectionGap, photoSize, photoShape, photoVisible, showIcons, proficiencyLabels } = useTemplateTheme();
 
   const visibleSections = sections.filter((s) => s.visible);
+  const sectionTitle = (type: string) => sections.find((s) => s.type === type)?.title || t(`sections.${type}`);
   const sidebarTypes = new Set(['personalInfo', 'skills', 'languages']);
   const mainSections = visibleSections.filter((s) => !sidebarTypes.has(s.type));
 
@@ -153,7 +156,7 @@ export function ModernTemplate() {
 
         {/* Contact */}
         <div className="space-y-2 mb-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-70">Contact</h3>
+          <h3 className="text-[10px] font-bold tracking-widest opacity-70">{upperTitle(t('templates.contactHeading'))}</h3>
           {contactItems.map((item, i) => {
             const href = getHref(item.icon, item.value!);
             return (
@@ -172,7 +175,7 @@ export function ModernTemplate() {
         {/* Skills */}
         {skills.length > 0 && visibleSections.some((s) => s.type === 'skills') && (
           <div className="space-y-2 mb-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-70">Skills</h3>
+            <h3 className="text-[10px] font-bold tracking-widest opacity-70">{upperTitle(sectionTitle('skills'))}</h3>
             {skills.map((cat) => (
               <div key={cat.id}>
                 {cat.category && (
@@ -189,7 +192,7 @@ export function ModernTemplate() {
         {/* Languages in sidebar */}
         {languages.length > 0 && visibleSections.some((s) => s.type === 'languages') && (
           <div className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-70">Languages</h3>
+            <h3 className="text-[10px] font-bold tracking-widest opacity-70">{upperTitle(sectionTitle('languages'))}</h3>
             {languages.map((l) => (
               <div key={l.id} className="flex justify-between text-[9.5px] opacity-90">
                 <span>{l.language}</span>
