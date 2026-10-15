@@ -14,7 +14,9 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 const baseUrl = args.find((a) => a.startsWith('http')) ?? 'http://localhost:5173/';
 const templates = args.filter((a) => !a.startsWith('http'));
-const targets = templates.length ? templates : ['classic', 'modern', 'twoColumn'];
+const targets = templates.length
+  ? templates
+  : ['classic', 'modern', 'twoColumn', 'minimalist', 'creative', 'academic', 'compact'];
 const outDir = fileURLToPath(new URL('../src/utils/pdf/__fixtures__/', import.meta.url));
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -36,6 +38,11 @@ try {
       document.body.innerHTML = '';
       document.body.style.margin = '0';
       document.body.appendChild(clone);
+      // The app shell pins html/body to the viewport with overflow hidden, which
+      // would clip everything after the first page.
+      const style = document.createElement('style');
+      style.textContent = 'html, body { height: auto !important; overflow: visible !important; }';
+      document.head.appendChild(style);
     });
     await page.emulateMedia({ media: 'print' });
 

@@ -103,12 +103,15 @@ interface Section {
   lines: string[];
 }
 
-function matchHeading(text: string): HeadingType | undefined {
+function matchHeading(text: string, allowDecorated = true): HeadingType | undefined {
   const key = headingKey(text);
   if (!key) return undefined;
   const exact = HEADING_LOOKUP[key];
   if (exact) return exact;
+  if (!allowDecorated) return undefined;
   // Decorated headings: "Work Experience & Internships", "Skills (Technical)".
+  // Sentences and titles ("Best Project, Red Bull Sustain2Solve") must not match.
+  if (/[,;.]/.test(text.replace(/\.{3}$/, '')) || text.trim().split(/\s+/).length > 5) return undefined;
   for (const known of HEADING_KEYS_BY_LENGTH) {
     if (known.length >= 6 && key.includes(known)) return HEADING_LOOKUP[known];
   }
@@ -160,7 +163,10 @@ function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; secti
 
   for (const line of lines) {
     const text = line.text.trim();
-    const matchedType = matchHeading(text);
+    // A line that merely contains a keyword only counts as a heading when it is
+    // visibly styled as one: all caps or set larger than the body text.
+    const styledAsHeading = isAllCaps(text) || line.fontSize > bodyFontSize * 1.05;
+    const matchedType = matchHeading(text, styledAsHeading);
     const looksLikeHeading =
       text.length < 40 && !line.isBullet && (line.fontSize >= bodyFontSize * 0.95 || isAllCaps(text));
 
@@ -193,6 +199,15 @@ function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; secti
 }
 
 // ── Personal info parsing ──
+
+/** "ALEX MORGAN" / "KADİR AY" → "Alex Morgan" / "Kadir Ay"; mixed-case names are kept. */
+function normalizeName(name: string): string {
+  if (!isAllCaps(name)) return name;
+  const locale = /[İĞŞÖÜÇ]/.test(name) ? 'tr' : 'en';
+  return name
+    .toLocaleLowerCase(locale)
+    .replace(/(^|[\s'’-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toLocaleUpperCase(locale));
+}
 
 function parsePersonalInfo(lines: LayoutLine[]): CVData['personalInfo'] {
   const info: CVData['personalInfo'] = {
@@ -227,7 +242,7 @@ function parsePersonalInfo(lines: LayoutLine[]): CVData['personalInfo'] {
     }
   }
   if (nameIndex === -1) nameIndex = 0;
-  info.fullName = lines[nameIndex].text.trim();
+  info.fullName = normalizeName(lines[nameIndex].text.trim());
 
   const allText = lines.map((l) => l.text).join(' ');
 
@@ -295,11 +310,12 @@ function parsePersonalInfo(lines: LayoutLine[]): CVData['personalInfo'] {
     const t = lines[i].text.trim();
     const hadContact = hasContactToken(t) || PHONE_RE.test(t);
     const rest = stripContactTokens(t).replace(/\s+,/g, ',');
-    if (!rest || rest.length > 40 || /\d/.test(rest)) continue;
+    // Digits are fine inside a parenthetical note such as "(Remote, UTC+3)".
+    if (!rest || rest.length > 40 || /\d/.test(rest.replace(/\([^)]*\)/g, ''))) continue;
     if (hadContact || /,/.test(rest) || knownPlaces.test(rest)) {
       // Rebuild "City, Country" punctuation lost by token stripping.
       const original = t.replace(new RegExp(EMAIL_RE.source, 'g'), ' ');
-      const commaForm = original.match(/[\p{L}.\s-]+,\s*[\p{L}.\s-]+/u);
+      const commaForm = original.match(/[\p{L}.\s-]+,\s*[\p{L}.\s-]+(?:\s*\([^)]*\))?/u);
       info.location = commaForm ? commaForm[0].trim() : rest;
       break;
     }
@@ -329,6 +345,13 @@ function extractDateRange(text: string): {
 
 /** "Company, City, Country" → company + location; leaves "Acme, Inc." alone. */
 function splitCompanyLocation(text: string): { company: string; location: string } {
+  // "Company | City, Country" (pipe or dot separated) keeps the whole tail as the location.
+  const sep = text.match(/\s+[|•·]\s+/);
+  if (sep && sep.index !== undefined) {
+    const company = text.slice(0, sep.index).trim();
+    const location = text.slice(sep.index + sep[0].length).trim();
+    if (company && location) return { company, location };
+  }
   const idx = text.indexOf(',');
   if (idx === -1) return { company: text.trim(), location: '' };
   const head = text.slice(0, idx).trim();
@@ -444,33 +467,35 @@ function parseEducation(lines: string[]): EducationEntry[] {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    const parts = trimmed.split(SEPARATOR_RE).map((p) => p.trim()).filter(Boolean);
     const texts: string[] = [];
     let startDate = '';
     let year = '';
     let gpa = '';
 
-    for (const part of parts) {
-      let rest = part;
-      const gpaMatch = rest.match(GPA_RE);
-      if (gpaMatch) {
-        gpa = gpaMatch[1].replace(/\s+/g, '');
-        rest = rest.replace(GPA_RE, ' ');
+    // Dates and GPA first: a spaced en dash in "2016 – 2020" must not be taken for a field separator.
+    let rest = trimmed;
+    const gpaMatch = rest.match(GPA_RE);
+    if (gpaMatch) {
+      gpa = gpaMatch[1].replace(/\s+/g, '');
+      rest = rest.replace(GPA_RE, ' ');
+    }
+    const rangeMatch = rest.match(YEAR_RANGE_RE);
+    if (rangeMatch) {
+      startDate = rangeMatch[1];
+      year = rangeMatch[2];
+      rest = rest.replace(YEAR_RANGE_RE, ' ');
+    } else {
+      const yearMatch = rest.match(YEAR_RE);
+      if (yearMatch) {
+        year = yearMatch[0];
+        rest = rest.replace(YEAR_RE, ' ');
       }
-      const rangeMatch = rest.match(YEAR_RANGE_RE);
-      if (rangeMatch) {
-        startDate = rangeMatch[1];
-        year = rangeMatch[2];
-        rest = rest.replace(YEAR_RANGE_RE, ' ');
-      } else {
-        const yearMatch = rest.match(YEAR_RE);
-        if (yearMatch) {
-          year = yearMatch[0];
-          rest = rest.replace(YEAR_RE, ' ');
-        }
-      }
-      rest = rest.replace(/^[\s,|:–—-]+|[\s,|:–—-]+$/g, '').replace(/\s+/g, ' ');
-      if (rest) texts.push(rest);
+    }
+    rest = rest.replace(/\(\s*\)/g, ' ');
+
+    for (const part of rest.split(/\s*[•·|]\s*|\s+[—–]\s+/)) {
+      const text = part.replace(/^[\s,|:–—-]+|[\s,|:–—-]+$/g, '').replace(/\s+/g, ' ');
+      if (text) texts.push(text);
     }
 
     const startsNewEntry = texts.length > 0 && !!current && !!current.degree && !!current.institution;
@@ -662,7 +687,11 @@ function createProjectFromTitle(text: string): Partial<ProjectEntry> {
   const urlMatch = entry.name!.match(URL_RE);
   if (urlMatch) {
     entry.link = urlMatch[0];
-    entry.name = entry.name!.replace(URL_RE, '').replace(/[|,•·\s]+$/, '').trim();
+    entry.name = entry.name!
+      .replace(URL_RE, '')
+      .replace(/\(\s*\)/g, '')
+      .replace(/[|,•·\s]+$/, '')
+      .trim();
   }
 
   return entry;
@@ -688,6 +717,16 @@ function parseCertifications(lines: string[]): CertificationEntry[] {
 
   const startEntry = (text: string): Partial<CertificationEntry> => {
     const entry: Partial<CertificationEntry> = { name: text, issuer: '', year: '', description: '' };
+    // One-line form: "Name — Issuer, 2023".
+    const dashed = text.split(/\s+[—–]\s+/);
+    if (dashed.length === 2 && dashed[0].trim() && dashed[1].trim()) {
+      const tail = dashed[1].trim();
+      const yearMatch = tail.match(YEAR_RE);
+      entry.name = dashed[0].trim();
+      entry.issuer = tail.replace(YEAR_RE, '').replace(/^[\s,|•·]+|[\s,|•·]+$/g, '').trim();
+      if (yearMatch) entry.year = yearMatch[0];
+      return entry;
+    }
     const yearMatch = text.match(YEAR_RE);
     if (yearMatch) {
       entry.year = yearMatch[0];
@@ -759,6 +798,13 @@ function parseInvolvement(lines: string[]): InvolvementEntry[] {
     const dateInfo = extractDateRange(trimmed);
 
     if (dateInfo) {
+      if (current && current.role && !current.startDate && !current.organization && !current.bullets?.length && !dateInfo.beforeDate) {
+        // Date on its own line right after the role line.
+        current.startDate = dateInfo.startDate;
+        current.endDate = dateInfo.endDate;
+        if (dateInfo.afterDate) current.institution = dateInfo.afterDate;
+        continue;
+      }
       pushCurrent();
       current = {
         role: dateInfo.beforeDate,
@@ -1016,9 +1062,25 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
   return cvData;
 }
 
+/** Thrown when a PDF has no recognizable CV structure (no sections and no contact details). */
+export class PdfNotCvError extends Error {
+  constructor() {
+    super('PDF does not look like a CV');
+    this.name = 'PdfNotCvError';
+  }
+}
+
+/** True when the parse found nothing that identifies the document as a CV. */
+export function looksLikeCv(cv: CVData): boolean {
+  const { email, phone, linkedin, github } = cv.personalInfo;
+  return cv.sections.some((s) => s.visible && s.type !== 'personalInfo') || Boolean(email || phone || linkedin || github);
+}
+
 export async function parsePdfToCV(file: File): Promise<CVData> {
   // Lazy import keeps pdfjs (~1 MB) out of the initial bundle.
   const { loadPdfPages } = await import('./pdf/textItems');
   const pages = await loadPdfPages(await file.arrayBuffer());
-  return parseLinesToCV(buildLayoutLines(pages));
+  const cv = parseLinesToCV(buildLayoutLines(pages));
+  if (!looksLikeCv(cv)) throw new PdfNotCvError();
+  return cv;
 }

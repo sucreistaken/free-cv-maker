@@ -75,8 +75,8 @@ export function CreativeTemplate() {
     children: React.ReactNode;
   }) => (
     <div className="flex gap-4">
-      <div className="w-[90px] shrink-0 text-right">
-        <span className="text-[9px] text-gray-400 leading-tight">{date}</span>
+      <div className="w-[120px] shrink-0 text-right">
+        <span className="text-[9px] text-gray-400 leading-tight whitespace-nowrap">{date}</span>
       </div>
       <div className="relative flex-1 pb-3 border-l-2 pl-4" style={{ borderColor: accentColor + '30' }}>
         <div

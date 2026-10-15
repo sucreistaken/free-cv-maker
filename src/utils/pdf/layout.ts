@@ -36,9 +36,13 @@ export interface LayoutLine {
   isBullet: boolean;
   /** True when visible runs are separated by a gap wider than 3 em (e.g. a right-aligned date). */
   hasWideGap: boolean;
+  /** Font that carries most of the line's characters; label/value lines differ in weight. */
+  fontName: string;
+  /** True for a full-width line on a two-column page (header, contact bar). */
+  spanning?: boolean;
 }
 
-export const BULLET_RE = /^[•\-*◦▪●‣⁃➢–—]\s*/;
+export const BULLET_RE = /^[•\-*◦▪●‣⁃➢–—▸▶►▹▷○◆◇■□✓✔➤➔★✦❖]\s*/u;
 
 /** Lowercases text so that Turkish dotted/dotless I variants all become plain "i". */
 export function foldTurkish(text: string): string {
@@ -169,9 +173,36 @@ interface JoinedText {
   textX: number;
   right: number;
   hasWideGap: boolean;
+  fontName: string;
 }
 
-function joinItems(items: PdfTextItem[]): JoinedText {
+/**
+ * Letter-spaced runs ("A L E X", from CSS letter-spacing) arrive with a space between
+ * every glyph. Word breaks are separate whitespace items, so inside a run the spaces go.
+ */
+function collapseLetterSpacing(str: string): string {
+  return /^\S( \S){2,}$/u.test(str) ? str.replace(/ /g, '') : str;
+}
+
+function dominantFont(items: PdfTextItem[]): string {
+  const weight = new Map<string, number>();
+  for (const item of items) {
+    const chars = item.str.trim().length;
+    if (chars) weight.set(item.fontName, (weight.get(item.fontName) ?? 0) + chars);
+  }
+  let best = '';
+  let bestWeight = 0;
+  for (const [font, w] of weight) {
+    if (w > bestWeight) {
+      best = font;
+      bestWeight = w;
+    }
+  }
+  return best;
+}
+
+function joinItems(rawItems: PdfTextItem[]): JoinedText {
+  const items = rawItems.map((item) => ({ ...item, str: collapseLetterSpacing(item.str) }));
   let text = '';
   let prevEnd: number | null = null;
   let prevVisibleEnd: number | null = null;
@@ -212,7 +243,7 @@ function joinItems(items: PdfTextItem[]): JoinedText {
       textX = run.item.x + into * perChar;
     }
   }
-  return { text: trimmed, x: x ?? 0, textX, right, hasWideGap };
+  return { text: trimmed, x: x ?? 0, textX, right, hasWideGap, fontName: dominantFont(items) };
 }
 
 // ── Continuation merging ──
@@ -231,12 +262,16 @@ function fillsColumn(prev: LayoutLine, columnRight: number): boolean {
 
 function shouldMerge(prev: LayoutLine, next: LayoutLine, columnRight: number): boolean {
   if (prev.page !== next.page || prev.column !== next.column) return false;
+  // A full-width paragraph may wrap onto another full-width line, but never into a column line.
+  if (Boolean(prev.spanning) !== Boolean(next.spanning)) return false;
   if (next.isBullet) return false;
   if (Math.abs(prev.fontSize - next.fontSize) > 0.3) return false;
   if (prev.isBullet) {
     return Math.abs(next.x - prev.textX) < CONTINUATION_X_TOLERANCE;
   }
   if (Math.abs(next.x - prev.x) >= CONTINUATION_X_TOLERANCE) return false;
+  // A label in a different weight ("DevOps & Tools" under a list of items) starts a new line.
+  if (prev.fontName && next.fontName && prev.fontName !== next.fontName) return false;
   if (/[,\-–]$/.test(prev.text)) return true;
   if (/[.:;!?]$/.test(prev.text)) return false;
   if (/^[\p{Ll}]/u.test(next.text)) return true;
@@ -282,12 +317,36 @@ function makeLine(items: PdfTextItem[], page: number, column: number, y: number,
     fontSize,
     isBullet,
     hasWideGap: joined.hasWideGap,
+    fontName: joined.fontName,
   };
+}
+
+const DATE_PART = '(?:[\\p{L}.]{3,9}\\s+)?(?:19|20)\\d{2}';
+const DATE_ONLY_RE = new RegExp(`^${DATE_PART}(?:\\s*[-–—]\\s*(?:${DATE_PART}|\\p{L}+))?$`, 'u');
+
+/**
+ * Timeline layouts print dates in a narrow rail left of the content. That rail is not
+ * a column of its own: its dates belong to the entries beside them, so the page is
+ * read as a single column.
+ */
+function isDateRail(rawLines: RawLine[], gutter: Gutter): boolean {
+  const mid = (gutter.start + gutter.end) / 2;
+  let leftCount = 0;
+  let dateCount = 0;
+  for (const raw of rawLines) {
+    const text = joinItems(raw.items.filter((i) => i.x + i.width / 2 < mid)).text;
+    // Section headings sit at the left edge too but are not part of the rail.
+    if (!text || isAllCapsText(text)) continue;
+    leftCount++;
+    if (DATE_ONLY_RE.test(text)) dateCount++;
+  }
+  return dateCount >= 3 && dateCount / leftCount >= 0.4;
 }
 
 function layoutPage(page: PdfPage, pageIndex: number): LayoutLine[] {
   const rawLines = groupIntoRawLines(page.items);
-  const gutter = detectGutter(rawLines, page.width);
+  let gutter = detectGutter(rawLines, page.width);
+  if (gutter && isDateRail(rawLines, gutter)) gutter = null;
   const out: LayoutLine[] = [];
 
   if (!gutter) {
@@ -307,13 +366,12 @@ function layoutPage(page: PdfPage, pageIndex: number): LayoutLine[] {
   };
 
   for (const raw of rawLines) {
-    const spansGutter = raw.items.some(
-      (i) => i.str.trim() && i.x < gutter.start - 2 && i.x + i.width > gutter.end + 2,
-    );
+    // A line whose ink runs unbroken across the gutter (a full-width contact bar) is not two columns.
+    const spansGutter = inkSpans(raw).some(([s, e]) => s < gutter.start - 2 && e > gutter.end + 2);
     if (spansGutter) {
       flush();
       const line = makeLine(raw.items, pageIndex, 0, raw.y, raw.fontSize);
-      if (line) out.push(line);
+      if (line) out.push({ ...line, spanning: true });
       continue;
     }
     const mid = (gutter.start + gutter.end) / 2;
