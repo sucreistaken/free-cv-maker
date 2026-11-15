@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react';
+import { computePageBreaks } from '../utils/pagination';
 
 /**
  * PDF export via the browser's own print, but hardened.
@@ -95,6 +96,7 @@ export function usePdfExport() {
           padding: 0;
           transform: none !important;
         }
+        .a4-page { box-shadow: none !important; }
         *, *::before, *::after {
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
@@ -104,9 +106,27 @@ export function usePdfExport() {
       doc.head.appendChild(printStyle);
       doc.title = 'CV';
 
-      doc.body.appendChild(source.cloneNode(true));
+      const clone = source.cloneNode(true) as HTMLElement;
+      doc.body.appendChild(clone);
+
+      // The template's top/bottom padding only exists once, so pages 2+ would start
+      // flush against the paper edge. Repeat it on every page fragment. (Using @page
+      // margins instead would make Chrome print its URL/date/page-number header and footer.)
+      const pageStyle = doc.createElement('style');
+      pageStyle.textContent = `
+        .a4-page { box-decoration-break: clone; -webkit-box-decoration-break: clone; min-height: 0 !important; }
+      `;
+      doc.head.appendChild(pageStyle);
 
       await waitForAssets(doc, win);
+
+      // Break exactly where the preview's page lines are: same measurement, forced here.
+      const page = clone.querySelector<HTMLElement>('.a4-page');
+      if (page) {
+        for (const { element } of computePageBreaks(page)) {
+          if (element) element.style.breakBefore = 'page';
+        }
+      }
 
       // The browser fires afterprint on the iframe window once the dialog
       // closes. A timeout is the fallback for browsers that never do.

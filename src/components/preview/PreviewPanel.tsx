@@ -9,7 +9,7 @@ import { useEditorFocusStore } from '../../store/useEditorFocusStore';
 import { InlineEditPopover } from './InlineEditPopover';
 import { buildPreviewFields, matchPreviewFields, normalizeForMatch } from '../../utils/previewFields';
 import type { PreviewField } from '../../utils/previewFields';
-import { fontSizeScale, resolvePageBreakHeight } from '../../hooks/useTemplateTheme';
+import { computePageBreaks } from '../../utils/pagination';
 
 interface PreviewPanelProps {
   contentRef: React.RefObject<HTMLDivElement | null>;
@@ -21,13 +21,11 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.6);
   const [showPageBreaks, setShowPageBreaks] = useState(true);
-  const [pageCount, setPageCount] = useState(1);
+  const [pageBreaks, setPageBreaks] = useState<number[]>([]);
+  const pageCount = pageBreaks.length + 1;
   const [editing, setEditing] = useState<{ field: PreviewField; anchor: DOMRect } | null>(null);
   const activeDocument = useAppStore((s) => s.activeDocument);
   const fontSize = useAppStore((s) => s.theme.fontSize);
-  const fontScaleOverride = useAppStore((s) => s.theme.fontScaleOverride);
-  const pageBreakHeights = useAppStore((s) => s.pageBreakHeights);
-  const a4Height = resolvePageBreakHeight(fontScaleOverride ?? fontSizeScale[fontSize], pageBreakHeights);
 
   /**
    * Finds the CV field behind a clicked piece of text. Walks up from the click
@@ -116,24 +114,38 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
     return () => observer.disconnect();
   }, [calculateScale]);
 
-  // Page count from content measurement
+  // Page breaks measured from the laid-out content, with the same rules the PDF export uses
   useEffect(() => {
     const wrapper = pageRef.current?.querySelector('.print-area') as HTMLElement | null;
     if (!wrapper) return;
 
+    let frame = 0;
     const update = () => {
-      const a4 = wrapper.querySelector('.a4-page') as HTMLElement | null;
-      const a4H = a4 ? a4.scrollHeight : 0;
-      const zoomVal = parseFloat(a4 ? getComputedStyle(a4).zoom : '1') || 1;
-      const visualH = Math.round(a4H * zoomVal);
-      setPageCount(Math.max(1, Math.ceil(visualH / a4Height)));
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const a4 = wrapper.querySelector('.a4-page') as HTMLElement | null;
+        const host = pageRef.current;
+        if (!a4 || !host) return;
+        // Use the exact zoom value: deriving it from rounded element sizes is off by ~1px
+        // at the page bottom, enough to disagree with the print on borderline entries.
+        const offset = (a4.getBoundingClientRect().top - host.getBoundingClientRect().top) / scale;
+        const next = computePageBreaks(a4, scale).map((b) => Math.round(offset + b.y));
+        setPageBreaks((prev) => (prev.length === next.length && prev.every((y, i) => y === next[i]) ? prev : next));
+      });
     };
 
     update();
-    const obs = new ResizeObserver(update);
-    obs.observe(wrapper);
-    return () => obs.disconnect();
-  }, [activeDocument, fontSize, a4Height]);
+    document.fonts?.ready.then(update);
+    const resize = new ResizeObserver(update);
+    resize.observe(wrapper);
+    const mutation = new MutationObserver(update);
+    mutation.observe(wrapper, { subtree: true, childList: true, characterData: true, attributes: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      resize.disconnect();
+      mutation.disconnect();
+    };
+  }, [activeDocument, fontSize, scale]);
 
   return (
     <div className="h-full flex flex-col bg-gray-100">
@@ -206,9 +218,7 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
 
           {/* Page break lines */}
           {showPageBreaks &&
-            pageCount > 1 &&
-            Array.from({ length: pageCount - 1 }, (_, i) => {
-              const top = (i + 1) * a4Height;
+            pageBreaks.map((top, i) => {
               return (
                 <div key={i} style={{ position: 'absolute', left: 0, right: 0, top, pointerEvents: 'none', zIndex: 10 }}>
                   <div style={{ height: 2, background: '#3b82f6', opacity: 0.45 }} />
