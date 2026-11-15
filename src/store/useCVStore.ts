@@ -17,6 +17,7 @@ import type {
 } from '../types/cv';
 import { defaultCV, defaultCoverLetter } from '../data/defaultCV';
 import { generateId } from '../utils/id';
+import { normalizeCVData } from '../utils/normalizeCV';
 import { useProfileStore } from './useProfileStore';
 
 interface CVStore extends CVData {
@@ -422,8 +423,9 @@ export const useCVStore = create<CVStore>()(
 
       // Import
       loadFromImport: (data) => {
-        set({ ...data });
-        useProfileStore.getState().updateActiveCVData(data);
+        const cv = normalizeCVData(data);
+        set({ ...cv });
+        useProfileStore.getState().updateActiveCVData(cv);
       },
 
       // Reset
@@ -438,7 +440,8 @@ export const useCVStore = create<CVStore>()(
         const profile = useProfileStore.getState().getActiveProfile();
         if (profile) {
           set({
-            ...profile.cvData,
+            // Heals profiles that already hold off-schema entries from an older import.
+            ...normalizeCVData(profile.cvData),
             coverLetterData: profile.coverLetterData || { ...defaultCoverLetter },
           });
         }

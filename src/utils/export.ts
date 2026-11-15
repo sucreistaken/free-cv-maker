@@ -1,6 +1,7 @@
 import type { CVData, CoverLetterData, ExportData, TemplateType, ThemeConfig } from '../types/cv';
 import { defaultCV, defaultCoverLetter } from '../data/defaultCV';
 import { generateId } from './id';
+import { normalizeCVData } from './normalizeCV';
 
 const CURRENT_VERSION = '1.0';
 
@@ -67,7 +68,9 @@ export function mergeWithDefaults(partial: Partial<ExportData>): ExportData {
   const partialCV = (partial.cvData || {}) as Partial<CVData>;
   const personalInfo = { ...defaultCV.personalInfo, ...(partialCV.personalInfo || {}) };
 
-  const cvData: CVData = {
+  // Imported files are often hand-written or chatbot-made; coerce every entry
+  // into the shape the editor reads so a missing field cannot crash it.
+  const cvData: CVData = normalizeCVData({
     personalInfo,
     summary: partialCV.summary ?? defaultCV.summary,
     experience: partialCV.experience ?? defaultCV.experience,
@@ -81,7 +84,7 @@ export function mergeWithDefaults(partial: Partial<ExportData>): ExportData {
     hobbies: partialCV.hobbies ?? defaultCV.hobbies,
     references: partialCV.references ?? defaultCV.references,
     sections: partialCV.sections ?? defaultSections,
-  };
+  });
 
   const coverLetterData: CoverLetterData = partial.coverLetterData
     ? { ...defaultCoverLetter, ...partial.coverLetterData }

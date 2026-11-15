@@ -723,7 +723,7 @@ const PROFICIENCY_SPLIT_RE = new RegExp(
   'giu',
 );
 
-function lookupProficiency(label: string): LanguageEntry['proficiency'] {
+export function lookupProficiency(label: string): LanguageEntry['proficiency'] {
   return FOLDED_PROFICIENCY[foldTurkish(label).replace(/\s+/g, ' ')] || 'intermediate';
 }
 
