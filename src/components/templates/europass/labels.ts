@@ -3,9 +3,9 @@ import type { CefrSkill, LanguageEntry, SectionType } from '../../../types/cv';
 /** Fixed German wording of the Europass CV; it does not follow the UI language or custom section titles. */
 export const EUROPASS_SECTION_TITLES: Record<Exclude<SectionType, 'personalInfo'>, string> = {
   summary: 'Über mich',
-  experience: 'Berufserfahrung',
+  experience: 'Praktische Erfahrung',
   projects: 'Projekte',
-  education: 'Allgemeine und berufliche Bildung',
+  education: 'Bildung',
   involvement: 'Ehrenamtliches Engagement',
   skills: 'Kompetenzen',
   certifications: 'Zertifikate',
