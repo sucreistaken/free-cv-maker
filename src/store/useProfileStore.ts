@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { persistStorage } from './storage';
 import type { CVProfile, CVData, CoverLetterData, TemplateType, ThemeConfig } from '../types/cv';
 import { defaultCV, defaultCoverLetter } from '../data/defaultCV';
 import { generateId } from '../utils/id';
@@ -191,6 +192,7 @@ export const useProfileStore = create<ProfileStore>()(
     }),
     {
       name: 'cv-builder-profiles',
+      storage: persistStorage,
       partialize: (state) => ({
         profiles: state.profiles,
         activeProfileId: state.activeProfileId,

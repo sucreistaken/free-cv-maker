@@ -2,9 +2,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import tr from './tr.json';
 import en from './en.json';
+import { currentEmbedMode } from '../embed/mode';
 
 // Read persisted language from localStorage
 function getStoredLanguage(): 'tr' | 'en' {
+  // A2C staff work in Turkish, and the embedded editor must not read the visitor's settings.
+  if (currentEmbedMode) return 'tr';
   try {
     const raw = localStorage.getItem('cv-builder-app');
     if (raw) {

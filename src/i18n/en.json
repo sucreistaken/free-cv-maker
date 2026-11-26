@@ -69,7 +69,9 @@
     "drivingLicense": "Driving License",
     "drivingLicensePlaceholder": "e.g. B",
     "birthDate": "Date of Birth",
-    "birthDatePlaceholder": "e.g. 03/15/2000"
+    "birthDatePlaceholder": "e.g. 03/15/2000",
+    "gender": "Gender",
+    "genderPlaceholder": "e.g. Weiblich"
   },
   "summaryForm": {
     "label": "Professional Summary",
@@ -98,7 +100,11 @@
     "year": "End",
     "yearPlaceholder": "e.g. 2022",
     "gpa": "GPA",
-    "gpaPlaceholder": "e.g. 3.5/4.0"
+    "gpaPlaceholder": "e.g. 3.5/4.0",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Izmir, Türkei",
+    "website": "Website",
+    "websitePlaceholder": "e.g. school.edu"
   },
   "projectsForm": {
     "add": "Add Project",
@@ -147,7 +153,14 @@
       "Spanish",
       "Arabic",
       "Russian"
-    ]
+    ],
+    "cefr": "CEFR levels",
+    "cefrHint": "Pick one level to fill all five.",
+    "cefrListening": "Listening",
+    "cefrReading": "Reading",
+    "cefrWriting": "Writing",
+    "cefrSpokenProduction": "Spoken production",
+    "cefrSpokenInteraction": "Spoken interaction"
   },
   "awardsForm": {
     "add": "Add Award",
@@ -159,7 +172,9 @@
   },
   "hobbiesForm": {
     "label": "Hobbies & Interests",
-    "placeholder": "e.g. Photography, Hiking, Open-source contribution..."
+    "placeholder": "e.g. Photography, Hiking, Open-source contribution...",
+    "europassHint": "One hobby per line. Start a line with \"# \" for a group heading (e.g. # Sport).",
+    "europassPlaceholder": "# Sport\nSwimming\nPlaying basketball"
   },
   "referencesForm": {
     "add": "Add Reference",
@@ -266,6 +281,8 @@
     "compactDesc": "Dense single-column layout to fit maximum content on one page",
     "twoColumn": "Two-Column",
     "twoColumnDesc": "Main content area with colored sidebar for skills and education",
+    "europass": "Europass (German)",
+    "europassDesc": "German Europass layout with grey sidebar, timelines and CEFR language grid",
     "contactHeading": "Contact"
   },
   "sectionAccordion": {

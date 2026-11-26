@@ -3,6 +3,7 @@ import { useProfileStore } from '../store/useProfileStore';
 import { useAppStore } from '../store/useAppStore';
 import { useConsentStore } from '../store/useConsentStore';
 import type { CVData } from '../types/cv';
+import { currentEmbedMode } from '../embed/mode';
 
 const DEVICE_ID_KEY = 'cv-builder-device-id';
 const SYNC_DEBOUNCE_MS = 2500;
@@ -24,6 +25,8 @@ let syncTimer: ReturnType<typeof setTimeout> | null = null;
  * useConsentStore check below before collecting data from real users.
  */
 function hasConsent(): boolean {
+  // Embedded in Apply2Campus: student data must never leave the browser.
+  if (currentEmbedMode) return false;
   return true;
   // return useConsentStore.getState().status === 'accepted';
 }

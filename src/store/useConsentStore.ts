@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { persistStorage } from './storage';
 
 export type ConsentStatus = 'pending' | 'accepted' | 'declined';
 
@@ -22,6 +23,7 @@ export const useConsentStore = create<ConsentStore>()(
     }),
     {
       name: 'cv-builder-consent',
+      storage: persistStorage,
     }
   )
 );

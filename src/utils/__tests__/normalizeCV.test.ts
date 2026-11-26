@@ -60,3 +60,69 @@ describe('normalizeCVData', () => {
     expect(cv.sections).toEqual(defaultCV.sections);
   });
 });
+
+// Optional Europass fields sent by Apply2Campus (all invented data).
+const europassRaw = {
+  personalInfo: { fullName: 'Mira Testfeld', gender: 'Weiblich' },
+  education: [
+    { id: 'e1', degree: 'Abitur', institution: 'Testschule', location: 'Ankara, Türkei', website: 'https://schule.example' },
+  ],
+  languages: [
+    { id: 'l1', language: 'Türkisch', proficiency: 'native', isNative: true },
+    {
+      id: 'l2',
+      language: 'Deutsch',
+      proficiency: 'beginner',
+      cefr: { listening: 'A2', reading: 'b1+', writing: 'A1', spokenProduction: ' A2 ', spokenInteraction: 'C2' },
+    },
+  ],
+};
+
+describe('normalizeCVData with Europass fields', () => {
+  it('keeps gender, education location and website', () => {
+    const cv = normalizeCVData(europassRaw);
+    expect(cv.personalInfo.gender).toBe('Weiblich');
+    expect(cv.education[0]).toMatchObject({ location: 'Ankara, Türkei', website: 'https://schule.example' });
+  });
+
+  it('keeps the native flag and reads CEFR levels loosely', () => {
+    const cv = normalizeCVData(europassRaw);
+    expect(cv.languages[0].isNative).toBe(true);
+    expect(cv.languages[1].cefr).toEqual({
+      listening: 'A2',
+      reading: 'B1',
+      writing: 'A1',
+      spokenProduction: 'A2',
+      spokenInteraction: 'C2',
+    });
+  });
+
+  it('drops a CEFR grid that misses a skill or has an unreadable level', () => {
+    const cv = normalizeCVData({
+      languages: [
+        { language: 'Englisch', cefr: { listening: 'B1', reading: 'B1', writing: 'B1', spokenProduction: 'B1' } },
+        { language: 'Spanisch', cefr: { listening: 'B1', reading: 'gut', writing: 'B1', spokenProduction: 'B1', spokenInteraction: 'B1' } },
+        { language: 'Italienisch', cefr: 'B1' },
+      ],
+    });
+    expect(cv.languages.map((l) => 'cefr' in l)).toEqual([false, false, false]);
+  });
+
+  it('drops a native flag that is not a boolean', () => {
+    const cv = normalizeCVData({ languages: [{ language: 'Arabisch', isNative: 'yes' }] });
+    expect('isNative' in cv.languages[0]).toBe(false);
+  });
+
+  it('does not add the optional keys to data that never had them', () => {
+    const cv = normalizeCVData({ personalInfo: {}, education: [{ degree: 'BSc' }], languages: [{ language: 'Englisch' }] });
+    expect('gender' in cv.personalInfo).toBe(false);
+    expect('location' in cv.education[0]).toBe(false);
+    expect('website' in cv.education[0]).toBe(false);
+    expect('cefr' in cv.languages[0]).toBe(false);
+  });
+
+  it('returns well-formed Europass data deep-equal', () => {
+    const once = normalizeCVData(europassRaw);
+    expect(normalizeCVData(JSON.parse(JSON.stringify(once)))).toEqual(once);
+  });
+});

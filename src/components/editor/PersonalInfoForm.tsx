@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { X, Camera } from 'lucide-react';
 import { toast } from '../ui/Toast';
 import { useCVStore } from '../../store/useCVStore';
+import { useAppStore } from '../../store/useAppStore';
 import { FormField } from './shared/FormField';
 import { validateImageFile, resizeImage } from '../../utils/image';
 
 export function PersonalInfoForm() {
   const { t } = useTranslation();
   const { personalInfo, updatePersonalInfo } = useCVStore();
+  // Only the Europass template prints gender; other templates keep their form unchanged.
+  const isEuropass = useAppStore((s) => s.template === 'europass');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +78,9 @@ export function PersonalInfoForm() {
       <FormField label={t('personalInfoForm.github')} value={personalInfo.github} onChange={(v) => updatePersonalInfo('github', v)} placeholder={t('personalInfoForm.githubPlaceholder')} />
       <FormField label={t('personalInfoForm.website')} value={personalInfo.website} onChange={(v) => updatePersonalInfo('website', v)} />
       <FormField label={t('personalInfoForm.nationality')} value={personalInfo.nationality} onChange={(v) => updatePersonalInfo('nationality', v)} placeholder={t('personalInfoForm.nationalityPlaceholder')} />
+      {isEuropass && (
+        <FormField label={t('personalInfoForm.gender')} value={personalInfo.gender ?? ''} onChange={(v) => updatePersonalInfo('gender', v)} placeholder={t('personalInfoForm.genderPlaceholder')} />
+      )}
       <FormField label={t('personalInfoForm.drivingLicense')} value={personalInfo.drivingLicense} onChange={(v) => updatePersonalInfo('drivingLicense', v)} placeholder={t('personalInfoForm.drivingLicensePlaceholder')} />
       <FormField label={t('personalInfoForm.birthDate')} value={personalInfo.birthDate || ''} onChange={(v) => updatePersonalInfo('birthDate', v)} placeholder={t('personalInfoForm.birthDatePlaceholder')} />
     </div>

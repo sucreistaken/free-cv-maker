@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { persistStorage } from './storage';
 import type {
   CVData,
   PersonalInfo,
@@ -67,7 +68,8 @@ interface CVStore extends CVData {
 
   // Languages
   addLanguage: () => void;
-  updateLanguage: (id: string, field: keyof LanguageEntry, value: string) => void;
+  /** `undefined` removes an optional field (e.g. clearing the CEFR grid). */
+  updateLanguage: <K extends keyof LanguageEntry>(id: string, field: K, value: LanguageEntry[K]) => void;
   removeLanguage: (id: string) => void;
   reorderLanguages: (entries: LanguageEntry[]) => void;
 
@@ -309,7 +311,12 @@ export const useCVStore = create<CVStore>()(
       },
       updateLanguage: (id, field, value) => {
         set((state) => {
-          const updated = state.languages.map((l) => (l.id === id ? { ...l, [field]: value } : l));
+          const updated = state.languages.map((l) => {
+            if (l.id !== id) return l;
+            const next: Record<string, unknown> = { ...l, [field]: value };
+            if (value === undefined) delete next[field];
+            return next as unknown as LanguageEntry;
+          });
           useProfileStore.getState().updateActiveCVData({ languages: updated });
           return { languages: updated };
         });
@@ -449,6 +456,7 @@ export const useCVStore = create<CVStore>()(
     }),
     {
       name: 'cv-builder-data',
+      storage: persistStorage,
     }
   )
 );
