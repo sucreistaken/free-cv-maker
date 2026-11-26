@@ -19,7 +19,7 @@ const MAX_BODY_BYTES = 900_000;
 const MAX_STORED_BYTES = 800_000;
 
 const KNOWN_TEMPLATES = new Set([
-  'classic', 'modern', 'minimalist', 'creative', 'academic', 'compact', 'twoColumn',
+  'classic', 'modern', 'minimalist', 'creative', 'academic', 'compact', 'twoColumn', 'europass',
 ]);
 
 function isNonEmptyString(v: unknown, maxLen: number): v is string {

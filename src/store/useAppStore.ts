@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { persistStorage } from './storage';
 import type { TemplateType, ThemeConfig, DocumentType } from '../types/cv';
 import { useProfileStore } from './useProfileStore';
 import i18n from '../i18n';
@@ -88,6 +89,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'cv-builder-app',
+      storage: persistStorage,
     }
   )
 );

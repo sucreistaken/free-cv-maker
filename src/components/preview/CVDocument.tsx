@@ -7,6 +7,7 @@ import { CreativeTemplate } from '../templates/CreativeTemplate';
 import { AcademicTemplate } from '../templates/AcademicTemplate';
 import { CompactTemplate } from '../templates/CompactTemplate';
 import { TwoColumnTemplate } from '../templates/TwoColumnTemplate';
+import { EuropassTemplate } from '../templates/EuropassTemplate';
 
 export const CVDocument = forwardRef<HTMLDivElement>((_, ref) => {
   const template = useAppStore((s) => s.template);
@@ -27,6 +28,8 @@ export const CVDocument = forwardRef<HTMLDivElement>((_, ref) => {
         return <CompactTemplate />;
       case 'twoColumn':
         return <TwoColumnTemplate />;
+      case 'europass':
+        return <EuropassTemplate />;
       default:
         return <ClassicTemplate />;
     }

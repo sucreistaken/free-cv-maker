@@ -11,6 +11,8 @@ export interface PersonalInfo {
   drivingLicense: string;
   birthDate: string;
   profilePhoto: string;
+  /** Optional, printed by the Europass template (e.g. "Weiblich"). */
+  gender?: string;
 }
 
 export interface ExperienceEntry {
@@ -40,6 +42,10 @@ export interface EducationEntry {
   startDate: string;
   year: string;
   gpa: string;
+  /** Optional, printed by the Europass template (e.g. "Izmir, Türkei"). */
+  location?: string;
+  /** Optional school site, printed by the Europass template. */
+  website?: string;
 }
 
 export interface InvolvementEntry {
@@ -66,10 +72,21 @@ export interface CertificationEntry {
   description: string;
 }
 
+export type CefrLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+
+/** The five self-assessment skills of the Europass language grid, in print order. */
+export const CEFR_SKILLS = ['listening', 'reading', 'writing', 'spokenProduction', 'spokenInteraction'] as const;
+export type CefrSkill = (typeof CEFR_SKILLS)[number];
+export type CefrGrid = Record<CefrSkill, CefrLevel>;
+
 export interface LanguageEntry {
   id: string;
   language: string;
   proficiency: 'native' | 'fluent' | 'intermediate' | 'beginner';
+  /** Optional explicit mother-tongue flag; when absent, proficiency 'native' decides. */
+  isNative?: boolean;
+  /** Optional CEFR self-assessment, printed by the Europass template. */
+  cefr?: CefrGrid;
 }
 
 export interface AwardEntry {
@@ -126,7 +143,7 @@ export interface CVData {
   sections: CVSection[];
 }
 
-export type TemplateType = 'classic' | 'modern' | 'minimalist' | 'creative' | 'academic' | 'compact' | 'twoColumn';
+export type TemplateType = 'classic' | 'modern' | 'minimalist' | 'creative' | 'academic' | 'compact' | 'twoColumn' | 'europass';
 
 export interface ThemeConfig {
   primaryColor: string;

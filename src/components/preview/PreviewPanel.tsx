@@ -81,8 +81,12 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
         else break;
       }
     }
+    // Templates with fixed heading text (Europass) name the section on the heading itself.
+    const typed = owner?.dataset.sectionType;
     const section = owner
-      ? sections.find((s) => norm(s.title) === norm(owner.textContent ?? ''))
+      ? typed
+        ? sections.find((s) => s.type === typed)
+        : sections.find((s) => norm(s.title) === norm(owner.textContent ?? ''))
       : sections.find((s) => s.type === 'personalInfo');
     if (!section) return;
     useAppStore.getState().setActiveTab('editor');

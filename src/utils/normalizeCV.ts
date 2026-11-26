@@ -12,7 +12,10 @@ import type {
   LanguageEntry,
   AwardEntry,
   ReferenceEntry,
+  CefrGrid,
+  CefrLevel,
 } from '../types/cv';
+import { CEFR_SKILLS } from '../types/cv';
 import { generateId } from './id';
 import { buildSections, lookupProficiency } from './pdfImport';
 
@@ -74,6 +77,30 @@ function proficiency(o: Obj): LanguageEntry['proficiency'] {
   return typeof value === 'string' ? lookupProficiency(value.trim()) : 'intermediate';
 }
 
+/** Reads a CEFR level loosely ("b1+", " C1 " both work); null when none is found. */
+export function parseCefrLevel(v: unknown): CefrLevel | null {
+  if (typeof v !== 'string') return null;
+  const match = v.match(/[ABC][12]/i);
+  return match ? (match[0].toUpperCase() as CefrLevel) : null;
+}
+
+/** A grid is only kept when every skill has a readable level; half a grid cannot be printed. */
+function cefrGrid(v: unknown): CefrGrid | null {
+  if (!isObj(v)) return null;
+  const grid: Partial<CefrGrid> = {};
+  for (const skill of CEFR_SKILLS) {
+    const level = parseCefrLevel(v[skill]);
+    if (!level) return null;
+    grid[skill] = level;
+  }
+  return grid as CefrGrid;
+}
+
+/** Copies an optional string field only when the source has one, so old data stays deep-equal. */
+function optionalStr<K extends string>(o: Obj, key: K): { [P in K]?: string } {
+  return (typeof o[key] === 'string' ? { [key]: o[key] } : {}) as { [P in K]?: string };
+}
+
 function personalInfo(v: unknown): PersonalInfo {
   const o = isObj(v) ? v : {};
   return {
@@ -89,6 +116,7 @@ function personalInfo(v: unknown): PersonalInfo {
     drivingLicense: str(o.drivingLicense),
     birthDate: str(o.birthDate),
     profilePhoto: str(o.profilePhoto),
+    ...optionalStr(o, 'gender'),
   };
 }
 
@@ -130,6 +158,8 @@ export function normalizeCVData(raw: unknown): CVData {
       startDate: str(e.startDate),
       year: str(e.year),
       gpa: str(e.gpa),
+      ...optionalStr(e, 'location'),
+      ...optionalStr(e, 'website'),
     })),
     involvement: entries<InvolvementEntry>(o.involvement, (e) => ({
       role: str(e.role),
@@ -149,10 +179,15 @@ export function normalizeCVData(raw: unknown): CVData {
       year: str(e.year),
       description: str(e.description),
     })),
-    languages: entries<LanguageEntry>(o.languages, (e) => ({
-      language: str(e.language, e.name),
-      proficiency: proficiency(e),
-    })),
+    languages: entries<LanguageEntry>(o.languages, (e) => {
+      const cefr = cefrGrid(e.cefr);
+      return {
+        language: str(e.language, e.name),
+        proficiency: proficiency(e),
+        ...(typeof e.isNative === 'boolean' ? { isNative: e.isNative } : {}),
+        ...(cefr ? { cefr } : {}),
+      };
+    }),
     awards: entries<AwardEntry>(o.awards, (e) => ({
       title: str(e.title, e.name),
       issuer: str(e.issuer),

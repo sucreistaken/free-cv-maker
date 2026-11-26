@@ -69,7 +69,9 @@
     "drivingLicense": "Ehliyet",
     "drivingLicensePlaceholder": "ör. B",
     "birthDate": "Doğum Tarihi",
-    "birthDatePlaceholder": "ör. 15.03.2000"
+    "birthDatePlaceholder": "ör. 15.03.2000",
+    "gender": "Cinsiyet",
+    "genderPlaceholder": "ör. Weiblich"
   },
   "summaryForm": {
     "label": "Profesyonel Özet",
@@ -98,7 +100,11 @@
     "year": "Bitiş",
     "yearPlaceholder": "ör. 2022",
     "gpa": "Not Ort.",
-    "gpaPlaceholder": "ör. 3.5/4.0"
+    "gpaPlaceholder": "ör. 3.5/4.0",
+    "location": "Konum",
+    "locationPlaceholder": "ör. İzmir, Türkei",
+    "website": "Web Sitesi",
+    "websitePlaceholder": "ör. okul.k12.tr"
   },
   "projectsForm": {
     "add": "Proje Ekle",
@@ -147,7 +153,14 @@
       "İspanyolca",
       "Arapça",
       "Rusça"
-    ]
+    ],
+    "cefr": "CEFR seviyeleri",
+    "cefrHint": "Bir seviye seçin, beşi birden dolar.",
+    "cefrListening": "Dinleme",
+    "cefrReading": "Okuma",
+    "cefrWriting": "Yazma",
+    "cefrSpokenProduction": "Sözlü anlatım",
+    "cefrSpokenInteraction": "Karşılıklı konuşma"
   },
   "awardsForm": {
     "add": "Ödül Ekle",
@@ -159,7 +172,9 @@
   },
   "hobbiesForm": {
     "label": "Hobiler ve İlgi Alanları",
-    "placeholder": "ör. Fotoğrafçılık, Doğa Yürüyüşü, Açık kaynak katkısı..."
+    "placeholder": "ör. Fotoğrafçılık, Doğa Yürüyüşü, Açık kaynak katkısı...",
+    "europassHint": "Her satıra bir hobi. Grup başlığı için satırı \"# \" ile başlatın (ör. # Spor).",
+    "europassPlaceholder": "# Sport\nSchwimmen\nBasketball spielen"
   },
   "referencesForm": {
     "add": "Referans Ekle",
@@ -266,6 +281,8 @@
     "compactDesc": "Tek sayfaya maksimum içerik sığdırmak için yoğun tek sütun düzeni",
     "twoColumn": "İki Sütun",
     "twoColumnDesc": "Beceriler ve eğitim için renkli kenar çubuğuyla ana içerik alanı",
+    "europass": "Europass (Almanca)",
+    "europassDesc": "Gri kenar çubuğu, zaman çizelgesi ve CEFR dil tablosuyla Almanca Europass düzeni",
     "contactHeading": "İletişim"
   },
   "sectionAccordion": {

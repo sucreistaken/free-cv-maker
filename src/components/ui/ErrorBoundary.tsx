@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import i18n from '../../i18n';
+import { currentEmbedMode } from '../../embed/mode';
+import { markPrintError } from '../../embed/printStatus';
 
 interface Props {
   children: ReactNode;
@@ -20,6 +22,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('ErrorBoundary caught:', error, info.componentStack);
+    // A2C print mode: a crashed render would otherwise leave the headless caller waiting.
+    if (currentEmbedMode === 'print') markPrintError('render-crash', error);
   }
 
   handleReset = () => {

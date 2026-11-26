@@ -34,7 +34,8 @@ const sectionForms: Record<SectionType, React.ComponentType> = {
   references: ReferencesForm,
 };
 
-export function EditorPanel() {
+/** `showTheme` is off in the A2C embed, where the Europass look is fixed. */
+export function EditorPanel({ showTheme = true }: { showTheme?: boolean } = {}) {
   const { t } = useTranslation();
   const { sections, toggleSectionVisibility, reorderSections } = useCVStore();
   const activeDocument = useAppStore((s) => s.activeDocument);
@@ -51,7 +52,7 @@ export function EditorPanel() {
   return (
     <div className="h-full overflow-y-auto custom-scrollbar bg-surface-alt">
       <div className="p-4 space-y-3">
-        <ThemePanel />
+        {showTheme && <ThemePanel />}
         <SortableList
           items={sections}
           onReorder={reorderSections}

@@ -83,6 +83,43 @@ body {
   color-adjust: exact !important;
 }
 
+/*
+ * A2C print mode (/?embed=a2c&print=1): the page holds only the CV and is printed
+ * by headless Chrome. Let the document grow past one screen so every page prints,
+ * repeat the page padding on each page, and drop the preview shadow.
+ */
+html.nextcv-print,
+html.nextcv-print body,
+html.nextcv-print #root {
+  height: auto;
+  overflow: visible;
+}
+html.nextcv-print {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+html.nextcv-print .a4-page {
+  box-shadow: none !important;
+  min-height: 0 !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Europass sidebar colour below the content on every printed page (see EuropassTemplate). */
+.europass-print-strip {
+  display: none;
+}
+@media print {
+  .europass-print-strip {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+}
+
 /* Prevent entries from breaking across pages */
 .break-inside-avoid {
   break-inside: avoid;

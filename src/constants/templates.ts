@@ -42,4 +42,9 @@ export const templates: TemplateMeta[] = [
     name: 'Two-Column',
     description: 'Main content area with colored sidebar for skills and education',
   },
+  {
+    id: 'europass',
+    name: 'Europass',
+    description: 'German Europass layout with grey sidebar, timelines and CEFR language grid',
+  },
 ];
