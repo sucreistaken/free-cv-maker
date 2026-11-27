@@ -223,11 +223,18 @@ describe('non-CV documents', () => {
 
 // A section the user added prints in the house heading style with words the importer does not
 // know. It must come back as a custom section instead of being merged into the one above it.
-// Fixtures: scripts/make-custom-section-fixture.mjs (default CV + "Conference Talks"). The script
-// prints with Chrome's own page breaks, which can strand a heading at a page bottom in the
-// two-column layout; the app's print keeps headings with their first entry, so only
-// single-flow layouts are fixtures here.
-describe.each(['export-custom-classic.pdf', 'export-custom-modern.pdf'])(
+// Fixtures: scripts/make-custom-section-fixture.mjs (default CV + "Conference Talks"), printed
+// through the app's own print path. Europass is left out: the importer has no German headings,
+// so a NextCV Europass PDF does not import at all yet.
+describe.each([
+  'export-custom-classic.pdf',
+  'export-custom-modern.pdf',
+  'export-custom-twoColumn.pdf',
+  'export-custom-minimalist.pdf',
+  'export-custom-creative.pdf',
+  'export-custom-academic.pdf',
+  'export-custom-compact.pdf',
+])(
   'custom section round-trip %s',
   (fixture) => {
     it('recovers the custom section and its entry', async () => {

@@ -1243,13 +1243,16 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
       case 'custom': {
         // Entries of a custom section print like Involvement (title, dates, subtitle, bullets).
         const items: CustomEntry[] = parseInvolvement(section.lines).map((e) => {
-          // A single date ("Keynote | Sep 2024") is not a range, so it stays glued to the title.
-          const single = e.startDate ? null : splitTrailingDate(e.role);
+          // A single date is not a range, so it stays glued to the title ("Keynote | Sep 2024")
+          // or, in timeline layouts, to the subtitle line ("ReactConf Istanbul, Sep 2024").
+          const subtitle = [e.institution, e.organization].filter(Boolean).join(', ');
+          const inTitle = e.startDate ? null : splitTrailingDate(e.role);
+          const inSubtitle = e.startDate || inTitle ? null : splitTrailingDate(subtitle);
           return {
             id: e.id,
-            title: single?.text ?? e.role,
-            subtitle: [e.institution, e.organization].filter(Boolean).join(', '),
-            startDate: single?.date ?? e.startDate,
+            title: inTitle?.text ?? e.role,
+            subtitle: inSubtitle?.text ?? subtitle,
+            startDate: inTitle?.date ?? inSubtitle?.date ?? e.startDate,
             endDate: e.endDate,
             bullets: e.bullets,
           };
@@ -1316,9 +1319,9 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
   return cvData;
 }
 
-const TRAILING_DATE_RE = new RegExp(`^(.*?\\S)\\s*(?:\\|\\s*)?((?:${MONTH_PATTERN}\\.?\\s+)?(?:19|20)\\d{2})$`, 'iu');
+const TRAILING_DATE_RE = new RegExp(`^(.*?[^\\s,|])\\s*(?:[|,]\\s*)?((?:${MONTH_PATTERN}\\.?\\s+)?(?:19|20)\\d{2})$`, 'iu');
 
-/** "Keynote Speaker | Sep 2024" -> text "Keynote Speaker", date "Sep 2024". */
+/** "Keynote Speaker | Sep 2024" or "ReactConf, Sep 2024" -> the text and "Sep 2024". */
 function splitTrailingDate(text: string): { text: string; date: string } | null {
   const match = text.trim().match(TRAILING_DATE_RE);
   return match ? { text: match[1].trim(), date: match[2] } : null;
