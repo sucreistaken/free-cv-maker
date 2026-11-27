@@ -41,7 +41,15 @@ export function useExportReminder() {
   const lastTickRef = useRef(0);
 
   useEffect(() => {
-    const unsub = useCVStore.subscribe(() => {
+    let unsub = () => {};
+    // App loads the active profile into the store in an effect that runs after this one.
+    // Subscribing a tick later keeps that load from counting as an edit; otherwise a CV
+    // last backed up a day ago showed the reminder the moment the page opened.
+    const start = setTimeout(() => {
+      unsub = useCVStore.subscribe(onChange);
+    }, 0);
+
+    function onChange() {
       const now = Date.now();
       if (now - lastTickRef.current < TICK_MS) return;
       lastTickRef.current = now;
@@ -66,8 +74,11 @@ export function useExportReminder() {
         });
         setTimeout(() => { shownRef.current = false; }, MAX_AGE_MS);
       }
-    });
+    }
 
-    return unsub;
+    return () => {
+      clearTimeout(start);
+      unsub();
+    };
   }, [t]);
 }
