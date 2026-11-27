@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { AwardEntryForm } from './AwardEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function AwardsForm() {
   const { t } = useTranslation();
-  const { awards, addAward, removeAward, reorderAwards } = useCVStore();
+  const { awards, addAward, reorderAwards } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function AwardsForm() {
           <EntryCard
             title={entry.title}
             subtitle={entry.issuer}
-            onRemove={() => removeAward(entry.id)}
+            onRemove={() => removeEntryWithUndo('awards', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <AwardEntryForm entry={entry} />

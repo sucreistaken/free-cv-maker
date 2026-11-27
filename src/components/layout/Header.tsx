@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Printer, RotateCcw, Download, Upload, FileText, Loader2, Users, HelpCircle, Maximize, Minimize, Sparkles } from 'lucide-react';
+import { Printer, Users, HelpCircle, Maximize, Minimize, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/Toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -8,13 +8,15 @@ import { useCVStore } from '../../store/useCVStore';
 import { useProfileStore } from '../../store/useProfileStore';
 import { templates } from '../../constants/templates';
 import type { TemplateType, DocumentType } from '../../types/cv';
-import { exportToJson, downloadJsonFile, validateImportData } from '../../utils/export';
+import { validateImportData } from '../../utils/export';
+import { currentCvData, downloadCvBackup } from '../../utils/backup';
 import { parsePdfToCV, PdfNotCvError } from '../../utils/pdfImport';
 import { markExported } from '../../hooks/useExportReminder';
 import { ProfileManager } from './ProfileManager';
 import { Dialog } from '../ui/Dialog';
 import { OnboardingTour } from '../ui/OnboardingTour';
 import { AIAssistModal } from './AIAssistModal';
+import { FileMenu } from './FileMenu';
 import { logEvent, uploadPdfFile } from '../../utils/cloudSync';
 
 interface HeaderProps {
@@ -23,7 +25,7 @@ interface HeaderProps {
 
 export function Header({ onPrint }: HeaderProps) {
   const { t } = useTranslation();
-  const { template, setTemplate, theme, activeDocument, setActiveDocument, language, setLanguage } = useAppStore();
+  const { template, setTemplate, activeDocument, setActiveDocument, language, setLanguage } = useAppStore();
   const resetToDefault = useCVStore((s) => s.resetToDefault);
   const { profiles, activeProfileId, switchProfile } = useProfileStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,18 +48,8 @@ export function Header({ onPrint }: HeaderProps) {
     }
   };
 
-  const getCurrentCvData = () => {
-    const cvState = useCVStore.getState();
-    const { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections } = cvState;
-    return { personalInfo, summary, experience, projects, education, involvement, skills, certifications, languages, awards, hobbies, references, sections };
-  };
-
   const handleExport = () => {
-    const cvState = useCVStore.getState();
-    const cvData = getCurrentCvData();
-    const json = exportToJson(cvData, { template, theme }, cvState.coverLetterData);
-    const name = cvData.personalInfo.fullName.replace(/\s+/g, '_') || 'cv';
-    downloadJsonFile(json, `${name}_cv.json`);
+    downloadCvBackup();
     markExported();
     logEvent('json_exported');
   };
@@ -127,7 +119,7 @@ export function Header({ onPrint }: HeaderProps) {
   };
 
   const handlePrintClick = () => {
-    logEvent('pdf_export_clicked', { cvSnapshot: getCurrentCvData() });
+    logEvent('pdf_export_clicked', { cvSnapshot: currentCvData() });
     onPrint();
   };
 
@@ -192,7 +184,7 @@ export function Header({ onPrint }: HeaderProps) {
             {canFullscreen && (
               <button
                 onClick={toggleFullscreen}
-                className="flex items-center gap-1 px-1.5 sm:px-2 py-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="hidden sm:flex items-center gap-1 px-1.5 sm:px-2 py-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}
               >
                 {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
@@ -205,7 +197,7 @@ export function Header({ onPrint }: HeaderProps) {
             {/* How to use */}
             <button
               onClick={() => setShowTutorial(true)}
-              className="p-1 sm:p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="hidden sm:block p-1 sm:p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               title={t('header.howToUse')}
             >
               <HelpCircle size={16} />
@@ -239,12 +231,14 @@ export function Header({ onPrint }: HeaderProps) {
               </button>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={handleExport} title={t('header.exportJson')} aria-label={t('header.exportJson')}>
-              <Download size={15} />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} title={t('header.importJson')} aria-label={t('header.importJson')}>
-              <Upload size={15} />
-            </Button>
+            <FileMenu
+              onBackup={handleExport}
+              onLoadBackup={() => fileInputRef.current?.click()}
+              onImportPdf={() => pdfInputRef.current?.click()}
+              onHelp={() => setShowTutorial(true)}
+              onReset={() => setShowResetConfirm(true)}
+              pdfImporting={pdfImporting}
+            />
             <input
               ref={fileInputRef}
               type="file"
@@ -252,9 +246,6 @@ export function Header({ onPrint }: HeaderProps) {
               onChange={handleImport}
               className="hidden"
             />
-            <Button variant="ghost" size="sm" onClick={() => pdfInputRef.current?.click()} title={t('header.importPdf')} aria-label={t('header.importPdf')} disabled={pdfImporting}>
-              {pdfImporting ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
-            </Button>
             <input
               ref={pdfInputRef}
               type="file"
@@ -273,10 +264,7 @@ export function Header({ onPrint }: HeaderProps) {
               <span className="font-semibold">AI</span>
             </Button>
             <div className="w-px h-5 bg-gray-200 hidden sm:block" />
-            <Button variant="ghost" size="sm" onClick={() => setShowResetConfirm(true)} title={t('header.reset')} aria-label={t('header.reset')}>
-              <RotateCcw size={15} />
-            </Button>
-            <Button variant="primary" size="sm" onClick={handlePrintClick}>
+            <Button variant="primary" size="sm" onClick={handlePrintClick} aria-label={t('header.printPdf')} title={t('header.printPdf')}>
               <Printer size={15} />
               <span className="hidden lg:inline">{t('header.printPdf')}</span>
             </Button>

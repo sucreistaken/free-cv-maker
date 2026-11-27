@@ -2,6 +2,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
 import { toast } from '../ui/Toast';
+import { removeCustomEntryWithUndo } from '../../utils/undoRemove';
 import { EntryCard } from './shared/EntryCard';
 import { FormField } from './shared/FormField';
 import { DateRangeField } from './shared/DateRangeField';
@@ -15,7 +16,6 @@ export function CustomSectionForm({ section }: { section: CVSection }) {
   const {
     addCustomEntry,
     updateCustomEntry,
-    removeCustomEntry,
     reorderCustomEntries,
     removeCustomSection,
     restoreSection,
@@ -40,7 +40,7 @@ export function CustomSectionForm({ section }: { section: CVSection }) {
           <EntryCard
             title={entry.title}
             subtitle={entry.subtitle}
-            onRemove={() => removeCustomEntry(section.id, entry.id)}
+            onRemove={() => removeCustomEntryWithUndo(section.id, entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <FormField

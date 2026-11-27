@@ -1,10 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '../components/ui/Toast';
+import { downloadCvBackup } from '../utils/backup';
 import { useCVStore } from '../store/useCVStore';
 
 const STORAGE_KEY = 'nextcv-export-reminder';
-const MAX_CHANGES = 20;
+/**
+ * Store changes fire on every keystroke, so 20 raw changes meant a reminder after one
+ * sentence. Count at most one change per TICK_MS instead: 40 ticks is about ten
+ * minutes of actual editing.
+ */
+const MAX_CHANGES = 40;
+const TICK_MS = 15_000;
 const MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 interface ReminderState {
@@ -31,9 +38,13 @@ export function markExported() {
 export function useExportReminder() {
   const { t } = useTranslation();
   const shownRef = useRef(false);
+  const lastTickRef = useRef(0);
 
   useEffect(() => {
     const unsub = useCVStore.subscribe(() => {
+      const now = Date.now();
+      if (now - lastTickRef.current < TICK_MS) return;
+      lastTickRef.current = now;
       const state = getState();
       state.changeCount++;
       saveState(state);
@@ -47,7 +58,7 @@ export function useExportReminder() {
           action: {
             label: t('toast.backupNow'),
             onClick: () => {
-              document.querySelector<HTMLButtonElement>('[title="Export JSON"], [title="JSON Dışa Aktar"]')?.click();
+              downloadCvBackup();
               markExported();
             },
           },

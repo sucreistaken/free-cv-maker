@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { LanguageEntryForm } from './LanguageEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function LanguagesForm() {
   const { t } = useTranslation();
-  const { languages, addLanguage, updateLanguage, removeLanguage, reorderLanguages } = useCVStore();
+  const { languages, addLanguage, updateLanguage, reorderLanguages } = useCVStore();
 
   // Common languages that are not on the CV yet, offered as one-click additions.
   const present = new Set(languages.map((l) => l.language.trim().toLocaleLowerCase()));
@@ -30,7 +31,7 @@ export function LanguagesForm() {
           <EntryCard
             title={entry.language}
             subtitle={t(`languagesForm.${entry.proficiency}`)}
-            onRemove={() => removeLanguage(entry.id)}
+            onRemove={() => removeEntryWithUndo('languages', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <LanguageEntryForm entry={entry} />

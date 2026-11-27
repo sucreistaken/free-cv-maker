@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { ReferenceEntryForm } from './ReferenceEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function ReferencesForm() {
   const { t } = useTranslation();
-  const { references, addReference, removeReference, reorderReferences } = useCVStore();
+  const { references, addReference, reorderReferences } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function ReferencesForm() {
           <EntryCard
             title={entry.name}
             subtitle={entry.company}
-            onRemove={() => removeReference(entry.id)}
+            onRemove={() => removeEntryWithUndo('references', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <ReferenceEntryForm entry={entry} />

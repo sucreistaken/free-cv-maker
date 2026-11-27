@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { ProjectEntryForm } from './ProjectEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function ProjectsForm() {
   const { t } = useTranslation();
-  const { projects, addProject, removeProject, reorderProjects } = useCVStore();
+  const { projects, addProject, reorderProjects } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function ProjectsForm() {
           <EntryCard
             title={entry.name}
             subtitle={entry.link}
-            onRemove={() => removeProject(entry.id)}
+            onRemove={() => removeEntryWithUndo('projects', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <ProjectEntryForm entry={entry} />

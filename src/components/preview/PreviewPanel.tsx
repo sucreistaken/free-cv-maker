@@ -228,15 +228,16 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
             pageBreaks.map((top, i) => {
               return (
                 <div key={i} style={{ position: 'absolute', left: 0, right: 0, top, pointerEvents: 'none', zIndex: 10 }}>
-                  <div style={{ height: 2, background: '#3b82f6', opacity: 0.45 }} />
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  {/* The label sits above the line, in page 1's bottom margin, so it never covers the next heading. */}
+                  <div style={{ position: 'absolute', right: 8, bottom: '100%', display: 'flex' }}>
                     <span
                       style={{
                         background: '#3b82f6',
                         color: 'white',
-                        fontSize: 10,
-                        padding: '1px 10px',
-                        borderRadius: '0 0 4px 4px',
+                        fontSize: 9,
+                        lineHeight: '13px',
+                        padding: '0 8px',
+                        borderRadius: '4px 4px 0 0',
                         fontWeight: 500,
                         letterSpacing: '0.02em',
                       }}
@@ -244,6 +245,7 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
                       {t('preview.page', { n1: i + 1, n2: i + 2 })}
                     </span>
                   </div>
+                  <div style={{ height: 2, background: '#3b82f6', opacity: 0.45 }} />
                 </div>
               );
             })}

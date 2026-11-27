@@ -95,7 +95,7 @@ export function SectionAccordion({
   };
 
   return (
-    <div ref={rootRef} className={cn('border border-gray-200 rounded-lg bg-white', !visible && 'opacity-60')}>
+    <div ref={rootRef} className={cn('border rounded-lg', visible ? 'border-gray-200 bg-white' : 'border-dashed border-gray-300 bg-gray-50/60')}>
       <div className="flex items-center gap-2 px-3 py-2.5">
         <button
           type="button"
@@ -139,7 +139,15 @@ export function SectionAccordion({
               size={16}
               className={cn('shrink-0 text-gray-400 transition-transform', open && 'rotate-180')}
             />
-            <span className="text-sm font-semibold text-gray-800 break-words min-w-0">{title}</span>
+            <span className={cn('text-sm font-semibold break-words min-w-0', visible ? 'text-gray-800' : 'text-gray-500')}>
+              {title}
+            </span>
+            {/* A hidden section is still editable; it is only left off the CV. */}
+            {!visible && (
+              <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-gray-500 bg-gray-200/70 rounded px-1.5 py-0.5">
+                {t('sectionAccordion.hidden')}
+              </span>
+            )}
           </button>
         )}
         {onRename && !renaming && (

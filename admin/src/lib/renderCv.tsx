@@ -122,6 +122,22 @@ export function renderSection(section: CVSection, cv: CVData) {
           </div>
         </SectionBlock>
       ) : null;
+    case 'custom':
+      return section.items?.length ? (
+        <SectionBlock key={section.id} title={section.title}>
+          <div className="space-y-3">
+            {section.items.map((e) => (
+              <div key={e.id}>
+                <div className="text-sm font-medium text-gray-900">{e.title}</div>
+                <div className="text-xs text-gray-400">
+                  {[e.subtitle, [e.startDate, e.endDate].filter(Boolean).join(' – ')].filter(Boolean).join(' · ')}
+                </div>
+                <Bullets items={e.bullets} />
+              </div>
+            ))}
+          </div>
+        </SectionBlock>
+      ) : null;
     case 'skills':
       return cv.skills.length ? (
         <SectionBlock key={section.id} title={section.title}>

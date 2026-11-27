@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { InvolvementEntryForm } from './InvolvementEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function InvolvementForm() {
   const { t } = useTranslation();
-  const { involvement, addInvolvement, removeInvolvement, reorderInvolvement } = useCVStore();
+  const { involvement, addInvolvement, reorderInvolvement } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function InvolvementForm() {
           <EntryCard
             title={entry.role}
             subtitle={entry.organization}
-            onRemove={() => removeInvolvement(entry.id)}
+            onRemove={() => removeEntryWithUndo('involvement', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <InvolvementEntryForm entry={entry} />

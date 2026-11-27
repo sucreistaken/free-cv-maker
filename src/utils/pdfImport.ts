@@ -1,6 +1,7 @@
 import type {
   CVData,
   CVSection,
+  CustomEntry,
   ExperienceEntry,
   ProjectEntry,
   EducationEntry,
@@ -13,6 +14,7 @@ import type {
   SectionType,
 } from '../types/cv';
 import { generateId } from './id';
+import { capitalizeWords } from './sections';
 import {
   COMPANY_WORDS_RE,
   RANGE_RE,
@@ -200,13 +202,49 @@ function detectSections(lines: LayoutLine[]): { headerLines: LayoutLine[]; secti
     }
   }
 
+  const looksLikeHeading = (line: LayoutLine, text: string) =>
+    text.length < 40 && !line.isBullet && (line.fontSize >= bodyFontSize * 0.95 || isAllCaps(text));
+
+  // Font size the document uses for its recognised headings. A renamed or user-added
+  // section ("GÖNÜLLÜLÜK") is printed in exactly that style, while the words are unknown.
+  const headingSizeCounts = new Map<number, number>();
+  for (const line of lines) {
+    const text = line.text.trim();
+    const type = matchHeading(text);
+    if (type && type !== 'personalInfo' && looksLikeHeading(line, text) && isAllCaps(text)) {
+      const rounded = Math.round(line.fontSize * 2) / 2;
+      headingSizeCounts.set(rounded, (headingSizeCounts.get(rounded) || 0) + 1);
+    }
+  }
+  let headingSize = 0;
+  let headingSizeCount = 0;
+  for (const [size, count] of headingSizeCounts) {
+    if (count > headingSizeCount) {
+      headingSizeCount = count;
+      headingSize = size;
+    }
+  }
+  // Needs a clear house style (two or more headings in it) before trusting unknown words.
+  const isUnknownHeading = (line: LayoutLine, text: string) =>
+    headingSizeCount >= 2 &&
+    headingSize > bodyFontSize &&
+    Math.abs(line.fontSize - headingSize) < 0.3 &&
+    isAllCaps(text) &&
+    !/\d/.test(text) &&
+    !hasContactToken(text) &&
+    looksLikeHeading(line, text);
+
   for (const line of lines) {
     const text = line.text.trim();
     const matchedType = matchHeading(text);
-    const looksLikeHeading =
-      text.length < 40 && !line.isBullet && (line.fontSize >= bodyFontSize * 0.95 || isAllCaps(text));
 
-    if (matchedType && looksLikeHeading) {
+    if (!matchedType && !inHeader && isUnknownHeading(line, text)) {
+      currentSection = { type: 'custom', title: text, lines: [] };
+      sections.push(currentSection);
+      continue;
+    }
+
+    if (matchedType && looksLikeHeading(line, text)) {
       if (matchedType === 'personalInfo') {
         inHeader = true;
         currentSection = null;
@@ -1198,9 +1236,27 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
   let hobbies = '';
   let references: ReferenceEntry[] = [];
   let involvement: InvolvementEntry[] = [];
+  const customSections: CVSection[] = [];
 
   for (const section of sections) {
     switch (section.type) {
+      case 'custom': {
+        // Entries of a custom section print like Involvement (title, dates, subtitle, bullets).
+        const items: CustomEntry[] = parseInvolvement(section.lines).map((e) => {
+          // A single date ("Keynote | Sep 2024") is not a range, so it stays glued to the title.
+          const single = e.startDate ? null : splitTrailingDate(e.role);
+          return {
+            id: e.id,
+            title: single?.text ?? e.role,
+            subtitle: [e.institution, e.organization].filter(Boolean).join(', '),
+            startDate: single?.date ?? e.startDate,
+            endDate: e.endDate,
+            bullets: e.bullets,
+          };
+        });
+        customSections.push({ id: generateId(), type: 'custom', title: headingToTitle(section.title), visible: true, items });
+        break;
+      }
       case 'summary':
         summary = [summary, section.lines.join(' ').trim()].filter(Boolean).join(' ');
         break;
@@ -1256,8 +1312,22 @@ export function parseLinesToCV(textLines: LayoutLine[]): CVData {
     sections: [],
   };
 
-  cvData.sections = buildSections(cvData);
+  cvData.sections = [...buildSections(cvData), ...customSections];
   return cvData;
+}
+
+const TRAILING_DATE_RE = new RegExp(`^(.*?\\S)\\s*(?:\\|\\s*)?((?:${MONTH_PATTERN}\\.?\\s+)?(?:19|20)\\d{2})$`, 'iu');
+
+/** "Keynote Speaker | Sep 2024" -> text "Keynote Speaker", date "Sep 2024". */
+function splitTrailingDate(text: string): { text: string; date: string } | null {
+  const match = text.trim().match(TRAILING_DATE_RE);
+  return match ? { text: match[1].trim(), date: match[2] } : null;
+}
+
+/** "GÖNÜLLÜLÜK ÇALIŞMALARI" (as printed) back to "Gönüllülük Çalışmaları". */
+function headingToTitle(heading: string): string {
+  const locale = /[çğıöşüİ]/i.test(heading) ? 'tr' : 'en';
+  return capitalizeWords(heading.toLocaleLowerCase(locale), locale);
 }
 
 /** Thrown when a PDF has no recognizable CV structure (no sections and no contact details). */
