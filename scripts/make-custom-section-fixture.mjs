@@ -1,6 +1,11 @@
 // Regenerates src/utils/pdf/__fixtures__/export-custom-<template>.pdf: the default CV plus a
 // user-added section, used to check that PDF import brings custom sections back.
 //
+// The PDF goes through the app's own print path ("Print / PDF"): the isolated print iframe
+// with page breaks forced where the preview shows them. Its print() call is intercepted, and
+// the same document is printed headless, so headings stay with their first entry exactly as
+// in a real export.
+//
 // Usage:
 //   npm run dev
 //   node scripts/make-custom-section-fixture.mjs [devServerUrl] [template ...]
@@ -11,10 +16,12 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 const baseUrl = args.find((a) => a.startsWith('http')) ?? 'http://localhost:5173/';
 const templates = args.filter((a) => !a.startsWith('http'));
-const targets = templates.length ? templates : ['classic', 'modern'];
+const targets = templates.length
+  ? templates
+  : ['classic', 'modern', 'twoColumn', 'minimalist', 'creative', 'academic', 'compact'];
 const outDir = fileURLToPath(new URL('../src/utils/pdf/__fixtures__/', import.meta.url));
 
-export const CUSTOM_SECTION = {
+const CUSTOM_SECTION = {
   id: 'custom-talks',
   type: 'custom',
   title: 'Conference Talks',
@@ -54,27 +61,29 @@ try {
     await templateSelect.selectOption(template);
     await page.waitForTimeout(800);
 
+    // Capture the print iframe's document at the moment the app calls print().
     await page.evaluate(() => {
-      const area = document.querySelector('.print-area');
-      if (!area) throw new Error('.print-area not found');
-      const clone = area.cloneNode(true);
-      document.body.innerHTML = '';
-      document.body.style.margin = '0';
-      document.body.appendChild(clone);
-      const style = document.createElement('style');
-      style.textContent = 'html, body { height: auto !important; overflow: visible !important; }';
-      document.head.appendChild(style);
+      window.__printHtml = new Promise((resolve) => {
+        const append = document.body.appendChild.bind(document.body);
+        document.body.appendChild = (node) => {
+          const result = append(node);
+          if (node instanceof HTMLIFrameElement && node.contentWindow) {
+            node.contentWindow.print = () => resolve(node.contentDocument.documentElement.outerHTML);
+          }
+          return result;
+        };
+      });
     });
-    await page.emulateMedia({ media: 'print' });
+    await page.keyboard.press('Control+p');
+    const html = await page.evaluate(() => window.__printHtml);
 
-    const out = path.join(outDir, `export-custom-${template}.pdf`);
-    await page.pdf({
-      path: out,
-      format: 'A4',
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
-      printBackground: true,
-      preferCSSPageSize: true,
+    const printPage = await context.newPage();
+    await printPage.setContent(`<!doctype html>${html.replace('<head>', `<head><base href="${baseUrl}">`)}`, {
+      waitUntil: 'networkidle',
     });
+    await printPage.emulateMedia({ media: 'print' });
+    const out = path.join(outDir, `export-custom-${template}.pdf`);
+    await printPage.pdf({ path: out, printBackground: true, preferCSSPageSize: true });
     console.log(`${template} -> ${out}`);
     await context.close();
   }
