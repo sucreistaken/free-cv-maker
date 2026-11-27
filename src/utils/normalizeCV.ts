@@ -12,6 +12,7 @@ import type {
   LanguageEntry,
   AwardEntry,
   ReferenceEntry,
+  CustomEntry,
   CefrGrid,
   CefrLevel,
 } from '../types/cv';
@@ -35,7 +36,7 @@ const PROFICIENCY_VALUES: LanguageEntry['proficiency'][] = ['native', 'fluent', 
 
 const SECTION_TYPES: SectionType[] = [
   'personalInfo', 'summary', 'experience', 'projects', 'education', 'involvement',
-  'skills', 'certifications', 'languages', 'awards', 'hobbies', 'references',
+  'skills', 'certifications', 'languages', 'awards', 'hobbies', 'references', 'custom',
 ];
 
 type Obj = Record<string, unknown>;
@@ -129,6 +130,17 @@ function sections(v: unknown, cv: Omit<CVData, 'sections'>): CVSection[] {
     type: s.type as SectionType,
     title: str(s.title),
     visible: s.visible !== false,
+    ...(s.type === 'custom'
+      ? {
+          items: entries<CustomEntry>(s.items, (e) => ({
+            title: str(e.title, e.name),
+            subtitle: str(e.subtitle),
+            startDate: str(e.startDate, e.date),
+            endDate: str(e.endDate),
+            bullets: strArray(e.bullets),
+          })),
+        }
+      : {}),
   }));
 }
 

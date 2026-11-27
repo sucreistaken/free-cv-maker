@@ -95,7 +95,10 @@ export function PreviewPanel({ contentRef }: PreviewPanelProps) {
 
   const openFormForEditing = () => {
     if (!editing) return;
-    const section = useCVStore.getState().sections.find((s) => s.type === editing.field.key);
+    const { sections } = useCVStore.getState();
+    const section = editing.field.sectionId
+      ? sections.find((s) => s.id === editing.field.sectionId)
+      : sections.find((s) => s.type === editing.field.key);
     setEditing(null);
     if (!section) return;
     useAppStore.getState().setActiveTab('editor');

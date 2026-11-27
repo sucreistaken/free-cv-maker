@@ -2,8 +2,10 @@ import type { CVData } from '../types/cv';
 
 /** Where a piece of preview text lives in the CV data, so it can be edited in place. */
 export interface PreviewField {
-  /** Top-level CV key, also the section type (e.g. "experience"). */
+  /** Top-level CV key, also the section type (e.g. "experience"); "custom" for user-added sections. */
   key: string;
+  /** Section id, set for user-added sections whose entries live on the section itself. */
+  sectionId?: string;
   /** Entry id for list sections; absent for flat fields (summary, personalInfo). */
   entryId?: string;
   /** Property inside the entry or personalInfo; absent for summary and hobbies. */
@@ -31,10 +33,20 @@ export function normalizeForMatch(text: string): string {
 /** All editable text values of the CV, ordered like the visible sections. */
 export function buildPreviewFields(cv: CVData): PreviewField[] {
   const out: PreviewField[] = [];
-  const order = cv.sections.filter((s) => s.visible).map((s) => s.type as string);
-
-  for (const type of order) {
-    if (type === 'personalInfo') {
+  for (const section of cv.sections.filter((s) => s.visible)) {
+    const type: string = section.type;
+    if (type === 'custom') {
+      for (const entry of section.items ?? []) {
+        for (const field of ['title', 'subtitle', 'startDate', 'endDate'] as const) {
+          if (entry[field]) {
+            out.push({ key: 'custom', sectionId: section.id, entryId: entry.id, field, value: entry[field], multiline: false });
+          }
+        }
+        entry.bullets.forEach((b, i) => {
+          if (b) out.push({ key: 'custom', sectionId: section.id, entryId: entry.id, field: 'bullets', bulletIndex: i, value: b, multiline: true });
+        });
+      }
+    } else if (type === 'personalInfo') {
       for (const [field, value] of Object.entries(cv.personalInfo)) {
         if (SKIPPED_FIELDS.has(field) || typeof value !== 'string' || !value) continue;
         out.push({ key: 'personalInfo', field, value, multiline: false });

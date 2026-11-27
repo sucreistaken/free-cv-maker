@@ -6,7 +6,8 @@ import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { parseFormattedText } from '../../utils/formatText';
 import { formatDateRange, isNativeLanguage, otherLanguageLevel, parseHobbies, splitListItems } from '../../utils/europass';
 import { CEFR_SKILLS } from '../../types/cv';
-import type { CVData, SectionType } from '../../types/cv';
+import type { CVData, CVSection, SectionType } from '../../types/cv';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import {
   EUROPASS_CEFR_LABELS,
   EUROPASS_LABELS,
@@ -26,16 +27,24 @@ function toHref(value: string): string {
   return value.startsWith('http') ? value : `https://${value}`;
 }
 
-/** The heading lives in its own wrapper so pagination keeps it with the first entry. */
-function SectionHeading({ type }: { type: Exclude<SectionType, 'personalInfo'> }) {
+type MainSectionType = Exclude<SectionType, 'personalInfo'>;
+
+/**
+ * The heading lives in its own wrapper so pagination keeps it with the first entry.
+ * Built-in sections carry their type so a click on the fixed German heading still finds
+ * the section; a user-added section is found by its own title.
+ */
+function SectionHeading({ section }: { section: CVSection }) {
+  const type = section.type as MainSectionType;
+  const custom = type === 'custom';
   return (
     <div className="mb-1.5">
       <h2
-        data-section-type={type}
+        data-section-type={custom ? undefined : type}
         className="text-[16px] font-normal uppercase leading-tight tracking-[0.01em]"
         style={{ color: S.heading }}
       >
-        {EUROPASS_SECTION_TITLES[type]}
+        {custom ? section.title : EUROPASS_SECTION_TITLES[type]}
       </h2>
     </div>
   );
@@ -213,7 +222,8 @@ function HobbiesSection({ hobbies }: { hobbies: string }) {
   );
 }
 
-function MainSection({ type, cv }: { type: Exclude<SectionType, 'personalInfo'>; cv: CVData }) {
+function MainSection({ section, cv }: { section: CVSection; cv: CVData }) {
+  const type = section.type as MainSectionType;
   let body: ReactNode = null;
   switch (type) {
     case 'summary':
@@ -252,8 +262,10 @@ function MainSection({ type, cv }: { type: Exclude<SectionType, 'personalInfo'>;
         : null;
       break;
     case 'involvement':
-      body = cv.involvement.length
-        ? cv.involvement.map((e) => (
+    case 'custom': {
+      const list = type === 'custom' ? customItemsAsInvolvement(section.items) : cv.involvement;
+      body = list.length
+        ? list.map((e) => (
             <TimelineEntry
               key={e.id}
               top={<DateLine dates={formatDateRange(e.startDate, e.endDate)} />}
@@ -264,6 +276,7 @@ function MainSection({ type, cv }: { type: Exclude<SectionType, 'personalInfo'>;
           ))
         : null;
       break;
+    }
     case 'projects':
       body = cv.projects.length
         ? cv.projects.map((p) => (
@@ -314,7 +327,7 @@ function MainSection({ type, cv }: { type: Exclude<SectionType, 'personalInfo'>;
   if (!body) return null;
   return (
     <section>
-      <SectionHeading type={type} />
+      <SectionHeading section={section} />
       <div>{body}</div>
     </section>
   );
@@ -411,7 +424,7 @@ export function EuropassTemplate() {
 
       <div className="flex-1 min-w-0 pl-[22px] pr-[24px] flex flex-col gap-[14px]">
         {mainSections.map((s) => (
-          <MainSection key={s.id} type={s.type as Exclude<SectionType, 'personalInfo'>} cv={cv} />
+          <MainSection key={s.id} section={s} cv={cv} />
         ))}
       </div>
     </div>

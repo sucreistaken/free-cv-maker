@@ -1,7 +1,8 @@
 import { parseFormattedText } from '../../utils/formatText';
 import { useCVStore } from '../../store/useCVStore';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
-import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
+import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry, CustomEntry } from '../../types/cv';
 import { CompanyName } from './shared/CompanyName';
 
 export function MinimalistTemplate() {
@@ -46,7 +47,7 @@ export function MinimalistTemplate() {
     </ul>
   );
 
-  const renderSection = (type: string, title: string) => {
+  const renderSection = (type: string, title: string, items?: CustomEntry[]) => {
     switch (type) {
       case 'summary':
         return summary ? (
@@ -112,11 +113,13 @@ export function MinimalistTemplate() {
           </div>
         ) : null;
       case 'involvement':
-        return involvement.length > 0 ? (
+      case 'custom': {
+        const list = type === 'custom' ? customItemsAsInvolvement(items) : involvement;
+        return list.length > 0 ? (
           <div>
             <SectionTitle title={title} />
             <div className="space-y-3">
-              {involvement.map((inv: InvolvementEntry) => (
+              {list.map((inv: InvolvementEntry) => (
                 <div key={inv.id}>
                   <div className="flex justify-between items-baseline">
                     <h3 className="text-[11.5px] font-semibold text-gray-800">
@@ -133,6 +136,7 @@ export function MinimalistTemplate() {
             </div>
           </div>
         ) : null;
+      }
       case 'skills':
         return skills.length > 0 ? (
           <div>
@@ -268,7 +272,7 @@ export function MinimalistTemplate() {
         {visibleSections
           .filter((s) => s.type !== 'personalInfo')
           .map((section) => {
-            const rendered = renderSection(section.type, section.title);
+            const rendered = renderSection(section.type, section.title, section.items);
             return rendered ? <div key={section.id}>{rendered}</div> : null;
           })}
       </div>

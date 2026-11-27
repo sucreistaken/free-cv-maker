@@ -14,12 +14,21 @@ import type {
   AwardEntry,
   ReferenceEntry,
   CVSection,
+  CustomEntry,
   CoverLetterData,
 } from '../types/cv';
 import { defaultCV, defaultCoverLetter } from '../data/defaultCV';
 import { generateId } from '../utils/id';
 import { normalizeCVData } from '../utils/normalizeCV';
+import { createCustomEntry, createCustomSection, localizeSectionTitles } from '../utils/sections';
 import { useProfileStore } from './useProfileStore';
+import i18n from '../i18n';
+
+/** CV data as the editor shows it: stock section names in the current UI language. */
+function forEditor(raw: unknown): CVData {
+  const cv = normalizeCVData(raw);
+  return { ...cv, sections: localizeSectionTitles(cv.sections, (type) => i18n.t(`sections.${type}`)) };
+}
 
 interface CVStore extends CVData {
   coverLetterData: CoverLetterData;
@@ -92,6 +101,18 @@ interface CVStore extends CVData {
   updateSectionTitle: (id: string, title: string) => void;
   toggleSectionVisibility: (id: string) => void;
   reorderSections: (sections: CVSection[]) => void;
+
+  // Custom sections (added by the user)
+  /** Appends a new custom section with one empty entry and returns its id. */
+  addCustomSection: (title: string) => string;
+  /** Removes a custom section; built-in sections can only be hidden. */
+  removeCustomSection: (id: string) => void;
+  /** Puts a removed section back at `index` (undo). */
+  restoreSection: (section: CVSection, index: number) => void;
+  addCustomEntry: (sectionId: string) => void;
+  updateCustomEntry: (sectionId: string, entryId: string, field: keyof CustomEntry, value: string | string[]) => void;
+  removeCustomEntry: (sectionId: string, entryId: string) => void;
+  reorderCustomEntries: (sectionId: string, entries: CustomEntry[]) => void;
 
   // Cover Letter
   updateCoverLetter: (field: keyof CoverLetterData, value: string) => void;
@@ -419,6 +440,69 @@ export const useCVStore = create<CVStore>()(
         useProfileStore.getState().updateActiveCVData({ sections });
       },
 
+      // Custom sections
+      addCustomSection: (title) => {
+        const section = createCustomSection(title);
+        set((state) => {
+          const updated = [...state.sections, section];
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+        return section.id;
+      },
+      removeCustomSection: (id) => {
+        set((state) => {
+          const updated = state.sections.filter((s) => !(s.id === id && s.type === 'custom'));
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+      restoreSection: (section, index) => {
+        set((state) => {
+          if (state.sections.some((s) => s.id === section.id)) return {};
+          const updated = [...state.sections];
+          updated.splice(Math.min(Math.max(index, 0), updated.length), 0, section);
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+      addCustomEntry: (sectionId) => {
+        set((state) => {
+          const updated = state.sections.map((s) =>
+            s.id === sectionId ? { ...s, items: [...(s.items ?? []), createCustomEntry()] } : s,
+          );
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+      updateCustomEntry: (sectionId, entryId, field, value) => {
+        set((state) => {
+          const updated = state.sections.map((s) =>
+            s.id === sectionId
+              ? { ...s, items: (s.items ?? []).map((e) => (e.id === entryId ? { ...e, [field]: value } : e)) }
+              : s,
+          );
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+      removeCustomEntry: (sectionId, entryId) => {
+        set((state) => {
+          const updated = state.sections.map((s) =>
+            s.id === sectionId ? { ...s, items: (s.items ?? []).filter((e) => e.id !== entryId) } : s,
+          );
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+      reorderCustomEntries: (sectionId, entries) => {
+        set((state) => {
+          const updated = state.sections.map((s) => (s.id === sectionId ? { ...s, items: entries } : s));
+          useProfileStore.getState().updateActiveCVData({ sections: updated });
+          return { sections: updated };
+        });
+      },
+
       // Cover Letter
       updateCoverLetter: (field, value) => {
         set((state) => {
@@ -430,7 +514,7 @@ export const useCVStore = create<CVStore>()(
 
       // Import
       loadFromImport: (data) => {
-        const cv = normalizeCVData(data);
+        const cv = forEditor(data);
         set({ ...cv });
         useProfileStore.getState().updateActiveCVData(cv);
       },
@@ -448,7 +532,7 @@ export const useCVStore = create<CVStore>()(
         if (profile) {
           set({
             // Heals profiles that already hold off-schema entries from an older import.
-            ...normalizeCVData(profile.cvData),
+            ...forEditor(profile.cvData),
             coverLetterData: profile.coverLetterData || { ...defaultCoverLetter },
           });
         }

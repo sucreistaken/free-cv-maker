@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import type { CustomEntry } from '../../types/cv';
 import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Github, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { ExperienceBlock } from './shared/ExperienceBlock';
 import { ProjectBlock } from './shared/ProjectBlock';
@@ -67,7 +69,7 @@ export function ModernTemplate() {
     </div>
   );
 
-  const renderMainSection = (type: string, title: string) => {
+  const renderMainSection = (type: string, title: string, items?: CustomEntry[]) => {
     switch (type) {
       case 'summary':
         return summary ? (
@@ -98,12 +100,15 @@ export function ModernTemplate() {
           </div>
         ) : null;
       case 'involvement':
-        return involvement.length > 0 ? (
+      case 'custom': {
+        const list = type === 'custom' ? customItemsAsInvolvement(items) : involvement;
+        return list.length > 0 ? (
           <div>
             <SectionTitle title={title} />
-            <InvolvementBlock entries={involvement} />
+            <InvolvementBlock entries={list} />
           </div>
         ) : null;
+      }
       case 'certifications':
         return certifications.length > 0 ? (
           <div>
@@ -208,7 +213,7 @@ export function ModernTemplate() {
         {mainSections
           .filter((s) => s.type !== 'personalInfo')
           .map((section) => {
-            const rendered = renderMainSection(section.type, section.title);
+            const rendered = renderMainSection(section.type, section.title, section.items);
             return rendered ? <div key={section.id}>{rendered}</div> : null;
           })}
       </div>

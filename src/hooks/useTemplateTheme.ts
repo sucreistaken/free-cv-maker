@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
 import type { LanguageEntry } from '../types/cv';
 import en from '../i18n/en.json';
+import { capitalizeWords } from '../utils/sections';
 
 /** Section names as written in English, so they are upper-cased with English rules even in a Turkish UI. */
 const ENGLISH_SECTION_TITLES = new Set(Object.values(en.sections).map((t) => t.toLowerCase()));
@@ -85,7 +86,7 @@ export function useTemplateTheme() {
 
   const transformTitle = (title: string): string => {
     if (theme.sectionTitleStyle === 'uppercase') return title.toLocaleUpperCase(localeFor(title));
-    if (theme.sectionTitleStyle === 'capitalize') return title.replace(/\b\w/g, (c) => c.toLocaleUpperCase(localeFor(title)));
+    if (theme.sectionTitleStyle === 'capitalize') return capitalizeWords(title, localeFor(title));
     return title;
   };
 

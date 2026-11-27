@@ -2,8 +2,9 @@ import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Github, Globe, Flag, Car, CalendarDays } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
-import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
+import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry, CustomEntry } from '../../types/cv';
 import { CompanyName } from './shared/CompanyName';
 
 export function CreativeTemplate() {
@@ -88,7 +89,7 @@ export function CreativeTemplate() {
     </div>
   );
 
-  const renderSection = (type: string, title: string) => {
+  const renderSection = (type: string, title: string, items?: CustomEntry[]) => {
     switch (type) {
       case 'summary':
         return summary ? (
@@ -147,10 +148,12 @@ export function CreativeTemplate() {
           </div>
         ) : null;
       case 'involvement':
-        return involvement.length > 0 ? (
+      case 'custom': {
+        const list = type === 'custom' ? customItemsAsInvolvement(items) : involvement;
+        return list.length > 0 ? (
           <div>
             <SectionTitle title={title} />
-            {involvement.map((inv: InvolvementEntry) => (
+            {list.map((inv: InvolvementEntry) => (
               <TimelineEntry
                 key={inv.id}
                 date={`${inv.startDate}${inv.endDate ? ` - ${inv.endDate}` : ''}`}
@@ -162,6 +165,7 @@ export function CreativeTemplate() {
             ))}
           </div>
         ) : null;
+      }
       case 'skills':
         return skills.length > 0 ? (
           <div>
@@ -300,7 +304,7 @@ export function CreativeTemplate() {
         {visibleSections
           .filter((s) => s.type !== 'personalInfo')
           .map((section) => {
-            const rendered = renderSection(section.type, section.title);
+            const rendered = renderSection(section.type, section.title, section.items);
             return rendered ? <div key={section.id}>{rendered}</div> : null;
           })}
       </div>

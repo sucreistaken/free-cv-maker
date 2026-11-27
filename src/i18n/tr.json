@@ -46,7 +46,8 @@
     "languages": "Diller",
     "awards": "Ödüller",
     "hobbies": "Hobiler",
-    "references": "Referanslar"
+    "references": "Referanslar",
+    "custom": "Yeni Bölüm"
   },
   "personalInfoForm": {
     "profilePhoto": "Profil Fotoğrafı",
@@ -287,7 +288,10 @@
   },
   "sectionAccordion": {
     "hideSection": "Bölümü gizle",
-    "showSection": "Bölümü göster"
+    "showSection": "Bölümü göster",
+    "rename": "Bölümün adını değiştir",
+    "titleLabel": "Bölüm adı",
+    "europassTitleHint": "Europass bu bölümde kendi sabit Almanca başlığını basar."
   },
   "toast": {
     "importFailed": "İçe aktarma başarısız: {{error}}",
@@ -372,5 +376,18 @@
     "collapse": "Daralt",
     "expand": "Genişlet",
     "remove": "Sil"
+  },
+  "editorPanel": {
+    "addSection": "Bölüm ekle"
+  },
+  "customSectionForm": {
+    "add": "Kayıt ekle",
+    "title": "Başlık",
+    "titlePlaceholder": "ör. Kızılay gönüllüsü",
+    "subtitle": "Alt başlık",
+    "subtitlePlaceholder": "Kurum, yer ya da kısa bir not",
+    "removeSection": "Bölümü sil",
+    "removed": "“{{title}}” silindi.",
+    "undo": "Geri al"
   }
 }

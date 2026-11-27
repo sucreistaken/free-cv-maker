@@ -1,7 +1,10 @@
-import type { CefrSkill, LanguageEntry, SectionType } from '../../../types/cv';
+import type { BuiltInSectionType, CefrSkill, LanguageEntry } from '../../../types/cv';
 
-/** Fixed German wording of the Europass CV; it does not follow the UI language or custom section titles. */
-export const EUROPASS_SECTION_TITLES: Record<Exclude<SectionType, 'personalInfo'>, string> = {
+/**
+ * Fixed German wording of the Europass CV; it does not follow the UI language or renamed
+ * section titles. Sections the user added print their own title instead.
+ */
+export const EUROPASS_SECTION_TITLES: Record<Exclude<BuiltInSectionType, 'personalInfo'>, string> = {
   summary: 'Über mich',
   experience: 'Praktische Erfahrung',
   projects: 'Projekte',

@@ -106,11 +106,24 @@ export interface ReferenceEntry {
   phone: string;
 }
 
+/** One entry of a section the user added (type 'custom'). */
+export interface CustomEntry {
+  id: string;
+  title: string;
+  /** Organization, place or a short note, printed under the title. */
+  subtitle: string;
+  startDate: string;
+  endDate: string;
+  bullets: string[];
+}
+
 export interface CVSection {
   id: string;
   type: SectionType;
   title: string;
   visible: boolean;
+  /** Entries of a user-added section; only present when `type` is 'custom'. */
+  items?: CustomEntry[];
 }
 
 export type SectionType =
@@ -125,7 +138,11 @@ export type SectionType =
   | 'languages'
   | 'awards'
   | 'hobbies'
-  | 'references';
+  | 'references'
+  | 'custom';
+
+/** The sections every CV starts with; 'custom' sections are added by the user. */
+export type BuiltInSectionType = Exclude<SectionType, 'custom'>;
 
 export interface CVData {
   personalInfo: PersonalInfo;

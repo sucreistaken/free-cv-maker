@@ -46,7 +46,8 @@
     "languages": "Languages",
     "awards": "Awards",
     "hobbies": "Hobbies",
-    "references": "References"
+    "references": "References",
+    "custom": "New Section"
   },
   "personalInfoForm": {
     "profilePhoto": "Profile Photo",
@@ -287,7 +288,10 @@
   },
   "sectionAccordion": {
     "hideSection": "Hide section",
-    "showSection": "Show section"
+    "showSection": "Show section",
+    "rename": "Rename section",
+    "titleLabel": "Section name",
+    "europassTitleHint": "Europass prints its own fixed German heading for this section."
   },
   "toast": {
     "importFailed": "Import failed: {{error}}",
@@ -372,5 +376,18 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "remove": "Remove"
+  },
+  "editorPanel": {
+    "addSection": "Add section"
+  },
+  "customSectionForm": {
+    "add": "Add entry",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Volunteer at the Red Cross",
+    "subtitle": "Subtitle",
+    "subtitlePlaceholder": "Organization, place or a short note",
+    "removeSection": "Delete section",
+    "removed": "\"{{title}}\" deleted.",
+    "undo": "Undo"
   }
 }
