@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { SkillCategoryForm } from './SkillCategoryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function SkillsForm() {
   const { t } = useTranslation();
-  const { skills, addSkillCategory, removeSkillCategory, reorderSkills } = useCVStore();
+  const { skills, addSkillCategory, reorderSkills } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -17,7 +18,7 @@ export function SkillsForm() {
         renderItem={(entry, dragHandleProps) => (
           <EntryCard
             title={entry.category || t('skillsForm.untitledCategory')}
-            onRemove={() => removeSkillCategory(entry.id)}
+            onRemove={() => removeEntryWithUndo('skills', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <SkillCategoryForm entry={entry} />

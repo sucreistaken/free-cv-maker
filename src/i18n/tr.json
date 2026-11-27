@@ -18,7 +18,11 @@
     "resetConfirmBody": "Aktif profildeki tüm içerik varsayılan örneğe döner. Bu işlem geri alınamaz. Önce JSON olarak dışa aktarmanı öneririz.",
     "resetConfirm": "Sıfırla",
     "resetCancel": "Vazgeç",
-    "interfaceLanguage": "Arayüz dili"
+    "interfaceLanguage": "Arayüz dili",
+    "fileMenu": "Dosya",
+    "backupJson": "Yedek indir (JSON)",
+    "loadBackupJson": "Yedekten yükle (JSON)",
+    "importFromPdf": "PDF'ten içe aktar"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -46,7 +50,8 @@
     "languages": "Diller",
     "awards": "Ödüller",
     "hobbies": "Hobiler",
-    "references": "Referanslar"
+    "references": "Referanslar",
+    "custom": "Yeni Bölüm"
   },
   "personalInfoForm": {
     "profilePhoto": "Profil Fotoğrafı",
@@ -287,7 +292,11 @@
   },
   "sectionAccordion": {
     "hideSection": "Bölümü gizle",
-    "showSection": "Bölümü göster"
+    "showSection": "Bölümü göster",
+    "rename": "Bölümün adını değiştir",
+    "titleLabel": "Bölüm adı",
+    "europassTitleHint": "Europass bu bölümde kendi sabit Almanca başlığını basar.",
+    "hidden": "Gizli"
   },
   "toast": {
     "importFailed": "İçe aktarma başarısız: {{error}}",
@@ -321,13 +330,13 @@
     "welcomeTitle": "NextCV'ye Hoş Geldin!",
     "welcomeDesc": "Profesyonel CV'ni kolayca oluştur, düzenle ve PDF olarak indir.",
     "templatesTitle": "Şablon Seç",
-    "templatesDesc": "Classic, Modern, Creative, Minimalist ve daha fazlası — 7 farklı şablondan birini seç.",
+    "templatesDesc": "Classic, Modern, Creative, Minimalist ve daha fazlası: 8 farklı şablondan birini seç.",
     "documentsTitle": "CV & Ön Yazı",
     "documentsDesc": "Üst bardaki sekmelerden CV ve kapak mektubu arasında kolayca geçiş yap.",
     "exportImportTitle": "Dışa / İçe Aktar",
-    "exportImportDesc": "CV verilerini JSON olarak kaydet ve geri yükle — verilerini asla kaybetme.",
+    "exportImportDesc": "Üstteki Dosya menüsünden CV'ni JSON olarak yedekle ve geri yükle; verilerini asla kaybetme.",
     "pdfImportTitle": "PDF'den İçe Aktar",
-    "pdfImportDesc": "Mevcut PDF CV'ni yükle, içeriği otomatik olarak ayrıştırılsın.",
+    "pdfImportDesc": "Dosya menüsünden mevcut PDF CV'ni yükle, içeriği otomatik olarak ayrıştırılsın.",
     "printTitle": "PDF Yazdır",
     "printDesc": "\"Yazdır / PDF\" butonu veya Ctrl+P ile CV'ni PDF olarak indir.",
     "skip": "Atla",
@@ -371,6 +380,20 @@
     "reorder": "Sırayı değiştirmek için sürükle",
     "collapse": "Daralt",
     "expand": "Genişlet",
-    "remove": "Sil"
+    "remove": "Sil",
+    "removed": "Kayıt silindi."
+  },
+  "editorPanel": {
+    "addSection": "Bölüm ekle"
+  },
+  "customSectionForm": {
+    "add": "Kayıt ekle",
+    "title": "Başlık",
+    "titlePlaceholder": "ör. Kızılay gönüllüsü",
+    "subtitle": "Alt başlık",
+    "subtitlePlaceholder": "Kurum, yer ya da kısa bir not",
+    "removeSection": "Bölümü sil",
+    "removed": "“{{title}}” silindi.",
+    "undo": "Geri al"
   }
 }

@@ -23,6 +23,13 @@ function writeField(field: PreviewField, value: string) {
   if (key === 'personalInfo') return store.updatePersonalInfo(prop as never, value);
   if (!entryId || !prop) return;
 
+  if (key === 'custom') {
+    const entry = store.sections.find((s) => s.id === field.sectionId)?.items?.find((e) => e.id === entryId);
+    if (!entry || !field.sectionId) return;
+    const next = bulletIndex !== undefined ? entry.bullets.map((b, i) => (i === bulletIndex ? value : b)) : value;
+    return store.updateCustomEntry(field.sectionId, entryId, prop as never, next);
+  }
+
   const list = store[key as 'experience'] as { id: string; bullets?: string[] }[];
   const entry = list.find((e) => e.id === entryId);
   if (!entry) return;

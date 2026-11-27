@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Eye, EyeOff, GripVertical } from 'lucide-react';
+import { ChevronDown, Eye, EyeOff, GripVertical, Pencil } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { SECTION_TITLE_MAX } from '../../utils/sections';
 import { useEditorFocusStore } from '../../store/useEditorFocusStore';
 
 interface SectionAccordionProps {
@@ -12,6 +13,16 @@ interface SectionAccordionProps {
   dragHandleProps?: Record<string, unknown>;
   defaultOpen?: boolean;
   sectionId?: string;
+  /** Saves a new name; the rename pencil is shown only when this is set. */
+  onRename?: (title: string) => void;
+  /** Shown as the placeholder while renaming: clearing the field restores this name. */
+  stockTitle?: string;
+  /** Short note under the name field while renaming (e.g. a template ignores the name). */
+  renameHint?: string;
+  /** Starts open with the name field selected (a section that was just added). */
+  startRenaming?: boolean;
+  /** Called once `startRenaming` took effect, so a later remount opens normally. */
+  onStartRenamingHandled?: () => void;
 }
 
 export function SectionAccordion({
@@ -22,10 +33,18 @@ export function SectionAccordion({
   dragHandleProps,
   defaultOpen = false,
   sectionId,
+  onRename,
+  stockTitle,
+  renameHint,
+  startRenaming = false,
+  onStartRenamingHandled,
 }: SectionAccordionProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(defaultOpen || startRenaming);
+  const [renaming, setRenaming] = useState(startRenaming && Boolean(onRename));
+  const [draft, setDraft] = useState(title);
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const focusTarget = useEditorFocusStore((s) => s.target);
 
   // A click on the preview asks the matching section to open and scroll into view.
@@ -40,31 +59,112 @@ export function SectionAccordion({
     return () => cancelAnimationFrame(frame);
   }, [focusTarget, sectionId]);
 
+  // A section that was just added scrolls into view with its name selected, ready to type over.
+  useEffect(() => {
+    if (!startRenaming) return;
+    const frame = requestAnimationFrame(() => {
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      onStartRenamingHandled?.();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [startRenaming, onStartRenamingHandled]);
+
+  useEffect(() => {
+    if (renaming) inputRef.current?.select();
+  }, [renaming]);
+
+  // Escape unmounts the field; a blur fired on the way out must not save the draft.
+  const cancelledRef = useRef(false);
+
+  const beginRename = () => {
+    cancelledRef.current = false;
+    setDraft(title);
+    setRenaming(true);
+  };
+
+  const commitRename = () => {
+    if (!renaming || cancelledRef.current) return;
+    setRenaming(false);
+    if (draft !== title) onRename?.(draft);
+  };
+
+  const cancelRename = () => {
+    cancelledRef.current = true;
+    setRenaming(false);
+    setDraft(title);
+  };
+
   return (
-    <div ref={rootRef} className={cn('border border-gray-200 rounded-lg bg-white', !visible && 'opacity-60')}>
+    <div ref={rootRef} className={cn('border rounded-lg', visible ? 'border-gray-200 bg-white' : 'border-dashed border-gray-300 bg-gray-50/60')}>
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <button type="button" className="cursor-grab text-gray-400 hover:text-gray-600" {...dragHandleProps}>
-          <GripVertical size={16} />
-        </button>
         <button
           type="button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          className="flex-1 flex items-center gap-2 text-left"
+          className="cursor-grab text-gray-400 hover:text-gray-600"
+          aria-label={t('entryCard.reorder')}
+          {...dragHandleProps}
         >
-          <ChevronDown
-            size={16}
-            className={cn(
-              'text-gray-400 transition-transform',
-              open && 'rotate-180'
-            )}
-          />
-          <span className="text-sm font-semibold text-gray-800">{title}</span>
+          <GripVertical size={16} />
         </button>
+        {renaming ? (
+          <div className="flex-1 min-w-0">
+            <input
+              ref={inputRef}
+              value={draft}
+              maxLength={SECTION_TITLE_MAX}
+              placeholder={stockTitle}
+              aria-label={t('sectionAccordion.titleLabel')}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitRename}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitRename();
+                } else if (e.key === 'Escape') {
+                  e.preventDefault();
+                  cancelRename();
+                }
+              }}
+              className="w-full text-sm font-semibold text-gray-800 border border-primary/60 rounded-md px-2 py-1 -my-1 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            {renameHint && <p className="text-[11px] text-gray-500 mt-1.5 leading-snug">{renameHint}</p>}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="flex-1 min-w-0 flex items-center gap-2 text-left"
+          >
+            <ChevronDown
+              size={16}
+              className={cn('shrink-0 text-gray-400 transition-transform', open && 'rotate-180')}
+            />
+            <span className={cn('text-sm font-semibold break-words min-w-0', visible ? 'text-gray-800' : 'text-gray-500')}>
+              {title}
+            </span>
+            {/* A hidden section is still editable; it is only left off the CV. */}
+            {!visible && (
+              <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-gray-500 bg-gray-200/70 rounded px-1.5 py-0.5">
+                {t('sectionAccordion.hidden')}
+              </span>
+            )}
+          </button>
+        )}
+        {onRename && !renaming && (
+          <button
+            type="button"
+            onClick={beginRename}
+            className="shrink-0 text-gray-400 hover:text-gray-600 p-0.5"
+            aria-label={t('sectionAccordion.rename')}
+            title={t('sectionAccordion.rename')}
+          >
+            <Pencil size={13} />
+          </button>
+        )}
         <button
           type="button"
           onClick={onToggleVisibility}
-          className="text-gray-400 hover:text-gray-600 p-0.5"
+          className="shrink-0 text-gray-400 hover:text-gray-600 p-0.5"
           aria-label={visible ? t('sectionAccordion.hideSection') : t('sectionAccordion.showSection')}
           title={visible ? t('sectionAccordion.hideSection') : t('sectionAccordion.showSection')}
         >

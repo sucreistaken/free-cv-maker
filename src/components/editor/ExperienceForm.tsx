@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { ExperienceEntryForm } from './ExperienceEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function ExperienceForm() {
   const { t } = useTranslation();
-  const { experience, addExperience, removeExperience, reorderExperience } = useCVStore();
+  const { experience, addExperience, reorderExperience } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function ExperienceForm() {
           <EntryCard
             title={entry.title}
             subtitle={entry.company}
-            onRemove={() => removeExperience(entry.id)}
+            onRemove={() => removeEntryWithUndo('experience', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <ExperienceEntryForm entry={entry} />

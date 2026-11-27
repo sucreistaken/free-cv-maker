@@ -103,13 +103,26 @@ export type SectionType =
   | 'languages'
   | 'awards'
   | 'hobbies'
-  | 'references';
+  | 'references'
+  | 'custom';
+
+/** One entry of a section the user added in the editor (type 'custom'). */
+export interface CustomEntry {
+  id: string;
+  title: string;
+  subtitle: string;
+  startDate: string;
+  endDate: string;
+  bullets: string[];
+}
 
 export interface CVSection {
   id: string;
   type: SectionType;
   title: string;
   visible: boolean;
+  /** Entries of a user-added section; only present when `type` is 'custom'. */
+  items?: CustomEntry[];
 }
 
 export interface CVData {

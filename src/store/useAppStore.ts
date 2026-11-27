@@ -4,6 +4,7 @@ import { persistStorage } from './storage';
 import type { TemplateType, ThemeConfig, DocumentType } from '../types/cv';
 import { useProfileStore } from './useProfileStore';
 import i18n from '../i18n';
+import { localizeSectionTitles } from '../utils/sections';
 import { useCVStore } from './useCVStore';
 
 interface AppStore {
@@ -62,13 +63,9 @@ export const useAppStore = create<AppStore>()(
         set({ language });
         i18n.changeLanguage(language);
         document.documentElement.lang = language;
-        // Update CV section titles to match new language
+        // Stock section names follow the new language; names the user typed stay as written.
         const cvState = useCVStore.getState();
-        const updated = cvState.sections.map((s) => ({
-          ...s,
-          title: i18n.t(`sections.${s.type}`) || s.title,
-        }));
-        cvState.reorderSections(updated);
+        cvState.reorderSections(localizeSectionTitles(cvState.sections, (type) => i18n.t(`sections.${type}`)));
       },
       setPageBreakHeight: (size, h) => set((state) => ({
         pageBreakHeights: { ...state.pageBreakHeights, [size]: h },

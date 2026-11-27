@@ -220,3 +220,37 @@ describe('non-CV documents', () => {
     expect(looksLikeCv(parseLinesToCV([L('Jane Doe', { fontSize: 20 }), L('jane@doe.com')]))).toBe(true);
   });
 });
+
+// A section the user added prints in the house heading style with words the importer does not
+// know. It must come back as a custom section instead of being merged into the one above it.
+// Fixtures: scripts/make-custom-section-fixture.mjs (default CV + "Conference Talks"). The script
+// prints with Chrome's own page breaks, which can strand a heading at a page bottom in the
+// two-column layout; the app's print keeps headings with their first entry, so only
+// single-flow layouts are fixtures here.
+describe.each(['export-custom-classic.pdf', 'export-custom-modern.pdf'])(
+  'custom section round-trip %s',
+  (fixture) => {
+    it('recovers the custom section and its entry', async () => {
+      const cv = await parseFixture(fixture);
+      const custom = cv.sections.filter((s) => s.type === 'custom');
+      expect(custom).toHaveLength(1);
+      expect(custom[0].title).toBe('Conference Talks');
+      expect(stripIds(custom[0].items ?? [])).toEqual([
+        {
+          title: 'Keynote Speaker',
+          subtitle: 'ReactConf Istanbul',
+          startDate: 'Sep 2024',
+          endDate: '',
+          bullets: ['Spoke about design systems at scale to 400 attendees'],
+        },
+      ]);
+    });
+
+    it('leaves the built-in sections as they were', async () => {
+      const cv = await parseFixture(fixture);
+      expect(cv.summary).toBe(defaultCV.summary);
+      expect(stripIds(cv.experience)).toEqual(expectedExperience);
+      expect(stripIds(cv.involvement)).toEqual(stripIds(defaultCV.involvement));
+    });
+  },
+);

@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Plus } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
 import { useAppStore } from '../../store/useAppStore';
 import { SectionAccordion } from './SectionAccordion';
@@ -17,9 +19,11 @@ import { HobbiesForm } from './HobbiesForm';
 import { ReferencesForm } from './ReferencesForm';
 import { ThemePanel } from './ThemePanel';
 import { CoverLetterForm } from './CoverLetterForm';
-import type { SectionType } from '../../types/cv';
+import { CustomSectionForm } from './CustomSectionForm';
+import { cleanSectionTitle, isDefaultSectionTitle } from '../../utils/sections';
+import type { BuiltInSectionType, CVSection } from '../../types/cv';
 
-const sectionForms: Record<SectionType, React.ComponentType> = {
+const sectionForms: Record<BuiltInSectionType, React.ComponentType> = {
   personalInfo: PersonalInfoForm,
   summary: SummaryForm,
   experience: ExperienceForm,
@@ -37,8 +41,12 @@ const sectionForms: Record<SectionType, React.ComponentType> = {
 /** `showTheme` is off in the A2C embed, where the Europass look is fixed. */
 export function EditorPanel({ showTheme = true }: { showTheme?: boolean } = {}) {
   const { t } = useTranslation();
-  const { sections, toggleSectionVisibility, reorderSections } = useCVStore();
+  const { sections, toggleSectionVisibility, reorderSections, updateSectionTitle, addCustomSection } = useCVStore();
   const activeDocument = useAppStore((s) => s.activeDocument);
+  const template = useAppStore((s) => s.template);
+  // The section added last opens with its name selected so the user can type over it.
+  const [justAddedId, setJustAddedId] = useState<string | null>(null);
+  const clearJustAdded = useCallback(() => setJustAddedId(null), []);
 
   if (activeDocument === 'coverLetter') {
     return (
@@ -49,6 +57,15 @@ export function EditorPanel({ showTheme = true }: { showTheme?: boolean } = {}) 
     );
   }
 
+  const stockTitle = (section: CVSection) => t(`sections.${section.type}`);
+  // Stock names are shown in the UI language; a name the user typed is shown as written.
+  const label = (section: CVSection) =>
+    isDefaultSectionTitle(section.type, section.title) ? stockTitle(section) : section.title;
+
+  const addSection = () => {
+    setJustAddedId(addCustomSection(t('sections.custom')));
+  };
+
   return (
     <div className="h-full overflow-y-auto custom-scrollbar bg-surface-alt">
       <div className="p-4 space-y-3">
@@ -57,21 +74,40 @@ export function EditorPanel({ showTheme = true }: { showTheme?: boolean } = {}) 
           items={sections}
           onReorder={reorderSections}
           renderItem={(section, dragHandleProps) => {
-            const FormComponent = sectionForms[section.type];
+            const isCustom = section.type === 'custom';
+            const FormComponent = isCustom ? null : sectionForms[section.type as BuiltInSectionType];
             return (
               <SectionAccordion
                 sectionId={section.id}
-                title={t(`sections.${section.type}`)}
+                title={label(section)}
                 visible={section.visible}
                 onToggleVisibility={() => toggleSectionVisibility(section.id)}
                 dragHandleProps={dragHandleProps}
                 defaultOpen={section.type === 'personalInfo'}
+                startRenaming={section.id === justAddedId}
+                onStartRenamingHandled={clearJustAdded}
+                stockTitle={stockTitle(section)}
+                // Templates never print a heading for personal info, so renaming it would change nothing.
+                onRename={
+                  section.type === 'personalInfo'
+                    ? undefined
+                    : (title) => updateSectionTitle(section.id, cleanSectionTitle(title, stockTitle(section)))
+                }
+                renameHint={template === 'europass' && !isCustom ? t('sectionAccordion.europassTitleHint') : undefined}
               >
-                <FormComponent />
+                {FormComponent ? <FormComponent /> : <CustomSectionForm section={section} />}
               </SectionAccordion>
             );
           }}
         />
+        <button
+          type="button"
+          onClick={addSection}
+          className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark font-medium w-full justify-center py-2.5 border border-dashed border-gray-300 rounded-lg bg-white/60 hover:border-primary/50 transition-colors"
+        >
+          <Plus size={16} />
+          {t('editorPanel.addSection')}
+        </button>
       </div>
     </div>
   );

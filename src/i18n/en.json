@@ -18,7 +18,11 @@
     "resetConfirmBody": "All content in the active profile returns to the default sample. This cannot be undone. Consider exporting to JSON first.",
     "resetConfirm": "Reset",
     "resetCancel": "Cancel",
-    "interfaceLanguage": "Interface language"
+    "interfaceLanguage": "Interface language",
+    "fileMenu": "File",
+    "backupJson": "Download backup (JSON)",
+    "loadBackupJson": "Load backup (JSON)",
+    "importFromPdf": "Import from PDF"
   },
   "footer": {
     "copyright": "© {{year}} NextCV",
@@ -46,7 +50,8 @@
     "languages": "Languages",
     "awards": "Awards",
     "hobbies": "Hobbies",
-    "references": "References"
+    "references": "References",
+    "custom": "New Section"
   },
   "personalInfoForm": {
     "profilePhoto": "Profile Photo",
@@ -287,7 +292,11 @@
   },
   "sectionAccordion": {
     "hideSection": "Hide section",
-    "showSection": "Show section"
+    "showSection": "Show section",
+    "rename": "Rename section",
+    "titleLabel": "Section name",
+    "europassTitleHint": "Europass prints its own fixed German heading for this section.",
+    "hidden": "Hidden"
   },
   "toast": {
     "importFailed": "Import failed: {{error}}",
@@ -321,13 +330,13 @@
     "welcomeTitle": "Welcome to NextCV!",
     "welcomeDesc": "Easily create, edit and download your professional CV as PDF.",
     "templatesTitle": "Choose a Template",
-    "templatesDesc": "Classic, Modern, Creative, Minimalist and more — pick from 7 different templates.",
+    "templatesDesc": "Classic, Modern, Creative, Minimalist and more: pick from 8 different templates.",
     "documentsTitle": "CV & Cover Letter",
     "documentsDesc": "Switch between your CV and cover letter using the tabs in the top bar.",
     "exportImportTitle": "Export / Import",
-    "exportImportDesc": "Save and restore your CV data as JSON — never lose your work.",
+    "exportImportDesc": "Back up your CV as JSON and restore it from the File menu at the top, so you never lose your work.",
     "pdfImportTitle": "Import from PDF",
-    "pdfImportDesc": "Upload your existing PDF CV and let it be parsed automatically.",
+    "pdfImportDesc": "Upload your existing PDF CV from the File menu and let it be parsed automatically.",
     "printTitle": "Print as PDF",
     "printDesc": "Use the \"Print / PDF\" button or Ctrl+P to download your CV as PDF.",
     "skip": "Skip",
@@ -371,6 +380,20 @@
     "reorder": "Drag to reorder",
     "collapse": "Collapse",
     "expand": "Expand",
-    "remove": "Remove"
+    "remove": "Remove",
+    "removed": "Entry deleted."
+  },
+  "editorPanel": {
+    "addSection": "Add section"
+  },
+  "customSectionForm": {
+    "add": "Add entry",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Volunteer at the Red Cross",
+    "subtitle": "Subtitle",
+    "subtitlePlaceholder": "Organization, place or a short note",
+    "removeSection": "Delete section",
+    "removed": "\"{{title}}\" deleted.",
+    "undo": "Undo"
   }
 }

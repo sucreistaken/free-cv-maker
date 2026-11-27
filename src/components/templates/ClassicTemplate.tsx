@@ -1,5 +1,7 @@
 import { parseFormattedText } from '../../utils/formatText';
+import type { CustomEntry } from '../../types/cv';
 import { useCVStore } from '../../store/useCVStore';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
 import { TemplateWrapper } from './TemplateWrapper';
 import { SectionHeading } from './shared/SectionHeading';
@@ -34,7 +36,7 @@ export function ClassicTemplate() {
 
   const visibleSections = sections.filter((s) => s.visible);
 
-  const renderSection = (type: string, title: string) => {
+  const renderSection = (type: string, title: string, items?: CustomEntry[]) => {
     switch (type) {
       case 'summary':
         return summary ? (
@@ -95,14 +97,17 @@ export function ClassicTemplate() {
           </div>
         ) : null;
       case 'involvement':
-        return involvement.length > 0 ? (
+      case 'custom': {
+        const list = type === 'custom' ? customItemsAsInvolvement(items) : involvement;
+        return list.length > 0 ? (
           <div>
             <SectionHeading title={transformTitle(title)} color={primaryColor} />
             <div className="mt-2">
-              <InvolvementBlock entries={involvement} />
+              <InvolvementBlock entries={list} />
             </div>
           </div>
         ) : null;
+      }
       case 'skills':
         return skills.length > 0 ? (
           <div>
@@ -187,7 +192,7 @@ export function ClassicTemplate() {
         {visibleSections
           .filter((s) => s.type !== 'personalInfo')
           .map((section) => {
-            const rendered = renderSection(section.type, section.title);
+            const rendered = renderSection(section.type, section.title, section.items);
             return rendered ? <div key={section.id}>{rendered}</div> : null;
           })}
       </div>

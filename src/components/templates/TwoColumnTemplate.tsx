@@ -1,8 +1,9 @@
 import { parseFormattedText } from '../../utils/formatText';
 import { MapPin, Mail, Phone, Linkedin, Github, Globe } from 'lucide-react';
 import { useCVStore } from '../../store/useCVStore';
+import { customItemsAsInvolvement } from '../../utils/sections';
 import { useTemplateTheme } from '../../hooks/useTemplateTheme';
-import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry } from '../../types/cv';
+import type { ExperienceEntry, ProjectEntry, InvolvementEntry, CertificationEntry, AwardEntry, LanguageEntry, ReferenceEntry, CustomEntry } from '../../types/cv';
 import { CompanyName } from './shared/CompanyName';
 
 export function TwoColumnTemplate() {
@@ -49,7 +50,7 @@ export function TwoColumnTemplate() {
     </ul>
   );
 
-  const renderMainSection = (type: string, title: string) => {
+  const renderMainSection = (type: string, title: string, items?: CustomEntry[]) => {
     switch (type) {
       case 'summary':
         return summary ? (
@@ -95,11 +96,13 @@ export function TwoColumnTemplate() {
           </div>
         ) : null;
       case 'involvement':
-        return involvement.length > 0 ? (
+      case 'custom': {
+        const list = type === 'custom' ? customItemsAsInvolvement(items) : involvement;
+        return list.length > 0 ? (
           <div>
             <MainSectionTitle title={title} />
             <div className="space-y-2">
-              {involvement.map((inv: InvolvementEntry) => (
+              {list.map((inv: InvolvementEntry) => (
                 <div key={inv.id}>
                   <div className="flex justify-between items-baseline">
                     <h3 className="text-[11px] font-bold text-gray-800">{inv.role}</h3>
@@ -112,6 +115,7 @@ export function TwoColumnTemplate() {
             </div>
           </div>
         ) : null;
+      }
       case 'awards':
         return awards.length > 0 ? (
           <div>
@@ -278,7 +282,7 @@ export function TwoColumnTemplate() {
         {/* Main content - 60% */}
         <div className="w-[60%] py-4" style={{ paddingLeft: margin, paddingRight: '16px', display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {mainSections.map((section) => {
-            const rendered = renderMainSection(section.type, section.title);
+            const rendered = renderMainSection(section.type, section.title, section.items);
             return rendered ? <div key={section.id}>{rendered}</div> : null;
           })}
         </div>

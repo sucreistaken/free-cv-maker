@@ -1,13 +1,14 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCVStore } from '../../store/useCVStore';
+import { removeEntryWithUndo } from '../../utils/undoRemove';
 import { EducationEntryForm } from './EducationEntryForm';
 import { EntryCard } from './shared/EntryCard';
 import { SortableList } from './SectionReorder';
 
 export function EducationForm() {
   const { t } = useTranslation();
-  const { education, addEducation, removeEducation, reorderEducation } = useCVStore();
+  const { education, addEducation, reorderEducation } = useCVStore();
 
   return (
     <div className="space-y-2">
@@ -18,7 +19,7 @@ export function EducationForm() {
           <EntryCard
             title={entry.degree}
             subtitle={entry.institution}
-            onRemove={() => removeEducation(entry.id)}
+            onRemove={() => removeEntryWithUndo('education', entry.id)}
             dragHandleProps={dragHandleProps}
           >
             <EducationEntryForm entry={entry} />
